@@ -1,3 +1,6 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic);
+
+
 /*
   Josh's Custom CSS Reset
   https://www.joshwcomeau.com/css/custom-css-reset/
@@ -45,3 +48,95 @@ h1, h2, h3, h4, h5, h6 {
 #root, #__next {
   isolation: isolate;
 }
+
+/* My reset */
+button{
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+
+:root{
+  --sidebar-background: hsl(0, 0%, 97%);
+  --main-background: hsl(0 0 99);
+  --text-color: hsl(0 0 15);
+  --font-family: "Roboto";
+
+  --light-gray: hsl(0 0 45);
+
+  --shadow-color: 0deg 0% 79%;
+  --shadow-elevation-low:
+    0.5px 0.5px 1.1px hsl(var(--shadow-color) / 0),
+    0.8px 0.8px 1.7px hsl(var(--shadow-color) / 0.11),
+    1.6px 1.5px 3.3px hsl(var(--shadow-color) / 0.22);
+}
+
+body{
+  height: 100vh;
+
+  display: grid;
+  grid-template-columns: 2fr 11fr;
+
+  font-family: var(--font-family);
+  color: var(--text-color);
+}
+
+/* Sidebar */
+#sidebar{
+  background-color: var(--sidebar-background);
+
+  display: grid;
+  grid-auto-rows: max-content;
+  gap: 2rem;
+
+  padding: 1rem;
+
+  box-shadow: var(--shadow-elevation-low);
+}
+
+#sidebar .user{
+  display: flex;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content; 
+  align-items: center; /* flexbox's aligning is slightly off in this case */
+  gap: 1rem;
+
+  font-weight: 500;
+}
+
+#projects{
+  display: flex;
+  justify-content: space-between;
+}
+
+#projects .title{
+  color: var(--light-gray);
+  font-weight: 600;
+}
+
+.add-project-btn{
+  background-color: transparent;
+}
+
+.hover,
+#sidebar button{
+  transition: all 0.4s;
+  cursor: pointer;
+  border-radius: 16px;
+  padding: 5px 16px;
+}
+
+#sidebar button{
+  padding: 0 12px;
+}
+
+.hover:hover{
+  background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
+}
+
+#sidebar button:hover{
+  background-color: hsl(from var(--sidebar-background) h s calc(l - 20));  
+}
+
+/* Main content */
