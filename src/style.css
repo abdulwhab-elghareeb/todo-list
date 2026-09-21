@@ -55,6 +55,20 @@ button{
   outline: none;
   cursor: pointer;
 }
+ul{
+  padding: 0 10px;
+}
+
+li{
+  list-style:none;
+}
+
+li::before{
+  content: "#";
+  font-size: 1.2rem;
+  margin-right: 8px;
+  color: var(--light-gray);
+}
 
 
 :root{
@@ -105,22 +119,23 @@ body{
   font-weight: 500;
 }
 
-#projects{
+#project-container-header{
   display: flex;
   justify-content: space-between;
 }
 
-#projects .title{
+#project-container-header .title{
   color: var(--light-gray);
   font-weight: 600;
 }
 
-.add-project-btn{
+#add-project-btn{
   background-color: transparent;
 }
 
 .hover,
-#sidebar button{
+#sidebar button,
+#project-container li{
   transition: all 0.4s;
   cursor: pointer;
   border-radius: 16px;
@@ -131,7 +146,8 @@ body{
   padding: 0 12px;
 }
 
-.hover:hover{
+.hover:hover,
+#project-container li:hover{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
 }
 
