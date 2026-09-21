@@ -30,8 +30,9 @@ img, picture, video, canvas, svg {
   max-width: 100%;
 }
 
-input, button, textarea, select {
+input, button, textarea, select, dialog {
   font: inherit;
+  color: inherit;
 }
 
 p, h1, h2, h3, h4, h5, h6 {
@@ -50,11 +51,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* My reset */
-button{
+button,
+input,
+textarea{
   border: none;
   outline: none;
   cursor: pointer;
+
+  transition: all 0.4s;
 }
+
+textarea{
+  resize: none;
+}
+
 ul{
   padding: 0 10px;
 }
@@ -72,12 +82,12 @@ li::before{
 
 
 :root{
-  --sidebar-background: hsl(0, 0%, 97%);
+  --sidebar-background: hsl(0, 0%, 98%);
   --main-background: hsl(0 0 99);
   --text-color: hsl(0 0 15);
   --font-family: "Roboto";
 
-  --light-gray: hsl(0 0 45);
+  --light-gray: hsl(0 0 50);
 
   --shadow-color: 0deg 0% 79%;
   --shadow-elevation-low:
@@ -102,10 +112,10 @@ body{
 
   display: grid;
   grid-auto-rows: max-content;
+  
   gap: 2rem;
-
   padding: 1rem;
-
+  
   box-shadow: var(--shadow-elevation-low);
 }
 
@@ -122,6 +132,7 @@ body{
 #project-container-header{
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 #project-container-header .title{
@@ -129,21 +140,75 @@ body{
   font-weight: 600;
 }
 
-#add-project-btn{
-  background-color: transparent;
+#project-container{
+  position: relative;
+
+  display: grid;
+  gap: 2rem;
+}
+
+#projects-counter{
+  position: absolute;
+  top: 50px; 
+  right: 15px;
+
+  color: var(--light-gray);
+  font-size: 0.9rem;
+}
+
+#projects-counter.low{
+  color: green;
+}
+
+#projects-counter.mid{
+  color: orange;
+}
+
+#projects-counter-max{
+  color: red;
+}
+
+#project-container li{
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.project-title{
+  word-break: break-all; /* If the user inputs a long word */
+
+  /* Limiting text lines */
+  display:-webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .hover,
 #sidebar button,
 #project-container li{
-  transition: all 0.4s;
-  cursor: pointer;
+  background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
+
+  cursor: pointer;
+  transition: all 0.4s;
 }
 
-#sidebar button{
-  padding: 0 12px;
+#sidebar #add-project-btn{
+  padding: 1px 12px;
+  font-size: 1.3rem;
+  color: hsl(120, 100%, 30%);
+}
+
+#sidebar .remove-project-btn{
+  margin-left: auto;
+  padding: 5px 8px;
+}
+
+.remove-project-btn img{
+  width: 17px;
+  height: 20px;
 }
 
 .hover:hover,
@@ -155,4 +220,75 @@ body{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 20));  
 }
 
+
+/* Dialog */
+dialog{
+  width: 700px;
+  height: 700px;
+
+  border: none;
+  border-radius: 6px;
+
+  box-shadow: var(--shadow-elevation-low);
+
+}
+
+dialog form{
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  
+  gap: 3rem;
+  padding: 1rem;
+}
+
+input,
+textarea{
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+input[name="project-title"]{
+  font-size: 36px;
+}
+
+textarea[name="project-description"]{
+  font-size: 22px;
+}
+
+input:hover,
+textarea:hover,
+input:focus,
+textarea:focus{
+  background-color: hsl(from var(--main-background) h s calc(l - 5));
+}
+
+form > div{
+  align-self: flex-end;
+  margin-top: auto;
+}
+
+form button{
+  height: 50px;
+  width: 120px;
+
+  margin-left: 8px; 
+
+  font-size: 1.1rem;
+  font-weight: 500;
+  background-color: transparent;
+  box-shadow: var(--shadow-elevation-low);
+  border-radius: 8px;
+
+  transition:all 0.4s;
+}
+
+#add-project-form-btn:hover{
+  background-color: hsl(120, 100%, 60%);
+}
+
+dialog .close-dialog-btn:hover{
+  background-color: hsl(from var(--light-gray) h s calc(l + 30));
+}
 /* Main content */

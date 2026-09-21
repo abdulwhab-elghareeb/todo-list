@@ -1,3 +1,2 @@
 import "./style.css"
-import { createTodoItem } from "./createTodoItem.js"
-import { createProject } from "./createProject.js"
+import { displayController } from "./displayController.js"
