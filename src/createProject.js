@@ -1,22 +1,22 @@
 
 export function createProject(title, description){
-    const todoItemsArray = []
+    const tasksArray = []
 
-    const getAllTodoItems = () => todoItemsArray
+    const getAllTasks = () => tasksArray
 
-    const addTodoItem = (todoItem) => {
-        todoItemsArray.push(todoItem)
+    const addTask = (task) => {
+        tasksArray.push(task)
     } 
 
-    const removeTodoItem = (todoItem) => {
-        todoItemsArray.splice(todoItemsArray.indexOf(todoItem), 1)
+    const removeTask = (task) => {
+        tasksArray.splice(tasksArray.indexOf(task), 1)
     }
 
     return{
         title,
         description,
-        getAllTodoItems,
-        addTodoItem,
-        removeTodoItem,
+        getAllTasks,
+        addTask,
+        removeTask,
     }
 }
