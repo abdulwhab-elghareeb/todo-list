@@ -13,10 +13,10 @@ export const displayController = (() =>{
     const showDialogBtn = document.querySelector("#project-dialog-show-btn")
 
     const projectsForm = document.querySelector("#project-dialog > form")
-    const formTitleInput = document.querySelector("#project-title")
-    const titleInputCharCounter = document.querySelector("#project-title + .char-counter")
-    const formDescriptionTextarea = document.querySelector("#project-description")
-    const descriptionTextareaCharCounter = document.querySelector("#project-description + .char-counter")
+    const formTitleInput = document.querySelector("#title-input")
+    const titleInputCharCounter = document.querySelector("#title-input + .char-counter")
+    const formDescriptionTextarea = document.querySelector("#description-textarea")
+    const descriptionTextareaCharCounter = document.querySelector("#description-textarea + .char-counter")
 
     function updateProjectsCounter(){ // updating the color of the counter depending on the current amount of projects
         projectsCounter.textContent = `${projectsContainer.getProjectsArray().length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
@@ -45,6 +45,12 @@ export const displayController = (() =>{
     formDescriptionTextarea.addEventListener("input", (e) =>{
         descriptionTextareaCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
     })
+    
+    function resetFormCounters(){
+        titleInputCharCounter.textContent = `0 / ${formTitleInput.maxLength}`
+        descriptionTextareaCharCounter.textContent = `0 / ${formDescriptionTextarea.maxLength}`
+
+    }
 
 
     // Adding Projects
@@ -58,6 +64,7 @@ export const displayController = (() =>{
 
         const projectTitle = document.createElement("div")
         projectTitle.textContent = project.title
+        projectTitle.classList.add("project-title")
 
 
         const removeProjectBtn = document.createElement("button")
@@ -82,6 +89,7 @@ export const displayController = (() =>{
         projectsForm.reset()
         updateProjectsCounter()
         updateShowDialogBtn()
+        resetFormCounters()
     })
 
 })()

@@ -210,8 +210,8 @@ body{
 }
 
 .project-remove-btn img{
-  width: 17px;
-  height: 20px;
+  min-width: 17px;
+  min-height: 20px;
 }
 
 .hover:hover,
