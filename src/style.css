@@ -108,25 +108,62 @@ body{
 
 /* Sidebar */
 #sidebar{
+  overflow: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
+  width: 300px;
+
   background-color: var(--sidebar-background);
 
   display: grid;
   grid-auto-rows: max-content;
   
   gap: 2rem;
-  padding: 1rem;
+  padding: 1rem 0.6rem 1rem 1rem;
   
   box-shadow: var(--shadow-elevation-low);
+
+  transition: width 0.4s, padding 0.4s;
+
 }
+
+#sidebar #sidebar-toggling-btn{
+  position: absolute;
+  left: 250px;
+  top: 20px;
+
+  text-align: center;
+  padding: 6px;
+}
+
+/* sidebar closing/opening transition */
+#sidebar.sidebar-close{
+  width: 0;
+  padding: 0;
+}
+
+#sidebar #sidebar-toggling-btn.sidebar-close{
+  left: 15px;
+}
+
+#main.sidebar-close{
+  margin-left: 0; /* remove the margin when the sidebar is closed */
+}
+
+#main{ 
+  margin-left: 200px;/* when the sidebar is opened */
+  transition: margin-left 0.6s;
+}
+
 
 #sidebar .user{
   display: flex;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content; 
-  align-items: center; /* flexbox's aligning is slightly off in this case */
-  gap: 1rem;
+  align-items: center;
+  justify-content: start;
+  gap: 0.6rem;
+
+  margin-left: -0.4rem;
 
   font-weight: 500;
+  white-space: pre;
 }
 
 #project-container-header{
@@ -265,6 +302,7 @@ textarea[name="project-description"]{
   font-weight: 500;
   color: var(--light-gray);
 }
+
 input + .char-counter{
   top: 90px;
   right: 50px;

@@ -6,6 +6,8 @@ import { createTask } from "./createTask.js"
 
 
 export const displayController = (() =>{
+    const sidebarTogglingBtn = document.querySelector("#sidebar-toggling-btn")
+
     const projectsList = document.querySelector("ul")
     const projectsCounter = document.querySelector("#projects-counter")
     
@@ -18,6 +20,14 @@ export const displayController = (() =>{
     const formDescriptionTextarea = document.querySelector("#description-textarea")
     const descriptionTextareaCharCounter = document.querySelector("#description-textarea + .char-counter")
     const formSubmissionBtn = document.querySelector("#project-form-submit-btn")
+
+    sidebarTogglingBtn.addEventListener("click", (e) =>{
+        document.querySelector("#sidebar").classList.toggle("sidebar-close")
+        document.querySelector("#main").classList.toggle("sidebar-close")
+        sidebarTogglingBtn.classList.toggle("sidebar-close")
+
+    })
+
 
     function updateProjectsCounter(){ // updating the color of the counter depending on the current amount of projects
         projectsCounter.textContent = `${projectsContainer.getProjectsArray().length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
