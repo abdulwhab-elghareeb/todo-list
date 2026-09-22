@@ -73,14 +73,6 @@ li{
   list-style:none;
 }
 
-li::before{
-  content: "#";
-  font-size: 1.2rem;
-  margin-right: 8px;
-  color: var(--light-gray);
-}
-
-
 :root{
   --sidebar-background: hsl(0, 0%, 98%);
   --main-background: hsl(0 0 99);
@@ -208,10 +200,19 @@ body{
   pointer-events: none;
 }
 
-#project-container li{
+.list-items-container::before{
+  content: "#";
+  font-size: 1.2rem;
+  margin-right: 8px;
+  color: var(--light-gray);
+}
+
+#sidebar .list-items-container{
+  width: 100%;
+
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
 }
 
 .project-title{
@@ -226,7 +227,7 @@ body{
 
 .hover,
 #sidebar button,
-#project-container li{
+#project-container .list-items-container{
   background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
@@ -252,7 +253,7 @@ body{
 }
 
 .hover:hover,
-#project-container li:hover{
+#project-container .list-items-container:hover{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
 }
 
@@ -321,8 +322,8 @@ textarea + .char-counter{
 
 input:hover,
 textarea:hover,
-input:focus,
-textarea:focus{
+input:focus:not(#main input),
+textarea:focus:not(#main textarea){
   background-color: hsl(from var(--main-background) h s calc(l - 5));
 }
 
@@ -357,7 +358,7 @@ form button{
 dialog .project-dialog-close-btn:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 30));
 }
-
+/* to do align the wrapper in the middle */
 /* Main content */
 .wrapper{
   min-height: 100%;

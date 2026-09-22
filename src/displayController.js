@@ -55,28 +55,27 @@ export const displayController = (() =>{
     }
 
     // Display the current number of characters in the form inputs 
-    const dialogTitleInput = document.querySelector("#dialog-title-input")
-    dialogTitleInput.addEventListener("input", (e) =>{
-        const titleInputCharCounter = document.querySelector("#dialog-title-input + span")
-        
-        titleInputCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
+    function updateCharCount(e){
+        const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
+        charCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
+    }
+
+    const textInputs = Array.from(document.querySelectorAll("input[type='text']"))
+    textInputs.forEach((input) => input.addEventListener("input", (e) =>{
+        updateCharCount(e)
         updateFormSubmissionBtn(e)
-    })
+    }))
 
-    const dialogDescriptionTextarea = document.querySelector("#dialog-description-textarea")
-    dialogDescriptionTextarea.addEventListener("input", (e) =>{
-        const descriptionTextareaCharCounter = document.querySelector("#dialog-description-textarea + span")
-
-        descriptionTextareaCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
-    })
+    const textAreas = Array.from(document.querySelectorAll("textarea"))
+    textAreas.forEach((textArea) => textArea.addEventListener("input", updateCharCount))
 
     // Resets the char counter
     function resetFormCounters(){
         const titleInputCharCounter = document.querySelector("#dialog-title-input + .char-counter")
         const descriptionTextareaCharCounter = document.querySelector("#dialog-description-textarea + .char-counter")
 
-        titleInputCharCounter.textContent = `0 / ${dialogTitleInput.maxLength}`
-        descriptionTextareaCharCounter.textContent = `0 / ${dialogDescriptionTextarea.maxLength}`
+        titleInputCharCounter.textContent = `0 / ${textInputs[0].maxLength}`
+        descriptionTextareaCharCounter.textContent = `0 / ${textAreas[0].maxLength}`
 
     }
 
@@ -88,6 +87,8 @@ export const displayController = (() =>{
 
         const projectsList = document.querySelector("ul")
 
+        const dialogTitleInput = document.querySelector("#dialog-title-input")
+        const dialogDescriptionTextarea = document.querySelector("#dialog-description-textarea")
         const project = createProject(dialogTitleInput.value, dialogDescriptionTextarea.value)
         projectsContainer.addProject(project)
         
@@ -113,8 +114,21 @@ export const displayController = (() =>{
             updateProjectsCounter()
             updateShowDialogBtn()
         })
+
+        const listItemsBtnContainer = document.createElement("button")
+        listItemsBtnContainer.classList.add("list-items-container")
         
-        projectListItem.append(projectTitle, removeProjectBtn)
+        // Display the project title and description on the project page
+        listItemsBtnContainer.addEventListener("click", (e) =>{
+            const projectPageTitle = document.querySelector("#project-page-title")
+            const projectPageDescription = document.querySelector("#project-page-description")
+
+            projectPageTitle.value = project.title
+            projectPageDescription.value = project.description
+        })
+
+        listItemsBtnContainer.append(projectTitle, removeProjectBtn)
+        projectListItem.append(listItemsBtnContainer)
         projectsList.appendChild(projectListItem)
 
         projectsForm.reset()
