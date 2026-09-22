@@ -301,9 +301,13 @@ form button{
 
   transition:all 0.4s;
 }
+#project-form-submit-btn{
+  background-color:hsl(120, 100%, 60%);;
+}
 
-#project-form-submit-btn:hover{
-  background-color: hsl(120, 100%, 60%);
+#project-form-submit-btn:disabled{
+  background-color: hsl(from var(--light-gray) h s calc(l + 10));
+  cursor: not-allowed;
 }
 
 dialog .project-dialog-close-btn:hover{

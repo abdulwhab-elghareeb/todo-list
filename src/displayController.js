@@ -17,6 +17,7 @@ export const displayController = (() =>{
     const titleInputCharCounter = document.querySelector("#title-input + .char-counter")
     const formDescriptionTextarea = document.querySelector("#description-textarea")
     const descriptionTextareaCharCounter = document.querySelector("#description-textarea + .char-counter")
+    const formSubmissionBtn = document.querySelector("#project-form-submit-btn")
 
     function updateProjectsCounter(){ // updating the color of the counter depending on the current amount of projects
         projectsCounter.textContent = `${projectsContainer.getProjectsArray().length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
@@ -37,15 +38,22 @@ export const displayController = (() =>{
         }
     }
 
+    function updateFormSubmissionBtn(e){// updates the btn depending on the input is valid or not
+        if (!e) return formSubmissionBtn.setAttribute("disabled", "") // if called without e argument add disabled back to the button
+        e.target.checkValidity()? formSubmissionBtn.removeAttribute("disabled") : formSubmissionBtn.setAttribute("disabled","")
+    }
+
     // Display the current number of characters 
     formTitleInput.addEventListener("input", (e) =>{
         titleInputCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
+        updateFormSubmissionBtn(e)
     })
 
     formDescriptionTextarea.addEventListener("input", (e) =>{
         descriptionTextareaCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
+        updateFormSubmissionBtn(e)
     })
-    
+
     function resetFormCounters(){
         titleInputCharCounter.textContent = `0 / ${formTitleInput.maxLength}`
         descriptionTextareaCharCounter.textContent = `0 / ${formDescriptionTextarea.maxLength}`
@@ -82,7 +90,7 @@ export const displayController = (() =>{
             updateProjectsCounter()
             updateShowDialogBtn()
         })
-
+        
         projectListItem.append(projectTitle, removeProjectBtn)
         projectsList.appendChild(projectListItem)
 
@@ -90,6 +98,7 @@ export const displayController = (() =>{
         updateProjectsCounter()
         updateShowDialogBtn()
         resetFormCounters()
+        updateFormSubmissionBtn()
     })
 
 })()
