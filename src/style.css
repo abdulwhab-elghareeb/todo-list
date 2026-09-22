@@ -367,7 +367,7 @@ dialog .project-dialog-close-btn:hover{
   grid-auto-rows: max-content;
 
   padding: 2rem;
-  gap: 2rem;
+  gap: 0.7rem;
 }
 #project-page-title{
 
