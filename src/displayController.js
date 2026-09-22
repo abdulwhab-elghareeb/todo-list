@@ -6,38 +6,36 @@ import { createTask } from "./createTask.js"
 
 
 export const displayController = (() =>{
+
+    // Closing and opening sidebar
     const sidebarTogglingBtn = document.querySelector("#sidebar-toggling-btn")
-
-    const projectsList = document.querySelector("ul")
-    const projectsCounter = document.querySelector("#projects-counter")
-    
-    const projectsDialog = document.querySelector("#project-dialog")
-    const showDialogBtn = document.querySelector("#project-dialog-show-btn")
-
-    const projectsForm = document.querySelector("#project-dialog > form")
-    const formTitleInput = document.querySelector("#title-input")
-    const titleInputCharCounter = document.querySelector("#title-input + .char-counter")
-    const formDescriptionTextarea = document.querySelector("#description-textarea")
-    const descriptionTextareaCharCounter = document.querySelector("#description-textarea + .char-counter")
-    const formSubmissionBtn = document.querySelector("#project-form-submit-btn")
-
     sidebarTogglingBtn.addEventListener("click", (e) =>{
+        sidebarTogglingBtn.classList.toggle("sidebar-close")
         document.querySelector("#sidebar").classList.toggle("sidebar-close")
         document.querySelector("#main").classList.toggle("sidebar-close")
-        sidebarTogglingBtn.classList.toggle("sidebar-close")
 
     })
 
 
-    function updateProjectsCounter(){ // updating the color of the counter depending on the current amount of projects
+    // updating the color of the counter depending on the current amount of projects
+    function updateProjectsCounter(){ 
+        const projectsCounter = document.querySelector("#projects-counter")
+
         projectsCounter.textContent = `${projectsContainer.getProjectsArray().length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
         
         projectsContainer.getProjectsArray().length <= projectsContainer.getMaxLength() / 2? projectsCounter.classList = "low" : projectsCounter.classList = "mid"
         if(projectsContainer.getProjectsArray().length == projectsContainer.getMaxLength()) projectsCounter.classList = "max"
     }
 
-    showDialogBtn.addEventListener("click", () => { projectsDialog.showModal() })
-    function updateShowDialogBtn(){ // disable or enable the button depending on the current remaining projects slots
+    // Opens the dialog
+    const showDialogBtn = document.querySelector("#project-dialog-show-btn")
+    showDialogBtn.addEventListener("click", () => {
+        const projectsDialog = document.querySelector("#project-dialog")
+        projectsDialog.showModal() 
+    })
+
+    // disable or enable the dialog button depending on the current remaining projects slots
+    function updateShowDialogBtn(){ 
         if (projectsContainer.getProjectsArray().length == projectsContainer.getMaxLength()){
             showDialogBtn.classList = "disable"
             showDialogBtn.style.color = "red"
@@ -48,33 +46,49 @@ export const displayController = (() =>{
         }
     }
 
-    function updateFormSubmissionBtn(e){// updates the btn depending on the input is valid or not
+    // Updates the form submission btn depending on the input if it's valid or not
+    function updateFormSubmissionBtn(e){
+        const formSubmissionBtn = document.querySelector("#project-form-submit-btn")
+
         if (!e) return formSubmissionBtn.setAttribute("disabled", "") // if called without e argument add disabled back to the button
         e.target.checkValidity()? formSubmissionBtn.removeAttribute("disabled") : formSubmissionBtn.setAttribute("disabled","")
     }
 
-    // Display the current number of characters 
-    formTitleInput.addEventListener("input", (e) =>{
+    // Display the current number of characters in the form inputs 
+    const dialogTitleInput = document.querySelector("#dialog-title-input")
+    dialogTitleInput.addEventListener("input", (e) =>{
+        const titleInputCharCounter = document.querySelector("#dialog-title-input + span")
+        
         titleInputCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
         updateFormSubmissionBtn(e)
     })
 
-    formDescriptionTextarea.addEventListener("input", (e) =>{
+    const dialogDescriptionTextarea = document.querySelector("#dialog-description-textarea")
+    dialogDescriptionTextarea.addEventListener("input", (e) =>{
+        const descriptionTextareaCharCounter = document.querySelector("#dialog-description-textarea + span")
+
         descriptionTextareaCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
     })
 
+    // Resets the char counter
     function resetFormCounters(){
-        titleInputCharCounter.textContent = `0 / ${formTitleInput.maxLength}`
-        descriptionTextareaCharCounter.textContent = `0 / ${formDescriptionTextarea.maxLength}`
+        const titleInputCharCounter = document.querySelector("#dialog-title-input + .char-counter")
+        const descriptionTextareaCharCounter = document.querySelector("#dialog-description-textarea + .char-counter")
+
+        titleInputCharCounter.textContent = `0 / ${dialogTitleInput.maxLength}`
+        descriptionTextareaCharCounter.textContent = `0 / ${dialogDescriptionTextarea.maxLength}`
 
     }
 
 
     // Adding Projects
+    const projectsForm = document.querySelector("#project-dialog > form")
     projectsForm.addEventListener("submit", () =>{
         if (projectsContainer.getProjectsArray().length >= projectsContainer.getMaxLength()) return // if the projectsContainer's max limit of projects is reached
 
-        const project = createProject(formTitleInput.value, formDescriptionTextarea.value)
+        const projectsList = document.querySelector("ul")
+
+        const project = createProject(dialogTitleInput.value, dialogDescriptionTextarea.value)
         projectsContainer.addProject(project)
         
         const projectListItem = document.createElement("li")
