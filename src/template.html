@@ -17,7 +17,7 @@
                     <div class="title">Projects</div>
 
                     <!--opens the dialog that contains the project adding form-->
-                    <button id="add-project-btn" command="show-modal" commandfor="add-project-dialog">+</button> 
+                    <button id="project-dialog-show-btn">+</button> 
                 </div>
 
                 <!-- Indicates the current amount of project that a user has comparing to the max amount-->
@@ -31,14 +31,14 @@
 
     <div id="main-content"></div>
     
-    <dialog id="add-project-dialog">
+    <dialog id="project-dialog">
         <form action="" method="dialog">
             <input type="text" name="project-title" id="project-title" placeholder="Title" minlength="2" maxlength="30" required>
             <textarea name="project-description" id="project-description" rows="4" columns="30" placeholder="Description" autocorrect="on" maxlength="80"></textarea>
             
             <div>
-                <button type="button" class="close-dialog-btn" command="close" commandfor="add-project-dialog">Close</button>
-                <button id="add-project-form-btn">Add</button>
+                <button type="button" class="project-dialog-close-btn" command="close" commandfor="project-dialog">Close</button>
+                <button id="project-form-submit-btn">Add</button>
             </div>
         </form>
     </dialog>

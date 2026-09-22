@@ -167,6 +167,10 @@ body{
   color: red;
 }
 
+.disable{
+  pointer-events: none;
+}
+
 #project-container li{
   display: flex;
   align-items: center;
@@ -194,18 +198,18 @@ body{
   transition: all 0.4s;
 }
 
-#sidebar #add-project-btn{
+#sidebar #project-dialog-show-btn{
   padding: 1px 12px;
   font-size: 1.3rem;
   color: hsl(120, 100%, 30%);
 }
 
-#sidebar .remove-project-btn{
+#sidebar .project-remove-btn{
   margin-left: auto;
   padding: 5px 8px;
 }
 
-.remove-project-btn img{
+.project-remove-btn img{
   width: 17px;
   height: 20px;
 }
@@ -283,11 +287,11 @@ form button{
   transition:all 0.4s;
 }
 
-#add-project-form-btn:hover{
+#project-form-submit-btn:hover{
   background-color: hsl(120, 100%, 60%);
 }
 
-dialog .close-dialog-btn:hover{
+dialog .project-dialog-close-btn:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 30));
 }
 /* Main content */
