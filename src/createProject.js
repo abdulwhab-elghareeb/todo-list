@@ -12,11 +12,16 @@ export function createProject(title, description){
         tasksArray.splice(tasksArray.indexOf(task), 1)
     }
 
+    const id = crypto.randomUUID()
+    const getId = () => id
+
+
     return{
         title,
         description,
         getAllTasks,
         addTask,
         removeTask,
+        getId,
     }
 }
