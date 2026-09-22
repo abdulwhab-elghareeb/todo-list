@@ -89,15 +89,15 @@ export const displayController = (() =>{
 
         const dialogTitleInput = document.querySelector("#dialog-title-input")
         const dialogDescriptionTextarea = document.querySelector("#dialog-description-textarea")
-        const project = createProject(dialogTitleInput.value, dialogDescriptionTextarea.value)
+        const project = createProject(dialogTitleInput.value.trim(), dialogDescriptionTextarea.value.trim())
         projectsContainer.addProject(project)
         
         const projectListItem = document.createElement("li")
+        projectListItem.dataset.id = project.getId()
 
         const projectTitle = document.createElement("div")
         projectTitle.textContent = project.title
         projectTitle.classList.add("project-title")
-
 
         const removeProjectBtn = document.createElement("button")
         removeProjectBtn.classList.add('project-remove-btn')
@@ -112,17 +112,16 @@ export const displayController = (() =>{
             projectsContainer.removeProject(project)
             projectListItem.remove()
             updateProjectsCounter()
-            updateShowDialogBtn()
+            updateShowDialogBtn()          
         })
 
         const listItemsBtnContainer = document.createElement("button")
         listItemsBtnContainer.classList.add("list-items-container")
-        
+
         // Display the project title and description on the project page
         listItemsBtnContainer.addEventListener("click", (e) =>{
             const projectPageTitle = document.querySelector("#project-page-title")
             const projectPageDescription = document.querySelector("#project-page-description")
-
             projectPageTitle.value = project.title
             projectPageDescription.value = project.description
         })
