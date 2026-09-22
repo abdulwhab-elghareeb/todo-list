@@ -51,7 +51,6 @@ export const displayController = (() =>{
 
     formDescriptionTextarea.addEventListener("input", (e) =>{
         descriptionTextareaCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
-        updateFormSubmissionBtn(e)
     })
 
     function resetFormCounters(){
