@@ -260,6 +260,21 @@ textarea[name="project-description"]{
   font-size: 22px;
 }
 
+.char-counter{
+  position: absolute;
+  font-weight: 500;
+  color: var(--light-gray);
+}
+input + .char-counter{
+  top: 90px;
+  right: 50px;
+}
+
+textarea + .char-counter{
+  top: 300px;
+  right: 50px;
+}
+
 input:hover,
 textarea:hover,
 input:focus,
@@ -267,7 +282,7 @@ textarea:focus{
   background-color: hsl(from var(--main-background) h s calc(l - 5));
 }
 
-form > div{
+form > div{ /* form buttons */
   align-self: flex-end;
   margin-top: auto;
 }

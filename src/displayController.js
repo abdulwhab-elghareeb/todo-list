@@ -13,8 +13,10 @@ export const displayController = (() =>{
     const showDialogBtn = document.querySelector("#project-dialog-show-btn")
 
     const projectsForm = document.querySelector("#project-dialog > form")
-    const projectTitleInput = document.querySelector("#project-title")
-    const projectDescriptionTextarea = document.querySelector("#project-description")
+    const formTitleInput = document.querySelector("#project-title")
+    const titleInputCharCounter = document.querySelector("#project-title + .char-counter")
+    const formDescriptionTextarea = document.querySelector("#project-description")
+    const descriptionTextareaCharCounter = document.querySelector("#project-description + .char-counter")
 
     function updateProjectsCounter(){ // updating the color of the counter depending on the current amount of projects
         projectsCounter.textContent = `${projectsContainer.getProjectsArray().length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
@@ -35,11 +37,21 @@ export const displayController = (() =>{
         }
     }
 
+    // Display the current number of characters 
+    formTitleInput.addEventListener("input", (e) =>{
+        titleInputCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
+    })
+
+    formDescriptionTextarea.addEventListener("input", (e) =>{
+        descriptionTextareaCharCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
+    })
+
+
     // Adding Projects
     projectsForm.addEventListener("submit", () =>{
         if (projectsContainer.getProjectsArray().length >= projectsContainer.getMaxLength()) return // if the projectsContainer's max limit of projects is reached
 
-        const project = createProject(projectTitleInput.value, projectDescriptionTextarea.value)
+        const project = createProject(formTitleInput.value, formDescriptionTextarea.value)
         projectsContainer.addProject(project)
         
         const projectListItem = document.createElement("li")

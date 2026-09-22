@@ -34,7 +34,10 @@
     <dialog id="project-dialog">
         <form action="" method="dialog">
             <input type="text" name="project-title" id="project-title" placeholder="Title" minlength="2" maxlength="30" required>
+            <span class="char-counter">0 / 30</span>
+
             <textarea name="project-description" id="project-description" rows="4" columns="30" placeholder="Description" autocorrect="on" maxlength="80"></textarea>
+            <span class="char-counter">0 / 80</span>
             
             <div>
                 <button type="button" class="project-dialog-close-btn" command="close" commandfor="project-dialog">Close</button>
