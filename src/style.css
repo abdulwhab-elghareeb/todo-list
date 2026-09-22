@@ -152,19 +152,18 @@ body{
   top: 50px; 
   right: 15px;
 
-  color: var(--light-gray);
   font-size: 0.9rem;
 }
 
-#projects-counter.low{
+.low{
   color: green;
 }
 
-#projects-counter.mid{
-  color: orange;
+.mid{
+  color: hsl(39, 100%, 40%);
 }
 
-#projects-counter-max{
+.max{
   color: red;
 }
 
