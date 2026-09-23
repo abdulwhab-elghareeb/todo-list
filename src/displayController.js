@@ -6,37 +6,39 @@ import { createTask } from "./createTask.js"
 
 
 export const displayController = (() =>{
+    const projectsArray = projectsContainer.getProjectsArray()
 
     // Closing and opening sidebar
-    const sidebarTogglingBtn = document.querySelector("#sidebar-toggling-btn")
-    sidebarTogglingBtn.addEventListener("click", (e) =>{
-        sidebarTogglingBtn.classList.toggle("sidebar-close")
+    function toggleSidebar(e){
+        e.currentTarget.classList.toggle("sidebar-close")
         document.querySelector("#sidebar").classList.toggle("sidebar-close")
         document.querySelector("#main").classList.toggle("sidebar-close")
-
-    })
+    }
+    document.querySelector("#sidebar-toggling-btn").addEventListener("click", toggleSidebar)
 
 
     // updating the color of the counter depending on the current amount of projects
     function updateProjectsCounter(){ 
         const projectsCounter = document.querySelector("#projects-counter")
 
-        projectsCounter.textContent = `${projectsContainer.getProjectsArray().length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
+        projectsCounter.textContent = `${projectsArray.length} / ${projectsContainer.getMaxLength()}` // current number of projects / max number of projects
         
-        projectsContainer.getProjectsArray().length <= projectsContainer.getMaxLength() / 2? projectsCounter.classList = "low" : projectsCounter.classList = "mid"
-        if(projectsContainer.getProjectsArray().length == projectsContainer.getMaxLength()) projectsCounter.classList = "max"
+        projectsArray.length <= projectsContainer.getMaxLength() / 2? projectsCounter.classList = "low" : projectsCounter.classList = "mid"
+        if(projectsArray.length == projectsContainer.getMaxLength()) projectsCounter.classList = "max"
     }
 
     // Opens the dialog
-    const showDialogBtn = document.querySelector("#project-dialog-show-btn")
-    showDialogBtn.addEventListener("click", () => {
-        const projectsDialog = document.querySelector("#project-dialog")
-        projectsDialog.showModal() 
-    })
+    function openDialog(){
+        document.querySelector("#project-dialog").showModal()
+        addEventsToInputs()
+    }
+    document.querySelector("#project-dialog-show-btn").addEventListener("click", openDialog)
 
     // disable or enable the dialog button depending on the current remaining projects slots
     function updateShowDialogBtn(){ 
-        if (projectsContainer.getProjectsArray().length == projectsContainer.getMaxLength()){
+        const showDialogBtn = document.querySelector("#project-dialog-show-btn")
+
+        if (projectsArray.length == projectsContainer.getMaxLength()){
             showDialogBtn.classList = "disable"
             showDialogBtn.style.color = "red"
         }else{
@@ -60,35 +62,47 @@ export const displayController = (() =>{
         charCounter.textContent = `${e.target.value.length} / ${e.target.maxLength}`
     }
 
-    const textInputs = Array.from(document.querySelectorAll("input[type='text']"))
-    textInputs.forEach((input) => input.addEventListener("input", (e) =>{
-        updateCharCount(e)
+    // Updates the project form submission btn & char count
+    function inputEventHandler(e){
         updateFormSubmissionBtn(e)
-    }))
+        updateCharCount(e)
+    }
 
-    const textAreas = Array.from(document.querySelectorAll("textarea"))
-    textAreas.forEach((textArea) => textArea.addEventListener("input", updateCharCount))
+    function addEventsToInputs(){
+        // preventing duplicate events
+        Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => input.removeEventListener("input", inputEventHandler))
+        Array.from(document.querySelectorAll("textarea")).forEach((textArea) => textArea.removeEventListener("input", updateCharCount))
+
+        Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => input.addEventListener("input", inputEventHandler))
+        Array.from(document.querySelectorAll("textarea")).forEach((textArea) => textArea.addEventListener("input", updateCharCount))
+    }
 
     // Resets the char counter
     function resetFormCounters(){
-        const titleInputCharCounter = document.querySelector("#dialog-title-input + .char-counter")
-        const descriptionTextareaCharCounter = document.querySelector("#dialog-description-textarea + .char-counter")
+        // reset input counter
+        document.querySelector("#dialog-title-input + .char-counter").textContent = `0 / ${document.querySelector("input").maxLength}`
 
-        titleInputCharCounter.textContent = `0 / ${textInputs[0].maxLength}`
-        descriptionTextareaCharCounter.textContent = `0 / ${textAreas[0].maxLength}`
-
+        // reset textarea counter
+        document.querySelector("#dialog-description-textarea + .char-counter").textContent = `0 / ${document.querySelector("textarea").maxLength}`
     }
 
+    // removes the inputs on the main page
+    function clearMainPage(){
+        if (!document.querySelector("#main input")) return
+        document.querySelector("#main input").remove()
+        document.querySelector("#main textarea").remove()
+        document.querySelectorAll("#main span").forEach((span) => span.textContent = "")
+    }
 
     // Adding Projects
-    const projectsForm = document.querySelector("#project-dialog > form")
-    projectsForm.addEventListener("submit", () =>{
-        if (projectsContainer.getProjectsArray().length >= projectsContainer.getMaxLength()) return // if the projectsContainer's max limit of projects is reached
+    function addProject(e){
+        if (projectsArray.length >= projectsContainer.getMaxLength()) return // if the projectsContainer's max limit of projects is reached
 
         const projectsList = document.querySelector("ul")
 
         const dialogTitleInput = document.querySelector("#dialog-title-input")
         const dialogDescriptionTextarea = document.querySelector("#dialog-description-textarea")
+
         const project = createProject(dialogTitleInput.value.trim(), dialogDescriptionTextarea.value.trim())
         projectsContainer.addProject(project)
         
@@ -107,77 +121,106 @@ export const displayController = (() =>{
         removeBtnImg.height = removeBtnImg.width = "15"
 
         removeProjectBtn.appendChild(removeBtnImg)
-        
-        removeProjectBtn.addEventListener("click", () =>{
+    
+        function removeBtnClickHandler(e){
+            e.stopPropagation()
             projectsContainer.removeProject(project)
             projectListItem.remove()
             updateProjectsCounter()
-            updateShowDialogBtn()          
-        })
-
-        const listItemsBtnContainer = document.createElement("button")
-        listItemsBtnContainer.classList.add("list-items-container")
+            updateShowDialogBtn()
+            
+            if (projectsArray.length > 1){
+                const prevProject = projectsArray[projectsArray.indexOf(project) - 1] || projectsArray[projectsArray.indexOf(project) + 1] // get the prev project or the next one if the prev is not found
+                document.querySelector(`li[data-id="${prevProject.getId()}"] .list-items-container`).click()
+            }else{
+                clearMainPage()
+            }
+        }
+        removeProjectBtn.addEventListener("click", removeBtnClickHandler)
 
         // Display the project title and description on the project page
-        listItemsBtnContainer.addEventListener("click", () =>{
-            
-            // Allowing to change the project title by double click it on the main page
-            const projectPageTitle = document.querySelector("#project-page-title")
+        function renderProjectPage(){
+            clearMainPage()
 
-            projectPageTitle.addEventListener("dblclick",() =>{
-                projectPageTitle.removeAttribute("readonly")
-                projectPageTitle.focus()
+            // Creating the main inputs
+            const projectPageTitle = document.createElement("input")
+            Object.assign(projectPageTitle, {
+                type: "text",
+                name: "project-title",
+                id: "project-page-title",
+                placeholder: "Title",
+                minLength: "2",
+                maxLength: "30",
+                pattern: "^\S{2,}.*",
+                required: true,
+                readOnly: true,
             })
+            document.querySelector("#main .title-input-container").prepend(projectPageTitle)
 
-            projectPageTitle,addEventListener("change", (e)=>{
-                if (!(/^\S{2,}.*/).test(projectPageTitle.value)) return // if the value doesn't match the required pattern
-
-                const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
-                charCounter.textContent = ""
-
-                project.title = projectPageTitle.value.trim()
-                projectTitle.textContent = project.title
-                projectPageTitle.setAttribute("readonly", "")
+            const projectPageDescription = document.createElement("textarea")
+            Object.assign(projectPageDescription, {
+                name: "project-description",
+                id: "project-page-description",
+                rows: "1",
+                autocorrect: "on",
+                placeholder: "Description",
+                maxLength: "80",
+                readOnly: true,
             })
-            
-            // Allowing to change the project description by double click it on the main page
-            const projectPageDescription = document.querySelector("#project-page-description")
+            document.querySelector("#main .description-textarea-container").prepend(projectPageDescription)
 
-            projectPageDescription.addEventListener("dblclick", ()=>{
-                projectPageDescription.removeAttribute("readonly")
-                projectPageDescription.focus()
-            })
-
-            // Saves the changes if "Enter" is pressed or the textarea lost focus
-            function textareaSaveHandler(e){
-                const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
-                charCounter.textContent = ""
-
-                project.description = projectPageDescription.value.trim()
-                projectPageDescription.setAttribute("readonly", "")
+            // inputs events
+            function DoubleClickInputsHandler(e){
+                e.target.removeAttribute("readonly")
             }
 
+            function ChangeEventHandler(e){
+                const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
+                charCounter.textContent = ""
+
+                project[e.target.name.split("-").at(-1)] = e.target.value.trim() // takes the last word of it's name (title or description)
+                e.target.setAttribute("readonly", "")
+            }
+
+            projectPageTitle.addEventListener("dblclick", DoubleClickInputsHandler)
+            projectPageTitle.addEventListener("change", (e)=>{
+                e.stopPropagation()
+                if (!(/^\S{2,}.*/).test(projectPageTitle.value)) return // if the value doesn't match the required pattern
+                ChangeEventHandler(e)
+                projectTitle.textContent = project.title
+            })
+
+            projectPageDescription.addEventListener("dblclick", DoubleClickInputsHandler)
+            projectPageDescription.addEventListener("change", ChangeEventHandler)
             projectPageDescription.addEventListener("keydown", (e) =>{
                 if(e.key === "Enter"){
                     e.preventDefault()
-                    textareaSaveHandler(e)
+                    ChangeEventHandler(e)
                 }
             })
-            projectPageDescription.addEventListener("change", textareaSaveHandler)
+            
+            addEventsToInputs() // add input event to the newly created input and textarea
 
             projectPageTitle.value = project.title
             projectPageDescription.value = project.description
-        })
-        listItemsBtnContainer.click() // to display the page immediately after it's creation
+
+        }
+
+        const listItemsBtnContainer = document.createElement("button")
+        listItemsBtnContainer.classList.add("list-items-container")
+        listItemsBtnContainer.addEventListener("click", renderProjectPage)
+        listItemsBtnContainer.click()
 
         listItemsBtnContainer.append(projectTitle, removeProjectBtn)
         projectListItem.append(listItemsBtnContainer)
         projectsList.appendChild(projectListItem)
 
-        projectsForm.reset()
+        e.target.reset()
         updateProjectsCounter()
         updateShowDialogBtn()
         resetFormCounters()
         updateFormSubmissionBtn()
-    })
+    }
+    document.querySelector("#project-dialog > form").addEventListener('submit', addProject)
+
 })()
