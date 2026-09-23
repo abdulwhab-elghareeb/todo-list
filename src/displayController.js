@@ -119,12 +119,52 @@ export const displayController = (() =>{
         listItemsBtnContainer.classList.add("list-items-container")
 
         // Display the project title and description on the project page
-        listItemsBtnContainer.addEventListener("click", (e) =>{
+        listItemsBtnContainer.addEventListener("click", () =>{
+            
+            // Allowing to change the project title by double click it on the main page
             const projectPageTitle = document.querySelector("#project-page-title")
+
+            projectPageTitle.addEventListener("dblclick",() =>{
+                projectPageTitle.removeAttribute("readonly")
+            })
+
+            projectPageTitle,addEventListener("change", (e)=>{
+                const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
+                charCounter.textContent = ""
+
+                project.title = projectPageTitle.value.trim()
+                projectTitle.textContent = project.title
+                projectPageTitle.setAttribute("readonly", "")
+            })
+
+            // Allowing to change the project description by double click it on the main page
             const projectPageDescription = document.querySelector("#project-page-description")
+
+            projectPageDescription.addEventListener("dblclick", ()=>{
+                projectPageDescription.removeAttribute("readonly")
+            })
+
+            // Saves the changes if "Enter" is pressed or the textarea lost focus
+            function textareaSaveHandler(e){
+                const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
+                charCounter.textContent = ""
+
+                project.description = projectPageDescription.value.trim()
+                projectPageDescription.setAttribute("readonly", "")
+            }
+
+            projectPageDescription.addEventListener("keydown", (e) =>{
+                if(e.key === "Enter"){
+                    e.preventDefault()
+                    textareaSaveHandler(e)
+                }
+            })
+            projectPageDescription.addEventListener("change", textareaSaveHandler)
+
             projectPageTitle.value = project.title
             projectPageDescription.value = project.description
         })
+        listItemsBtnContainer.click() // to display the page immediately after it's creation
 
         listItemsBtnContainer.append(projectTitle, removeProjectBtn)
         projectListItem.append(listItemsBtnContainer)
@@ -136,6 +176,4 @@ export const displayController = (() =>{
         resetFormCounters()
         updateFormSubmissionBtn()
     })
-
-    
 })()
