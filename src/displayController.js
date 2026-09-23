@@ -124,17 +124,14 @@ export const displayController = (() =>{
     
         function removeBtnClickHandler(e){
             e.stopPropagation()
+            const prevOrNextProject = projectsArray[projectsArray.indexOf(project) - 1] || projectsArray[projectsArray.indexOf(project) + 1] // get the prev project or the next one if the prev is not found       
             projectsContainer.removeProject(project)
             projectListItem.remove()
             updateProjectsCounter()
             updateShowDialogBtn()
-            
-            if (projectsArray.length > 1){
-                const prevProject = projectsArray[projectsArray.indexOf(project) - 1] || projectsArray[projectsArray.indexOf(project) + 1] // get the prev project or the next one if the prev is not found
-                document.querySelector(`li[data-id="${prevProject.getId()}"] .list-items-container`).click()
-            }else{
-                clearMainPage()
-            }
+
+            // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
+            projectsArray.length === 0? clearMainPage() : document.querySelector(`li[data-id="${prevOrNextProject.getId()}"] .list-items-container`).click()
         }
         removeProjectBtn.addEventListener("click", removeBtnClickHandler)
 
@@ -184,7 +181,6 @@ export const displayController = (() =>{
 
             projectPageTitle.addEventListener("dblclick", DoubleClickInputsHandler)
             projectPageTitle.addEventListener("change", (e)=>{
-                e.stopPropagation()
                 if (!(/^\S{2,}.*/).test(projectPageTitle.value)) return // if the value doesn't match the required pattern
                 ChangeEventHandler(e)
                 projectTitle.textContent = project.title
@@ -203,6 +199,8 @@ export const displayController = (() =>{
 
             projectPageTitle.value = project.title
             projectPageDescription.value = project.description
+
+            Array.from(document.querySelectorAll("#main .note")).forEach((note) => note.textContent = "Double click to edit")
 
         }
 
