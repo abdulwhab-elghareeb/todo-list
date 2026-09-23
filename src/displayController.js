@@ -126,9 +126,12 @@ export const displayController = (() =>{
 
             projectPageTitle.addEventListener("dblclick",() =>{
                 projectPageTitle.removeAttribute("readonly")
+                projectPageTitle.focus()
             })
 
             projectPageTitle,addEventListener("change", (e)=>{
+                if (!(/^\S{2,}.*/).test(projectPageTitle.value)) return // if the value doesn't match the required pattern
+
                 const charCounter = document.querySelector(`#${e.target.id} + .char-counter`)
                 charCounter.textContent = ""
 
@@ -136,12 +139,13 @@ export const displayController = (() =>{
                 projectTitle.textContent = project.title
                 projectPageTitle.setAttribute("readonly", "")
             })
-
+            
             // Allowing to change the project description by double click it on the main page
             const projectPageDescription = document.querySelector("#project-page-description")
 
             projectPageDescription.addEventListener("dblclick", ()=>{
                 projectPageDescription.removeAttribute("readonly")
+                projectPageDescription.focus()
             })
 
             // Saves the changes if "Enter" is pressed or the textarea lost focus
