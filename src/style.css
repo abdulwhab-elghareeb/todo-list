@@ -318,6 +318,11 @@ textarea:focus:not(#main textarea){
   background-color: hsl(from var(--main-background) h s calc(l - 5));
 }
 
+input:user-invalid,
+textarea:user-invalid{
+  background-color: hsl(0, 100%, 90%);
+}
+
 form > div:has(button){ /* form buttons */
   align-self: flex-end;
   margin-top: auto;
