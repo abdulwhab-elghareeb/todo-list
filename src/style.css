@@ -77,8 +77,8 @@ select{
   transition: all 0.4s;
 }
 
-button:not(:disabled):active{
-  outline: 0.1rem solid white;
+button{
+  background-color: inherit;
 }
 
 textarea{
@@ -370,6 +370,14 @@ dialog button[command="close"]:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 30));
 }
 
+label{
+  margin-left: 5px;
+}
+
+select{
+  background-color: transparent;
+}
+
 /* Main content */
 #main{
   flex-grow: 1;
@@ -425,10 +433,63 @@ dialog button[command="close"]:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 40));
 }
 
-label{
-  margin-left: 5px;
+#task-card{
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  align-items: center;
+  gap: 1.5rem;
+  
+  padding: 1rem;
+  border-radius: 8px;
+
+  box-shadow: var(--shadow-elevation-low);
+
+  transition: all 0.4s;
+  cursor: pointer;
 }
 
-select{
-  background-color: transparent;
+.card-title{
+  font-size: 20px;
+  font-weight: 500;
+}
+
+#task-card:hover{
+  background-color: hsl(from var(--light-gray) h s calc(l + 45));
+}
+
+#task-card > button{
+  position: relative;
+}
+
+#task-card > button::after{ /* the vertical line between check mark circle and task title */
+  content: "";
+  height: calc(100% + 1.5rem);
+  width: 1px;
+
+  position: absolute;
+  right: -10px;
+  bottom: -12px;
+    
+  background-color: var(--text-color);
+}
+
+#task-card > button::before{ /* the check mark circle */
+  content: "";
+
+  width: 16px;
+  height: 16px;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 50%;
+  background-color: var(--light-gray);
+  opacity: 0;
+  transition: all 0.4s;
+}
+
+#task-card > button:hover::before{
+  opacity: 1;
+  top: 11px;
+  right: 16.5px;
 }

@@ -1,5 +1,5 @@
 import delIcon  from "./assets/close.svg"
-import "./assets/circle-important.svg"
+import circleIcon from "./assets/circle-outline.svg"
 
 import { projectsContainer } from "./projectsContainer.js"
 import { createProject } from "./createProject.js"
@@ -253,14 +253,36 @@ export const displayController = (() =>{
     document.querySelector(".task-add-btn").addEventListener("click", openTaskDialog)
 
     function addTask(){
+        // logic
         const taskFormElements = Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select:not(#task-project)")),
               taskProject = document.querySelector("#task-project")
-              
+
         const task = createTask(taskFormElements[0].value, taskFormElements[1].value, taskFormElements[2].value, taskFormElements[3].value)
 
         const selectedProject = projectsArray.find((project) => project.title == taskProject.value)
         selectedProject.addTask(task)
+
+        // displaying
+        const taskCardContainer = document.createElement("div")
+        taskCardContainer.setAttribute("id", "task-card")
+
+        const checkBtn = document.createElement("button"),
+              checkBtnImg = document.createElement("img")
+        checkBtnImg.src = circleIcon
+        checkBtnImg.height = checkBtnImg.width = "35"
+        checkBtn.appendChild(checkBtnImg)
+
+        const cardTaskTitle = document.createElement("div"),
+              cardTaskDueDate = document.createElement("div")
+        cardTaskTitle.classList.add("card-title")
+        cardTaskDueDate.classList.add("card-due-date")
+        cardTaskTitle.textContent = task.title
+        cardTaskDueDate.textContent = task.dueDate
+
+        taskCardContainer.append(checkBtn, cardTaskTitle, cardTaskDueDate)
+        document.querySelector("#main .wrapper").appendChild(taskCardContainer)
     }
+
     document.querySelector("#tasks-dialog form").addEventListener("submit", addTask)
 
 
