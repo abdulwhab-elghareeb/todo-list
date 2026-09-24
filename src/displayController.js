@@ -268,18 +268,41 @@ export const displayController = (() =>{
 
         const checkBtn = document.createElement("button"),
               checkBtnImg = document.createElement("img")
+        checkBtn.classList.add("task-check-btn")
         checkBtnImg.src = circleIcon
         checkBtnImg.height = checkBtnImg.width = "35"
         checkBtn.appendChild(checkBtnImg)
 
+        function checkBtnClickHandler(e){
+            task.toggleState();
+            console.log(task.completed());
+            (task.completed())? e.currentTarget.classList.add("checked") : e.currentTarget.classList.remove("checked")
+        }
+        checkBtn.addEventListener("click", checkBtnClickHandler)
+
         const cardTaskTitle = document.createElement("div"),
               cardTaskDueDate = document.createElement("div")
-        cardTaskTitle.classList.add("card-title")
-        cardTaskDueDate.classList.add("card-due-date")
+        cardTaskTitle.classList.add("task-title")
+        cardTaskDueDate.classList.add("task-due-date")
         cardTaskTitle.textContent = task.title
         cardTaskDueDate.textContent = task.dueDate
 
-        taskCardContainer.append(checkBtn, cardTaskTitle, cardTaskDueDate)
+        const delBtn = document.createElement("button"),
+              delBtnImg = document.createElement("img")
+        delBtn.classList.add("task-del-btn")
+        delBtnImg.src = delIcon
+        delBtnImg.height = delBtnImg.width = 20
+        delBtn.appendChild(delBtnImg)
+
+        function delBtnClickHandler(e){
+            e.stopPropagation()
+            selectedProject.removeTask(task)
+            taskCardContainer.remove()
+        }
+        delBtn.addEventListener("click", delBtnClickHandler )
+
+
+        taskCardContainer.append(checkBtn, cardTaskTitle, cardTaskDueDate, delBtn)
         document.querySelector("#main .wrapper").appendChild(taskCardContainer)
     }
 

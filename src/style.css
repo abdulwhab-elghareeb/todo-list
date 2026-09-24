@@ -434,8 +434,10 @@ select{
 }
 
 #task-card{
+  position: relative;
+
   display: grid;
-  grid-template-columns: max-content 1fr max-content;
+  grid-template-columns: max-content 1fr max-content max-content;
   align-items: center;
   gap: 1.5rem;
   
@@ -448,20 +450,24 @@ select{
   cursor: pointer;
 }
 
-.card-title{
+.task-title{
   font-size: 20px;
   font-weight: 500;
 }
 
-#task-card:hover{
-  background-color: hsl(from var(--light-gray) h s calc(l + 45));
+.task-due-date{
+  font-weight: 500;
 }
 
-#task-card > button{
+#task-card:hover{
+  background-color: hsl(from var(--light-gray) h s calc(l + 47));
+}
+
+#task-card > .task-check-btn{
   position: relative;
 }
 
-#task-card > button::after{ /* the vertical line between check mark circle and task title */
+#task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
   content: "";
   height: calc(100% + 1.5rem);
   width: 1px;
@@ -470,26 +476,55 @@ select{
   right: -10px;
   bottom: -12px;
     
-  background-color: var(--text-color);
+  background-color: hsl(from var(--light-gray) h s calc(l + 35));
 }
 
-#task-card > button::before{ /* the check mark circle */
+#task-card > .task-check-btn::before{ /* the check mark circle */
   content: "";
 
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
 
   position: absolute;
   top: 0;
   right: 0;
   border-radius: 50%;
-  background-color: var(--light-gray);
+  background-image: url(./assets/check.svg);
   opacity: 0;
-  transition: all 0.4s;
+  transition: all 0.3s;
 }
 
-#task-card > button:hover::before{
+
+#task-card:has(> .task-check-btn.checked){
+  background-color: hsl(from var(--light-gray) h s calc(l + 37));
+  text-decoration: line-through;
+  opacity: 0.9;
+  color: var(--light-gray);
+}
+
+#task-card > .task-check-btn:not(.checked):hover::before{
   opacity: 1;
   top: 11px;
-  right: 16.5px;
+  right: 15.5px;
+}
+
+#task-card > .task-check-btn.checked::before{
+  opacity: 1;
+  top: 11px;
+  right: 15.5px;
+}
+
+.task-del-btn{
+  padding: 6px;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+.task-del-btn > img{
+  width: 20px;
+  height: 20px;
+}
+
+.task-del-btn:hover{
+  background-color: hsl(from var(--light-gray) h s calc(l + 32));
 }
