@@ -42,7 +42,7 @@
                 <span class="note"></span>
             </div>
 
-            <button class="task-add-btn" command="show-modal" commandfor="tasks-dialog">+</button>
+            <button class="task-add-btn">+</button>
         </div>
     </div>
     
@@ -88,11 +88,19 @@
                 <label for="task-priority">Task Priority</label>
                 <select name="task-priority" id="task-priority">
                     <option disabled hidden selected value="">Priority</option>
-                    <option>Urgent</option>
-                    <option>Important</option>
-                    <option>Less Important</option>
-                    <option>Not Important</option>
+                    <option value="4">Urgent</option>
+                    <option value="3">Important</option>
+                    <option value="2">Less Important</option>
+                    <option value="1">Not Important</option>
                 </select>
+            </div>
+
+            <div>
+                <label for="task-project">Select Project</label>
+                <select name="task-project" id="task-project">
+                    
+                </select>
+
             </div>
             
             <div>

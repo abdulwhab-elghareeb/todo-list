@@ -99,10 +99,9 @@ export const displayController = (() =>{
     function addProject(e){
         if (projectsArray.length >= projectsContainer.getMaxLength()) return // if the projectsContainer's max limit of projects is reached
 
-        const projectsList = document.querySelector("ul")
-
-        const projectTitle = document.querySelector("#project-title")
-        const projectDescription = document.querySelector("#project-description")
+        const projectsList = document.querySelector("ul"),
+              projectTitle = document.querySelector("#project-title"),
+              projectDescription = document.querySelector("#project-description")
 
         const project = createProject(projectTitle.value.trim(), projectDescription.value.trim())
         projectsContainer.addProject(project)
@@ -223,5 +222,47 @@ export const displayController = (() =>{
 
 
     // to do: add indication to the current project (maybe bold text)
+
+    // Adding tasks
+    function renderProjectSelection(){
+        const projectSelection = document.querySelector("#task-project")
+        projectSelection.replaceChildren() // clear all children
+
+        const initialSelection = document.createElement('option')
+        Object.assign(initialSelection, {
+            textContent: "Project",
+            disabled: true,
+            selected: true,
+            hidden: true,
+            value: "",
+        })
+        projectSelection.appendChild(initialSelection)
+
+        projectsArray.forEach((project) =>{
+            const projectOption = document.createElement("option")
+            projectOption.textContent = project.title
+
+            projectSelection.appendChild(projectOption)
+        })
+    }
+
+    function openTaskDialog(){
+        renderProjectSelection()
+        document.querySelector("#tasks-dialog").showModal()
+    }
+    document.querySelector(".task-add-btn").addEventListener("click", openTaskDialog)
+
+    function addTask(){
+        const taskFormElements = Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select:not(#task-project)")),
+              taskProject = document.querySelector("#task-project")
+              
+        const task = createTask(taskFormElements[0].value, taskFormElements[1].value, taskFormElements[2].value, taskFormElements[3].value)
+
+        const selectedProject = projectsArray.find((project) => project.title == taskProject.value)
+        selectedProject.addTask(task)
+    }
+    document.querySelector("#tasks-dialog form").addEventListener("submit", addTask)
+
+
 
 })()
