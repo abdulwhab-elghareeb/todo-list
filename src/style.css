@@ -357,11 +357,11 @@ form button{
   transition:all 0.4s;
 }
 
-form button[type="submit"]{
+form button[id*='submit']{
   background-color:hsl(120, 100%, 60%);;
 }
 
-form button[type="submit"]:disabled{
+form button[id*='submit']:disabled{
   background-color: hsl(from var(--light-gray) h s calc(l + 10));
   cursor: not-allowed;
 }
@@ -441,7 +441,7 @@ select{
   align-items: center;
   gap: 1.5rem;
   
-  padding: 1rem;
+  padding: 1rem 2.5rem 1rem 1rem;
   border-radius: 8px;
 
   box-shadow: var(--shadow-elevation-low);
@@ -527,4 +527,11 @@ select{
 
 .task-del-btn:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 32));
+}
+
+.task-expand-btn{
+  padding: 4px;
+  position: absolute;
+  right: 4px;
+  top: 1px;
 }

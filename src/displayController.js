@@ -1,9 +1,12 @@
 import delIcon  from "./assets/close.svg"
 import circleIcon from "./assets/circle-outline.svg"
+import expandIcon from "./assets/chevron-down.svg"
 
 import { projectsContainer } from "./projectsContainer.js"
 import { createProject } from "./createProject.js"
 import { createTask } from "./createTask.js"
+import * as helper from "./helper.js"
+
 
 
 export const displayController = (() =>{
@@ -51,12 +54,12 @@ export const displayController = (() =>{
 
     // Updates the form submission btn depending on the input if it's valid or not
     function updateFormSubmissionBtn(e){
-        const formSubmissionBtn = document.querySelector(`#${e.target.closest("dialog").id} button[type='submit']`) // gets the inputs's parent dialog and from there gets the btn
+        const formSubmissionBtn = document.querySelector(`#${e.target.closest("dialog").id} button[id*='submit']`) // gets the inputs's parent dialog and from there gets the btn
         e.target.checkValidity()? formSubmissionBtn.removeAttribute("disabled") : formSubmissionBtn.setAttribute("disabled","")
     }
 
     function disableFormSubmissionBtn(){
-        Array.from(document.querySelectorAll("button[type='submit']")).forEach((btn) => btn.setAttribute("disabled", ""))
+        Array.from(document.querySelectorAll("button[id*='submit']")).forEach((btn) => btn.setAttribute("disabled", ""))
     }
 
     // Display the current number of characters in the form inputs 
@@ -240,7 +243,8 @@ export const displayController = (() =>{
 
         projectsArray.forEach((project) =>{
             const projectOption = document.createElement("option")
-            projectOption.textContent = project.title
+            projectOption.value = projectOption.textContent = project.title
+        
 
             projectSelection.appendChild(projectOption)
         })
@@ -254,17 +258,35 @@ export const displayController = (() =>{
 
     function addTask(){
         // logic
-        const taskFormElements = Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select:not(#task-project)")),
-              taskProject = document.querySelector("#task-project")
+        const taskFormElements = Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select"))
 
         const task = createTask(taskFormElements[0].value, taskFormElements[1].value, taskFormElements[2].value, taskFormElements[3].value)
 
-        const selectedProject = projectsArray.find((project) => project.title == taskProject.value)
+        const selectedProject = projectsArray.find((project) => project.title == taskFormElements[4].value)
         selectedProject.addTask(task)
 
         // displaying
         const taskCardContainer = document.createElement("div")
         taskCardContainer.setAttribute("id", "task-card")
+        taskCardContainer.dataset.id = task.getId()
+
+        function taskContainerClickHandler(e){
+            const tasksDialog = document.querySelector("#tasks-dialog")
+            tasksDialog.showModal()
+            
+            // adjust the submit btn
+            const saveBtn = document.querySelector("#task-submit-btn")
+            saveBtn.type = "button"
+            saveBtn.textContent = "Save"
+            
+            // setting the values of inputs
+            taskFormElements.forEach(formElement => {
+                (formElement.id == "task-project")? formElement.value = `${selectedProject.title}` : formElement.value = task[`${helper.toCamelCase(formElement.id, 1)}`]
+            }) 
+
+
+        }
+        taskCardContainer.addEventListener("click", taskContainerClickHandler)
 
         const checkBtn = document.createElement("button"),
               checkBtnImg = document.createElement("img")
@@ -274,8 +296,9 @@ export const displayController = (() =>{
         checkBtn.appendChild(checkBtnImg)
 
         function checkBtnClickHandler(e){
+            e.stopPropagation()
+
             task.toggleState();
-            console.log(task.completed());
             (task.completed())? e.currentTarget.classList.add("checked") : e.currentTarget.classList.remove("checked")
         }
         checkBtn.addEventListener("click", checkBtnClickHandler)
@@ -296,13 +319,22 @@ export const displayController = (() =>{
 
         function delBtnClickHandler(e){
             e.stopPropagation()
+
             selectedProject.removeTask(task)
             taskCardContainer.remove()
         }
         delBtn.addEventListener("click", delBtnClickHandler )
 
+        const expandBtn = document.createElement("button"),
+              expandBtnImg = document.createElement("img")
 
-        taskCardContainer.append(checkBtn, cardTaskTitle, cardTaskDueDate, delBtn)
+        expandBtn.classList.add("task-expand-btn")
+        expandBtnImg.src = expandIcon
+        expandBtnImg.height = expandBtnImg.width = 20
+        expandBtn.appendChild(expandBtnImg)
+
+
+        taskCardContainer.append(checkBtn, cardTaskTitle, cardTaskDueDate, delBtn, expandBtn)
         document.querySelector("#main .wrapper").appendChild(taskCardContainer)
     }
 

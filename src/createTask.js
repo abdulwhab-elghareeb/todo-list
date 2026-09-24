@@ -1,6 +1,8 @@
-export function createTask(title, description, dueDate, priorityLevel){
+export function createTask(title, description, dueDate, priority){
+    const id = crypto.randomUUID()
+    const getId = () => id
+
     let isComplete = false
-    
     const completed = () => isComplete,
           toggleState = () => isComplete? isComplete = false : isComplete = true
 
@@ -9,7 +11,8 @@ export function createTask(title, description, dueDate, priorityLevel){
         title,
         description,
         dueDate,
-        priorityLevel,
+        priority,
+        getId,
         completed,
         toggleState,
     }
