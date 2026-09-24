@@ -1,4 +1,5 @@
 import delIcon  from "./assets/close.svg"
+import "./assets/circle-important.svg"
 
 import { projectsContainer } from "./projectsContainer.js"
 import { createProject } from "./createProject.js"
@@ -50,10 +51,12 @@ export const displayController = (() =>{
 
     // Updates the form submission btn depending on the input if it's valid or not
     function updateFormSubmissionBtn(e){
-        const formSubmissionBtn = document.querySelector("#project-form-submit-btn")
-
-        if (!e) return formSubmissionBtn.setAttribute("disabled", "") // if called without e argument add disabled back to the button
+        const formSubmissionBtn = document.querySelector(`#${e.target.closest("dialog").id} button[type='submit']`) // gets the inputs's parent dialog and from there gets the btn
         e.target.checkValidity()? formSubmissionBtn.removeAttribute("disabled") : formSubmissionBtn.setAttribute("disabled","")
+    }
+
+    function disableFormSubmissionBtn(){
+        Array.from(document.querySelectorAll("button[type='submit']")).forEach((btn) => btn.setAttribute("disabled", ""))
     }
 
     // Display the current number of characters in the form inputs 
@@ -63,27 +66,25 @@ export const displayController = (() =>{
     }
 
     // Updates the project form submission btn & char count
-    function inputEventHandler(e){
+    function requiredInputHandler(e){
         updateFormSubmissionBtn(e)
         updateCharCount(e)
     }
 
     function addEventsToInputs(){
         // preventing duplicate events
-        Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => input.removeEventListener("input", inputEventHandler))
-        Array.from(document.querySelectorAll("textarea")).forEach((textArea) => textArea.removeEventListener("input", updateCharCount))
+        Array.from(document.querySelectorAll("input[type='text']:required")).forEach((input) => input.removeEventListener("input", requiredInputHandler))
+        Array.from(document.querySelectorAll("textarea, input[type='text']:not(:required)")).forEach((textArea) => textArea.removeEventListener("input", updateCharCount))
 
-        Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => input.addEventListener("input", inputEventHandler))
-        Array.from(document.querySelectorAll("textarea")).forEach((textArea) => textArea.addEventListener("input", updateCharCount))
+        Array.from(document.querySelectorAll("input[type='text']:required")).forEach((input) => input.addEventListener("input", requiredInputHandler))
+        Array.from(document.querySelectorAll("textarea, input[type='text']:not(:required)")).forEach((textArea) => textArea.addEventListener("input", updateCharCount))
     }
 
     // Resets the char counter
     function resetFormCounters(){
-        // reset input counter
-        document.querySelector("#dialog-title-input + .char-counter").textContent = `0 / ${document.querySelector("input").maxLength}`
-
-        // reset textarea counter
-        document.querySelector("#dialog-description-textarea + .char-counter").textContent = `0 / ${document.querySelector("textarea").maxLength}`
+        Array.from(document.querySelectorAll("input[type='text'] + .char-counter, textarea + .char-counter")).forEach((charCounter) => {
+                charCounter.textContent = `0 / ${document.querySelector("*:has(+ .char-counter)").maxLength}`
+            })
     }
 
     // removes the inputs on the main page
@@ -100,18 +101,18 @@ export const displayController = (() =>{
 
         const projectsList = document.querySelector("ul")
 
-        const dialogTitleInput = document.querySelector("#dialog-title-input")
-        const dialogDescriptionTextarea = document.querySelector("#dialog-description-textarea")
+        const projectTitle = document.querySelector("#project-title")
+        const projectDescription = document.querySelector("#project-description")
 
-        const project = createProject(dialogTitleInput.value.trim(), dialogDescriptionTextarea.value.trim())
+        const project = createProject(projectTitle.value.trim(), projectDescription.value.trim())
         projectsContainer.addProject(project)
         
         const projectListItem = document.createElement("li")
         projectListItem.dataset.id = project.getId()
 
-        const projectTitle = document.createElement("div")
-        projectTitle.textContent = project.title
-        projectTitle.classList.add("project-title")
+        const projectListTitle = document.createElement("div")
+        projectListTitle.textContent = project.title
+        projectListTitle.classList.add("project-title")
 
         const removeProjectBtn = document.createElement("button")
         removeProjectBtn.classList.add('project-remove-btn')
@@ -149,10 +150,9 @@ export const displayController = (() =>{
                 minLength: "2",
                 maxLength: "30",
                 pattern: "^\S{2,}.*",
-                required: true,
                 readOnly: true,
             })
-            document.querySelector("#main .title-input-container").prepend(projectPageTitle)
+            document.querySelector("#main .title-container").prepend(projectPageTitle)
 
             const projectPageDescription = document.createElement("textarea")
             Object.assign(projectPageDescription, {
@@ -164,7 +164,7 @@ export const displayController = (() =>{
                 maxLength: "80",
                 readOnly: true,
             })
-            document.querySelector("#main .description-textarea-container").prepend(projectPageDescription)
+            document.querySelector("#main .description-container").prepend(projectPageDescription)
 
             // inputs events
             function DoubleClickInputsHandler(e){
@@ -209,7 +209,7 @@ export const displayController = (() =>{
         listItemsBtnContainer.addEventListener("click", renderProjectPage)
         listItemsBtnContainer.click()
 
-        listItemsBtnContainer.append(projectTitle, removeProjectBtn)
+        listItemsBtnContainer.append(projectListTitle, removeProjectBtn)
         projectListItem.append(listItemsBtnContainer)
         projectsList.appendChild(projectListItem)
 
@@ -217,8 +217,11 @@ export const displayController = (() =>{
         updateProjectsCounter()
         updateShowDialogBtn()
         resetFormCounters()
-        updateFormSubmissionBtn()
+        disableFormSubmissionBtn()
     }
     document.querySelector("#project-dialog > form").addEventListener('submit', addProject)
+
+
+    // to do: add indication to the current project (maybe bold text)
 
 })()

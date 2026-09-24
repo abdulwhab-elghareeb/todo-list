@@ -33,6 +33,7 @@ img, picture, video, canvas, svg {
 input, button, textarea, select, dialog {
   font: inherit;
   color: inherit;
+  letter-spacing: inherit;
 }
 
 p, h1, h2, h3, h4, h5, h6 {
@@ -50,29 +51,6 @@ h1, h2, h3, h4, h5, h6 {
   isolation: isolate;
 }
 
-/* My reset */
-button,
-input,
-textarea{
-  border: none;
-  outline: none;
-  cursor: pointer;
-
-  transition: all 0.4s;
-}
-
-textarea{
-  resize: none;
-}
-
-ul{
-  padding: 0 10px;
-}
-
-li{
-  list-style:none;
-}
-
 :root{
   --sidebar-background: hsl(0, 0%, 98%);
   --main-background: hsl(0 0 99);
@@ -86,6 +64,33 @@ li{
     0.5px 0.5px 1.1px hsl(var(--shadow-color) / 0),
     0.8px 0.8px 1.7px hsl(var(--shadow-color) / 0.11),
     1.6px 1.5px 3.3px hsl(var(--shadow-color) / 0.22);
+}
+
+button,
+input,
+textarea,
+select{
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  transition: all 0.4s;
+}
+
+button:not(:disabled):active{
+  outline: 0.1rem solid white;
+}
+
+textarea{
+  resize: none;
+}
+
+ul{
+  padding: 0 10px;
+}
+
+li{
+  list-style:none;
 }
 
 body{
@@ -262,7 +267,12 @@ dialog{
   border-radius: 6px;
 
   box-shadow: var(--shadow-elevation-low);
+}
 
+dialog input,
+dialog select, 
+dialog button{
+  box-shadow: var(--shadow-elevation-low);
 }
 
 dialog form{
@@ -272,26 +282,28 @@ dialog form{
   flex-direction: column;
   
   gap: 3rem;
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
-.title-input-container,
-.description-textarea-container{
+.form-element{
   position: relative;
 }
 
 input,
-textarea{
+textarea,
+select{
   width: 100%;
   border-radius: 10px;
-  padding: 1rem;
+  padding: 0.6rem 0.8rem;
 }
 
 input[name="project-title"]{
+  padding: 1rem;
   font-size: 36px;
 }
 
 textarea[name="project-description"]{
+  padding: 1rem;
   font-size: 22px;
 }
 
@@ -314,7 +326,9 @@ textarea + .char-counter{
 input:hover,
 textarea:hover,
 input:focus:not(#main input),
-textarea:focus:not(#main textarea){
+textarea:focus:not(#main textarea),
+select:hover,
+select:focus{
   background-color: hsl(from var(--main-background) h s calc(l - 5));
 }
 
@@ -342,16 +356,17 @@ form button{
 
   transition:all 0.4s;
 }
-#project-form-submit-btn{
+
+form button[type="submit"]{
   background-color:hsl(120, 100%, 60%);;
 }
 
-#project-form-submit-btn:disabled{
+form button[type="submit"]:disabled{
   background-color: hsl(from var(--light-gray) h s calc(l + 10));
   cursor: not-allowed;
 }
 
-dialog .project-dialog-close-btn:hover{
+dialog button[command="close"]:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 30));
 }
 
@@ -393,4 +408,27 @@ dialog .project-dialog-close-btn:hover{
 
   font-size: 0.7rem;
   color: var(--light-gray);
+}
+
+.task-add-btn{
+  width: 100%;
+  height: 80px;
+  border-radius: 1rem;
+  font-size: 40px; 
+  background-color: transparent;
+  box-shadow: var(--shadow-elevation-low);
+  margin: 1rem 0;
+}
+
+.task-add-btn:hover{
+  margin: 0.7rem 0;
+  background-color: hsl(from var(--light-gray) h s calc(l + 40));
+}
+
+label{
+  margin-left: 5px;
+}
+
+select{
+  background-color: transparent;
 }

@@ -28,7 +28,7 @@ export default {
             {
                 test: /\.html$/i,
                 use: ["html-loader"],
-            }
+            },
         ],
     },
 
