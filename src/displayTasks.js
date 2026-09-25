@@ -5,6 +5,8 @@ import expandIcon from "./assets/chevron-down.svg"
 import { projectsContainer } from "./projectsContainer.js"
 import { createTask } from "./createTask.js"
 import * as helper from "./helper.js"
+import { intlFormatDistance } from "date-fns";
+import { format } from "date-fns"
 
 export const displayTasks = (() =>{
     const projectsArray = projectsContainer.getProjectsArray()
@@ -49,10 +51,20 @@ export const displayTasks = (() =>{
         e.currentTarget.id === "task-add-btn"? submitBtn.textContent = "Add" : submitBtn.textContent = "Save"
     }
 
+    function selectDefaultDate(){
+        const dateInput = document.querySelector("#task-due-date")
+        Object.assign(dateInput, {
+            min: format(new Date(), 'yyyy-MM-dd'),
+            max: '2100-12-20',
+            value: format((new Date()).setDate((new Date()).getDate() + 3),'yyyy-MM-dd') // set to after 3 days
+        })
+    }
+
     // 1-renders project selection form elem, 2-selects the current project, 3-adjusts text of dialog submit btn, 4- opens the dialog
     function openTaskDialog(e){
         renderProjectSelection()
         selectCurrentProject()
+        selectDefaultDate()
         adjustTaskSubmitBtnText(e)
         document.querySelector("#tasks-dialog").showModal()
     }
@@ -61,7 +73,8 @@ export const displayTasks = (() =>{
     // updates the content of the task card after edit
     function updateDisplayedTask(task){
         document.querySelector(`.task-card[data-id='${task.getId()}'] .task-title`).textContent = task.title
-        document.querySelector(`.task-card[data-id='${task.getId()}'] .task-due-date`).textContent = task.dueDate
+        document.querySelector(`.task-card[data-id='${task.getId()}'] .task-due-date`).textContent = intlFormatDistance(task.dueDate, new Date())
+
         displayPriority(task)
     }
 
@@ -95,6 +108,8 @@ export const displayTasks = (() =>{
     // creates a task and appends it to the correct project
     function addTask(){
         const taskFormElements = getAllTaskFormElements()
+
+
         const task = createTask(taskFormElements[0].value.trim(), taskFormElements[1].value.trim(), taskFormElements[2].value, taskFormElements[3].value)
         const selectedProject = projectsArray.find((project) => project.title == taskFormElements[4].value)
         selectedProject.addTask(task)
@@ -169,7 +184,7 @@ export const displayTasks = (() =>{
         cardTaskTitle.classList.add("task-title")
         cardTaskDueDate.classList.add("task-due-date")
         cardTaskTitle.textContent = task.title
-        cardTaskDueDate.textContent = task.dueDate
+        cardTaskDueDate.textContent = intlFormatDistance(task.dueDate, new Date())
 
         return {cardTaskTitle, cardTaskDueDate}
     }
