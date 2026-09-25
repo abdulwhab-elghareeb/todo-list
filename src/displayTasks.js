@@ -83,6 +83,10 @@ export const displayTasks = (() =>{
         }
     }
 
+    function updateCheckBtn(task, checkBtn){
+        (task.completed())? checkBtn.classList.add("checked") : checkBtn.classList.remove("checked")
+    }
+
     // gets all tasks form elements
     function getAllTaskFormElements(){
         return Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select"))
@@ -91,7 +95,7 @@ export const displayTasks = (() =>{
     // creates a task and appends it to the correct project
     function addTask(){
         const taskFormElements = getAllTaskFormElements()
-        const task = createTask(taskFormElements[0].value, taskFormElements[1].value, taskFormElements[2].value, taskFormElements[3].value)
+        const task = createTask(taskFormElements[0].value.trim(), taskFormElements[1].value.trim(), taskFormElements[2].value, taskFormElements[3].value)
         const selectedProject = projectsArray.find((project) => project.title == taskFormElements[4].value)
         selectedProject.addTask(task)
 
@@ -150,9 +154,10 @@ export const displayTasks = (() =>{
             e.stopPropagation()
 
             task.toggleState();
-            (task.completed())? e.currentTarget.classList.add("checked") : e.currentTarget.classList.remove("checked")
+            updateCheckBtn(task, e.currentTarget)
         }
         checkBtn.addEventListener("click", checkBtnClickHandler)
+        
 
         return checkBtn
     }
@@ -182,9 +187,11 @@ export const displayTasks = (() =>{
         function delBtnClickHandler(e){
             e.stopPropagation()
             const currentProject = getCurrentProject()
-            const taskToBeDeleted = currentProject.getAllTasks().find((task) => task.id === e.target.closest(".task-card").dataset.id) 
+            const taskToBeDeleted = currentProject.getAllTasks().find((task) => task.getId() === e.target.closest(".task-card").dataset.id) 
+            console.log(taskToBeDeleted)
 
             currentProject.removeTask(taskToBeDeleted)
+            console.log(currentProject.getAllTasks())
             e.target.closest(".task-card").remove()
         }
         delBtn.addEventListener("click", delBtnClickHandler )
@@ -206,23 +213,34 @@ export const displayTasks = (() =>{
     }
 
     // renders the task after form submission
-    function renderTask(){
-        const task =  addTask(),
-            taskCardContainer = createCardContainer(task),
-            taskCheckBtn = createCheckBtn(task),
-            taskTitle = createTaskMainContent(task).cardTaskTitle,
-            taskDueDate = createTaskMainContent(task).cardTaskDueDate,
-            taskDelBtn = createTaskDelBtn(),
-            taskExpandBtn = createExpandBtn()
+    function renderProjectTasks(){
+        const currentProject = getCurrentProject()
+        currentProject.getAllTasks().forEach((task) => {
+            if (document.querySelector(`*[data-id='${task.getId()}'`)) return
 
+            const taskCardContainer = createCardContainer(task),
+                  taskCheckBtn = createCheckBtn(task),
+                  taskTitle = createTaskMainContent(task).cardTaskTitle,
+                  taskDueDate = createTaskMainContent(task).cardTaskDueDate,
+                  taskDelBtn = createTaskDelBtn(),
+                  taskExpandBtn = createExpandBtn()
 
-        taskCardContainer.append(taskCheckBtn, taskTitle, taskDueDate, taskDelBtn, taskExpandBtn)
-        const cardsContainer = document.querySelector("#cards-container")
-        cardsContainer.appendChild(taskCardContainer)
-        document.querySelector("#main .wrapper").appendChild(cardsContainer)
-        displayPriority(task)
-
-        document.querySelector("#tasks-dialog form").reset() // reset the form
+            taskCardContainer.append(taskCheckBtn, taskTitle, taskDueDate, taskDelBtn, taskExpandBtn)
+            const cardsContainer = document.querySelector("#cards-container")
+            cardsContainer.appendChild(taskCardContainer)
+            document.querySelector("#main .wrapper").appendChild(cardsContainer)
+            displayPriority(task)
+            updateCheckBtn(task, taskCheckBtn)
+        })
     }
-    document.querySelector("#tasks-dialog form").addEventListener("submit", renderTask)
+
+    function formSubmitHandler(e){
+        addTask()
+        e.currentTarget.reset()
+        renderProjectTasks()
+    }
+
+    document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
+
+    return {renderProjectTasks, getCurrentProject}
 })()

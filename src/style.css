@@ -332,8 +332,7 @@ select:focus{
   background-color: hsl(from var(--main-background) h s calc(l - 5));
 }
 
-input:user-invalid,
-textarea:user-invalid{
+input:user-invalid{
   background-color: hsl(0, 100%, 90%);
 }
 
@@ -544,4 +543,10 @@ select{
   position: absolute;
   right: 4px;
   top: 1px;
+}
+
+#cards-container{
+  display: grid;
+  grid-auto-rows: max-content;
+  gap: 1rem;
 }
