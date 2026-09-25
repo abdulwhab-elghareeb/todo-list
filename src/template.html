@@ -54,12 +54,12 @@
         <form action="" method="dialog">
             <div class="form-element title-contaienr">
                 <input type="text" name="project-title" id="project-title" placeholder="Title" minlength="2" maxlength="30" pattern="^\S{2,}.*" required>
-                <span class="char-counter">0 / 30</span>
+                <span class="char-counter"></span>
             </div>
 
             <div class="form-element description-container">
-                <textarea name="project-description" id="project-description" rows="4" columns="30" placeholder="Description" autocorrect="on" maxlength="80"></textarea>
-                <span class="char-counter">0 / 80</span>
+                <input type="text" name="project-description" id="project-description" rows="4" columns="30" placeholder="Description" autocorrect="on" maxlength="80"></input>
+                <span class="char-counter"></span>
             </div>
             
             <div>
@@ -71,16 +71,16 @@
 
     <dialog id="tasks-dialog">
         <form action="" method="dialog">
-            <div>
+            <div class="form-element">
                 <label for="task-title">Task Title</label>
                 <input type="text" name="task-title" id="task-title" placeholder="Title" minlength="2" maxlength="30" pattern="^\S{2,}.*" required>
-                <span class="char-counter">0 / 30</span>
+                <span class="char-counter"></span>
             </div>
 
-            <div>
+            <div class="form-element">
                 <label for="task-description">Task Description</label`>
                 <input type="text" name="task-description" id="task-description" placeholder="Description" maxlength="80">
-                <span class="char-counter">0 / 80</span>
+                <span class="char-counter"></span>
             </div>
 
             <div>

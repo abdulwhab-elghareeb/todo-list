@@ -96,8 +96,8 @@ export const displayProjects = (() =>{
 
     // Resets the char counter
     function resetFormCounters(){
-        Array.from(document.querySelectorAll("input[type='text'] + .char-counter")).forEach((charCounter) => {
-                charCounter.textContent = `0 / ${document.querySelector("*:has(+ .char-counter)").maxLength}`
+        Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => {
+                document.querySelector(`#${input.id} + .char-counter`).textContent = `0 / ${input.maxLength}`
             })
     }
 
@@ -197,6 +197,7 @@ export const displayProjects = (() =>{
 
         const projectPageDescription = document.createElement("input")
         Object.assign(projectPageDescription, {
+            type: "text",
             name: "project-description",
             id: "project-page-description",
             autocorrect: "on",
@@ -234,7 +235,7 @@ export const displayProjects = (() =>{
         projectPageTitle.value = project.title
         projectPageDescription.value = project.description
 
-        Array.from(document.querySelectorAll("#main .note")).forEach((note) => note.textContent = "Double click to edit")
+        Array.from(document.querySelectorAll("#main .note")).forEach((note) => note.textContent = "Double click to edit!")
     }
 
     // Displays the project title and description in the project main page
@@ -272,7 +273,6 @@ export const displayProjects = (() =>{
         e.currentTarget.reset()
         updateProjectsCounter()
         updateShowDialogBtn()
-        resetFormCounters()
         disableFormSubmissionBtn()
     }
     document.querySelector("#project-dialog > form").addEventListener('submit', renderProject)

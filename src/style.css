@@ -81,10 +81,6 @@ button{
   background-color: inherit;
 }
 
-textarea{
-  resize: none;
-}
-
 ul{
   padding: 0 10px;
 }
@@ -281,7 +277,7 @@ dialog form{
   display: flex;
   flex-direction: column;
   
-  gap: 3rem;
+  gap: 2.5rem;
   padding: 1.5rem;
 }
 
@@ -290,7 +286,6 @@ dialog form{
 }
 
 input,
-textarea,
 select{
   width: 100%;
   border-radius: 10px;
@@ -302,31 +297,26 @@ input[name="project-title"]{
   font-size: 36px;
 }
 
-textarea[name="project-description"]{
+input[name="project-description"]{
   padding: 1rem;
-  font-size: 22px;
+  font-size: 20px;
+  height: 80px;
 }
 
 .char-counter{
   position: absolute;
   font-weight: 500;
+  font-size: 0.85rem;
   color: var(--light-gray);
 }
 
 input + .char-counter{
-  bottom: 8px;
-  right: 18px;
-}
-
-textarea + .char-counter{
-  bottom: 18px;
-  right: 18px;
+  bottom: 5px;
+  right: 15px;
 }
 
 input:hover,
-textarea:hover,
 input:focus:not(#main input),
-textarea:focus:not(#main textarea),
 select:hover,
 select:focus{
   background-color: hsl(from var(--main-background) h s calc(l - 5));
@@ -406,7 +396,6 @@ select{
   grid-auto-rows: max-content;
 
   padding: 2rem;
-  gap: 0.4rem;
 }
 
 #project-page-title{
@@ -414,8 +403,9 @@ select{
 }
 
 #project-page-description{
+  height: max-content;
   font-size: 1.1rem;
-  color: hsl(from var(--light-gray) h s calc(l - 10));
+  color: hsl(from var(--light-gray) h s calc(l - 20));
 }
 
 .note{

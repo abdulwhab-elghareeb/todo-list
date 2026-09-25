@@ -110,7 +110,6 @@ export const displayTasks = (() =>{
     function addTask(){
         const taskFormElements = getAllTaskFormElements()
 
-        console.log(taskFormElements[4].selectedIndex)
         const task = createTask(taskFormElements[0].value.trim(), taskFormElements[1].value.trim(), taskFormElements[2].value, taskFormElements[3].value)
         const selectedProject = projectsArray[taskFormElements[4].selectedIndex - 1]
         selectedProject.addTask(task)
