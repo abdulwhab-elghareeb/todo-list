@@ -29,6 +29,7 @@ export const displayTasks = (() =>{
         projectsArray.forEach((project) =>{
             const projectOption = document.createElement("option")
             projectOption.value = projectOption.textContent = project.title
+            projectOption.dataset.id = project.getId()
         
 
             projectSelection.appendChild(projectOption)
@@ -109,9 +110,9 @@ export const displayTasks = (() =>{
     function addTask(){
         const taskFormElements = getAllTaskFormElements()
 
-
+        console.log(taskFormElements[4].selectedIndex)
         const task = createTask(taskFormElements[0].value.trim(), taskFormElements[1].value.trim(), taskFormElements[2].value, taskFormElements[3].value)
-        const selectedProject = projectsArray.find((project) => project.title == taskFormElements[4].value)
+        const selectedProject = projectsArray[taskFormElements[4].selectedIndex - 1]
         selectedProject.addTask(task)
 
         return task
