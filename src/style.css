@@ -374,6 +374,16 @@ label{
   margin-left: 5px;
 }
 
+label:has(+ *:required)::after{
+  content: "*";
+  color: red;
+  margin-left: 2px;
+}
+
+*:required{
+  font-weight: 600;
+}
+
 select{
   background-color: transparent;
 }

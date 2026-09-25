@@ -108,6 +108,8 @@ export const displayController = (() =>{
 
         const project = createProject(projectTitle.value.trim(), projectDescription.value.trim())
         projectsContainer.addProject(project)
+
+        document.querySelector("#main").dataset.id = project.getId()
         
         const projectListItem = document.createElement("li")
         projectListItem.dataset.id = project.getId()
@@ -250,6 +252,11 @@ export const displayController = (() =>{
         })
     }
 
+    function selectCurrentProject(e){
+        const currentProject = projectsArray.find((project) => project.getId() === document.querySelector("#main").dataset.id)
+        document.querySelector("#task-project").value = currentProject.title
+    }
+
     function adjustTaskSubmitBtn(e){
         const submitBtn = document.querySelector("#task-submit-btn")
         e.currentTarget.id === "task-add-btn"? submitBtn.textContent = "Add" : submitBtn.textContent = "save"
@@ -257,6 +264,7 @@ export const displayController = (() =>{
 
     function openTaskDialog(e){
         renderProjectSelection()
+        selectCurrentProject(e)
         adjustTaskSubmitBtn(e)
         document.querySelector("#tasks-dialog").showModal()
     }
@@ -299,7 +307,7 @@ export const displayController = (() =>{
                 e.preventDefault()
 
                 taskFormElements.forEach(formElement => {
-                    (formElement.id == "task-project")? selectedProject.title = formElement.value : task[`${helper.toCamelCase(formElement.id, 1)}`] = formElement.value 
+                    (formElement.id == "task-project")? selectCurrentProject(e) : task[`${helper.toCamelCase(formElement.id, 1)}`] = formElement.value 
                 }) 
 
                 updateDisplayedTask(task)
