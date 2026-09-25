@@ -418,7 +418,7 @@ select{
   color: var(--light-gray);
 }
 
-.task-add-btn{
+#task-add-btn{
   width: 100%;
   height: 80px;
   border-radius: 1rem;
@@ -428,7 +428,7 @@ select{
   margin: 1rem 0;
 }
 
-.task-add-btn:hover{
+#task-add-btn:hover{
   margin: 0.7rem 0;
   background-color: hsl(from var(--light-gray) h s calc(l + 40));
 }

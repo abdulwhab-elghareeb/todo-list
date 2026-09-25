@@ -250,14 +250,25 @@ export const displayController = (() =>{
         })
     }
 
-    function openTaskDialog(){
+    function adjustTaskSubmitBtn(e){
+        const submitBtn = document.querySelector("#task-submit-btn")
+        e.currentTarget.id === "task-add-btn"? submitBtn.textContent = "Add" : submitBtn.textContent = "save"
+    }
+
+    function openTaskDialog(e){
         renderProjectSelection()
+        adjustTaskSubmitBtn(e)
         document.querySelector("#tasks-dialog").showModal()
     }
-    document.querySelector(".task-add-btn").addEventListener("click", openTaskDialog)
+    document.querySelector("#task-add-btn").addEventListener("click", openTaskDialog)
+
+    function updateDisplayedTask(task){
+        document.querySelector(`#task-card[data-id='${task.getId()}'] .task-title`).textContent = task.title
+        document.querySelector(`#task-card[data-id='${task.getId()}'] .task-due-date`).textContent = task.dueDate
+    }
 
     function addTask(){
-        // logic
+
         const taskFormElements = Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select"))
 
         const task = createTask(taskFormElements[0].value, taskFormElements[1].value, taskFormElements[2].value, taskFormElements[3].value)
@@ -270,21 +281,32 @@ export const displayController = (() =>{
         taskCardContainer.setAttribute("id", "task-card")
         taskCardContainer.dataset.id = task.getId()
 
+
         function taskContainerClickHandler(e){
             const tasksDialog = document.querySelector("#tasks-dialog")
             tasksDialog.showModal()
             
             // adjust the submit btn
             const saveBtn = document.querySelector("#task-submit-btn")
-            saveBtn.type = "button"
-            saveBtn.textContent = "Save"
+            adjustTaskSubmitBtn(e)
             
             // setting the values of inputs
             taskFormElements.forEach(formElement => {
                 (formElement.id == "task-project")? formElement.value = `${selectedProject.title}` : formElement.value = task[`${helper.toCamelCase(formElement.id, 1)}`]
             }) 
 
+            function saveBtnHandler(e){
+                e.preventDefault()
 
+                taskFormElements.forEach(formElement => {
+                    (formElement.id == "task-project")? selectedProject.title = formElement.value : task[`${helper.toCamelCase(formElement.id, 1)}`] = formElement.value 
+                }) 
+
+                updateDisplayedTask(task)
+                document.querySelector("#tasks-dialog form").reset()
+                tasksDialog.close()
+            }
+            saveBtn.addEventListener("click", saveBtnHandler, {once:true})
         }
         taskCardContainer.addEventListener("click", taskContainerClickHandler)
 
@@ -339,7 +361,4 @@ export const displayController = (() =>{
     }
 
     document.querySelector("#tasks-dialog form").addEventListener("submit", addTask)
-
-
-
 })()
