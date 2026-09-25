@@ -439,11 +439,10 @@ select{
 }
 
 #task-add-btn:hover{
-  margin: 0.7rem 0;
   background-color: hsl(from var(--light-gray) h s calc(l + 40));
 }
 
-#task-card{
+.task-card{
   position: relative;
 
   display: grid;
@@ -453,7 +452,8 @@ select{
   
   padding: 1rem 2.5rem 1rem 1rem;
   border-radius: 8px;
-
+  border: 1px solid;
+  
   box-shadow: var(--shadow-elevation-low);
 
   transition: all 0.4s;
@@ -469,15 +469,15 @@ select{
   font-weight: 500;
 }
 
-#task-card:hover{
+.task-card:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 47));
 }
 
-#task-card > .task-check-btn{
+.task-card > .task-check-btn{
   position: relative;
 }
 
-#task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
+.task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
   content: "";
   height: calc(100% + 1.5rem);
   width: 1px;
@@ -489,7 +489,7 @@ select{
   background-color: hsl(from var(--light-gray) h s calc(l + 35));
 }
 
-#task-card > .task-check-btn::before{ /* the check mark circle */
+.task-card > .task-check-btn::before{ /* the check mark circle */
   content: "";
 
   width: 17px;
@@ -505,20 +505,20 @@ select{
 }
 
 
-#task-card:has(> .task-check-btn.checked){
+.task-card:has(> .task-check-btn.checked){
   background-color: hsl(from var(--light-gray) h s calc(l + 37));
   text-decoration: line-through;
   opacity: 0.9;
   color: var(--light-gray);
 }
 
-#task-card > .task-check-btn:not(.checked):hover::before{
+.task-card > .task-check-btn:not(.checked):hover::before{
   opacity: 1;
   top: 11px;
   right: 15.5px;
 }
 
-#task-card > .task-check-btn.checked::before{
+.task-card > .task-check-btn.checked::before{
   opacity: 1;
   top: 11px;
   right: 15.5px;
