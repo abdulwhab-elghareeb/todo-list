@@ -1,2 +1,3 @@
 import "./style.css"
-import { displayController } from "./displayController.js"
+import { displayTasks } from "./displayTasks.js"
+import { displayProjects } from "./displayProjects.js"

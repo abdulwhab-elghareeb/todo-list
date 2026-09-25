@@ -6,7 +6,7 @@ import { projectsContainer } from "./projectsContainer.js"
 import { createTask } from "./createTask.js"
 import * as helper from "./helper.js"
 
-export const displayTask = (() =>{
+export const displayTasks = (() =>{
     const projectsArray = projectsContainer.getProjectsArray()
         
     // renders the projects selection option depending on all the current project
@@ -215,8 +215,11 @@ export const displayTask = (() =>{
             taskDelBtn = createTaskDelBtn(),
             taskExpandBtn = createExpandBtn()
 
+
         taskCardContainer.append(taskCheckBtn, taskTitle, taskDueDate, taskDelBtn, taskExpandBtn)
-        document.querySelector("#main .wrapper").appendChild(taskCardContainer)
+        const cardsContainer = document.querySelector("#cards-container")
+        cardsContainer.appendChild(taskCardContainer)
+        document.querySelector("#main .wrapper").appendChild(cardsContainer)
         displayPriority(task)
 
         document.querySelector("#tasks-dialog form").reset() // reset the form
