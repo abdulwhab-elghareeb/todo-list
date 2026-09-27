@@ -240,10 +240,10 @@ export const displayProjects = (() =>{
             document.querySelector(`#${e.target.id} + .char-counter`).textContent = ""
             e.target.setAttribute("readonly", "")
             
-            updateProjectListTitle(project)
-            
             project[e.target.name.split("-").at(-1)] = e.target.value.trim() // takes the last word of the input's name (title or description)
             storage.saveProjectsArray()
+            
+            updateProjectListTitle(project)
         }
 
         [projectPageTitle, projectPageDescription].forEach((input) =>{

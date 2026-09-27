@@ -121,7 +121,7 @@ export const displayTasks = (() =>{
         const task = createTask(taskFormElements[0].value.trim(), taskFormElements[1].value.trim(), taskFormElements[2].value, taskFormElements[3].value, taskFormElements[4].selectedIndex - 1)
         
         projectsArray[task.parentProjectIdx].addTask(task)
-        storage.saveProjectsContainer()
+        storage.saveProjectsArray()
 
         return task
     }
@@ -153,7 +153,7 @@ export const displayTasks = (() =>{
                 taskFormElements.forEach(formElement => {
                     (formElement.id == "task-project")? selectCurrentProject(e) : task[`${helper.toCamelCase(formElement.id, 1)}`] = formElement.value 
                 }) 
-                storage.saveProjectsContainer()
+                storage.saveProjectsArray()
                 updateDisplayedTask(task)
                 renderProjectTasks(getCurrentProject())
 
@@ -182,7 +182,7 @@ export const displayTasks = (() =>{
             task.toggleState();
             updateCheckBtn(task, e.currentTarget)
 
-            storage.saveProjectsContainer()
+            storage.saveProjectsArray()
         }
         checkBtn.addEventListener("click", checkBtnClickHandler)
         
@@ -217,7 +217,7 @@ export const displayTasks = (() =>{
             projectsArray[task.parentProjectIdx].removeTask(task)
             e.target.closest(".task-card").remove()
 
-            storage.saveProjectsContainer()
+            storage.saveProjectsArray()
         }
         delBtn.addEventListener("click", delBtnClickHandler )
 
