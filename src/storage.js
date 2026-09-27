@@ -24,9 +24,7 @@ function storageAvailable(type) {
 export function saveProjectsArray(){
     if (!storageAvailable("localStorage")) return
 
-    localStorage.setItem("projectsContainer", JSON.stringify(projectsContainer), (key,value) =>{
-      console.log(key , value)
-    })
+    localStorage.setItem("projectsContainer", JSON.stringify(projectsContainer))
 }
 
 export function getSavedProjectsArray(){
