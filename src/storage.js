@@ -26,7 +26,7 @@ export function saveProjectsArray(){
 
     console.log(projectsContainer.getProjectsArray())
     console.log(JSON.stringify(projectsContainer))
-    localStorage.setItem("projectsContainer", JSON.stringify(projectsContainer, [projectsArray]))
+    localStorage.setItem("projectsContainer", JSON.stringify(projectsContainer))
 }
 
 export function getSavedProjectsArray(){
