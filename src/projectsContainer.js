@@ -2,19 +2,19 @@ export const projectsContainer = (() =>{
     const projectsArray = []
 
     const maxLength = 15
-    const getMaxLength = () => maxLength
+    const getMaxArrayLength = () => maxLength
 
     const getProjectsArray = () => {
         return projectsArray
     }
 
-    const addProject = (project) => {
+    const addProjectToArray = (project) => {
         if (projectsArray.length < maxLength){
             projectsArray.push(project)
         }
     } 
 
-    const removeProject = (project) =>{
+    const removeProjectFromArray = (project) =>{
         projectsArray.splice(projectsArray.indexOf(project), 1)
     }
 
@@ -23,9 +23,9 @@ export const projectsContainer = (() =>{
     // }
 
     return{
-        getMaxLength,
+        getMaxArrayLength,
         getProjectsArray,
-        addProject,
-        removeProject,
+        addProjectToArray,
+        removeProjectFromArray,
     }
 })()

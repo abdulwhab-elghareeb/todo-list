@@ -192,14 +192,14 @@ body{
   pointer-events: none;
 }
 
-.list-items-container::before{
+.project-page-loader::before{
   content: "#";
   font-size: 1.2rem;
   margin-right: 8px;
   color: var(--light-gray);
 }
 
-#sidebar .list-items-container{
+#sidebar .project-page-loader{
   width: 100%;
 
   display: flex;
@@ -219,7 +219,7 @@ body{
 
 .hover,
 #sidebar button,
-#project-container .list-items-container{
+#project-container .project-page-loader{
   background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
@@ -245,7 +245,7 @@ body{
 }
 
 .hover:hover,
-#project-container .list-items-container:hover{
+#project-container .project-page-loader:hover{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
 }
 
@@ -316,7 +316,7 @@ input + .char-counter{
 }
 
 input:hover,
-input:focus:not(#main input),
+input:focus:not(#project-page input),
 select:hover,
 select:focus{
   background-color: hsl(from var(--main-background) h s calc(l - 5));
@@ -378,7 +378,7 @@ select{
 }
 
 /* Main content */
-#main{
+#project-page{
   flex-grow: 1;
 
   display: flex;
