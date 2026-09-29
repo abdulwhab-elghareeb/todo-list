@@ -1,3 +1,6 @@
 import "./style.css"
-import { displayTasks } from "./displayTasks.js"
 import { displayProjects } from "./displayProjects.js"
+import { displayTasks } from "./displayTasks.js"
+
+displayProjects.initialRendering()
+displayTasks.initialRendering()

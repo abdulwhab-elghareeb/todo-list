@@ -3,9 +3,35 @@ import delIcon  from "./assets/close.svg"
 import { projectsContainer } from "./projectsContainer.js"
 import { createProject } from "./createProject.js"
 import { displayTasks } from "./displayTasks.js"
+// import * as storage from "./storage.js"
+import { createTask } from "./createTask.js"
+
 
 export const displayProjects = (() =>{
     const projectsArray = projectsContainer.getProjectsArray()
+
+//     const savedArray = JSON.parse(localStorage.getItem("projectsContainer"))
+//     console.table(savedArray)
+
+//     if (savedArray){
+//         savedArray.forEach(savedProject =>{
+//         // restore projects
+//         const project = createProject(savedProject.title, savedProject.description, savedProject.id)
+//         projectsContainer.addProject(project)
+
+//         // restore project tasks
+//         savedProject.tasksArray.forEach(savedProjectTask =>{
+//             const projectTask = createTask(savedProjectTask.title,
+//                                             savedProjectTask.description,
+//                                             savedProjectTask.dueDate,
+//                                             savedProjectTask.priority,
+//                                             savedProjectTask.parentProjectIdx,
+//                                             savedProjectTask.isComplete)
+
+//             project.addTask(projectTask)
+//         })
+//     })
+// }
 
     // Closing and opening sidebar
     function toggleSidebar(e){
@@ -93,14 +119,6 @@ export const displayProjects = (() =>{
         Array.from(document.querySelectorAll("button[id*='submit']")).forEach((btn) => btn.setAttribute("disabled", ""))
     }
 
-
-    // Resets the char counter
-    function resetFormCounters(){
-        Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => {
-                document.querySelector(`#${input.id} + .char-counter`).textContent = `0 / ${input.maxLength}`
-            })
-    }
-
     // removes the inputs on the main page
     function clearMainPage(){
         Array.from(document.querySelectorAll("#main .wrapper > div")).forEach(container => container.replaceChildren())
@@ -128,11 +146,12 @@ export const displayProjects = (() =>{
 
         const project = createProject(projectTitleInput.value.trim(), projectDescriptionInput.value.trim())
         projectsContainer.addProject(project)
+        // localStorage.setItem("projectsContainer", JSON.stringify(projectsArray))
         updateMainId(project)
 
         return project
     }
-
+    
     // creates the navbar project list
     function createProjectList(project){
         const projectListItem = document.createElement("li")
@@ -158,15 +177,18 @@ export const displayProjects = (() =>{
         removeProjectBtn.appendChild(removeBtnImg)
     
         function removeBtnClickHandler(e){
-            e.stopPropagation()
-            const prevOrNextProject = projectsArray[projectsArray.indexOf(project) - 1] || projectsArray[projectsArray.indexOf(project) + 1] // get the prev project or the next one if the prev is not found       
-            projectsContainer.removeProject(project)
+            e.stopPropagation();
+            const prevOrNextProject = projectsArray[projectsArray.indexOf(project) - 1] || projectsArray[projectsArray.indexOf(project) + 1];// get the prev project or the next one if the prev is not found     
+
             getCurrentList(project).remove()
+            projectsContainer.removeProject(project)
             updateProjectsCounter()
             updateShowDialogBtn()
+            
+            // localStorage.setItem("projectsContainer", JSON.stringify(projectsArray))
 
             // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
-            projectsArray.length === 0? clearMainPage() : document.querySelector(`li[data-id="${prevOrNextProject.getId()}"] .list-items-container`).click()
+            projectsArray.length === 0? clearMainPage() : document.querySelector(`li[data-id="${prevOrNextProject.getId()}"] .list-items-container`).click();
         }
         removeProjectBtn.addEventListener("click", removeBtnClickHandler)
 
@@ -183,8 +205,8 @@ export const displayProjects = (() =>{
             id: "project-page-title",
             placeholder: "Title",
             minLength: "2",
-            maxLength: "30",
-            pattern: "^\S{2,}.*",
+            maxLength: "50",
+            pattern: "^\S{1,}.*",
             readOnly: true,
         })
         const titleCharCounter = document.createElement("span")
@@ -219,9 +241,13 @@ export const displayProjects = (() =>{
 
         function inputChangeEventHandler(e){
             document.querySelector(`#${e.target.id} + .char-counter`).textContent = ""
-            project[e.target.name.split("-").at(-1)] = e.target.value.trim() // takes the last word of it's name (title or description)
             e.target.setAttribute("readonly", "")
-
+            
+            projectsArray[0].title = e.target.value.trim() // takes the last word of the input's name (title or description)
+            console.log(projectsArray)
+            // localStorage.setItem("projectsContainer", JSON.stringify(projectsArray))
+            
+            
             updateProjectListTitle(project)
         }
 
@@ -235,14 +261,14 @@ export const displayProjects = (() =>{
         projectPageTitle.value = project.title
         projectPageDescription.value = project.description
 
-        Array.from(document.querySelectorAll("#main .note")).forEach((note) => note.textContent = "Double click to edit!")
+        Array.from(document.querySelectorAll("#main .note")).forEach((note) => note.textContent = "Double click to edit")
     }
 
     // Displays the project title and description in the project main page
     function renderProjectMainPage(project){
         clearMainPage()
+        displayTasks.renderProjectTasks(project)
         updateMainId(project)
-        displayTasks.renderProjectTasks()
         renderProjectInputs(project)
 
     }
@@ -258,22 +284,38 @@ export const displayProjects = (() =>{
     }
 
     // Adding Projects
-    function renderProject(e){
+    function renderProjects(){
         if (projectsArray.length >= projectsContainer.getMaxLength()) return // if the projectsContainer's max limit of projects is reached
-        const project = addProject(),
-              projectListItem = createProjectList(project).projectListItem,
-              projectListTitle = createProjectList(project).projectListTitle,
-              removeProjectBtn = createRemoveProjectBtn(project),
-              listItemsBtnContainer = createListItemsBtnContainer(project)
+        projectsArray.forEach(project =>{
+            if (document.querySelector(`li[data-id='${project.getId()}'`)) return
 
-        listItemsBtnContainer.append(projectListTitle, removeProjectBtn)
-        projectListItem.append(listItemsBtnContainer)
-        document.querySelector("#projects-list").appendChild(projectListItem)
+            const projectListItem = createProjectList(project).projectListItem,
+                  projectListTitle = createProjectList(project).projectListTitle,
+                  removeProjectBtn = createRemoveProjectBtn(project),
+                  listItemsBtnContainer = createListItemsBtnContainer(project)
+            
+            listItemsBtnContainer.append(projectListTitle, removeProjectBtn)
+            projectListItem.append(listItemsBtnContainer)
+            document.querySelector("#projects-list").appendChild(projectListItem)
 
+        })
+    }
+
+    function formSubmissionHandler(e){
+        addProject()
+        renderProjects()
         e.currentTarget.reset()
         updateProjectsCounter()
         updateShowDialogBtn()
         disableFormSubmissionBtn()
     }
-    document.querySelector("#project-dialog > form").addEventListener('submit', renderProject)
+    document.querySelector("#project-dialog > form").addEventListener('submit', formSubmissionHandler)
+
+    function initialRendering(){
+        renderProjects()
+        updateProjectsCounter()
+        updateShowDialogBtn()
+    }
+
+    return {initialRendering, renderProjectMainPage}
 })()

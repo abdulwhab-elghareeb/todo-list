@@ -451,11 +451,9 @@ select{
 
 .task-title{
   font-size: 20px;
-  font-weight: 500;
 }
 
 .task-due-date{
-  font-weight: 500;
 }
 
 .task-card:hover{
