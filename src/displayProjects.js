@@ -3,32 +3,35 @@ import delIcon  from "./assets/close.svg"
 import { projectsContainer } from "./projectsContainer.js"
 import { createProject } from "./createProject.js"
 import { displayTasks } from "./displayTasks.js"
-import * as storage from "./storage.js"
+// import * as storage from "./storage.js"
 import { createTask } from "./createTask.js"
 
 
 export const displayProjects = (() =>{
     const projectsArray = projectsContainer.getProjectsArray()
 
-    if (storage.getSavedProjectsArray()){
-        storage.getSavedProjectsArray().forEach(savedProject =>{
-        // restore projects
-        const project = createProject(savedProject.title, savedProject.description, savedProject.id)
-        projectsContainer.addProject(project)
+//     const savedArray = JSON.parse(localStorage.getItem("projectsContainer"))
+//     console.table(savedArray)
 
-        // restore project tasks
-        savedProject.tasksArray.forEach(savedProjectTask =>{
-            const projectTask = createTask(savedProjectTask.title,
-                                            savedProjectTask.description,
-                                            savedProjectTask.dueDate,
-                                            savedProjectTask.priority,
-                                            savedProjectTask.parentProjectIdx,
-                                            savedProjectTask.isComplete)
+//     if (savedArray){
+//         savedArray.forEach(savedProject =>{
+//         // restore projects
+//         const project = createProject(savedProject.title, savedProject.description, savedProject.id)
+//         projectsContainer.addProject(project)
 
-            project.addTask(projectTask)
-        })
-    })
-}
+//         // restore project tasks
+//         savedProject.tasksArray.forEach(savedProjectTask =>{
+//             const projectTask = createTask(savedProjectTask.title,
+//                                             savedProjectTask.description,
+//                                             savedProjectTask.dueDate,
+//                                             savedProjectTask.priority,
+//                                             savedProjectTask.parentProjectIdx,
+//                                             savedProjectTask.isComplete)
+
+//             project.addTask(projectTask)
+//         })
+//     })
+// }
 
     // Closing and opening sidebar
     function toggleSidebar(e){
@@ -143,7 +146,7 @@ export const displayProjects = (() =>{
 
         const project = createProject(projectTitleInput.value.trim(), projectDescriptionInput.value.trim())
         projectsContainer.addProject(project)
-        storage.saveProjectsArray()
+        // localStorage.setItem("projectsContainer", JSON.stringify(projectsArray))
         updateMainId(project)
 
         return project
@@ -178,11 +181,11 @@ export const displayProjects = (() =>{
             const prevOrNextProject = projectsArray[projectsArray.indexOf(project) - 1] || projectsArray[projectsArray.indexOf(project) + 1];// get the prev project or the next one if the prev is not found     
 
             getCurrentList(project).remove()
+            projectsContainer.removeProject(project)
             updateProjectsCounter()
             updateShowDialogBtn()
-            projectsContainer.removeProject(project)
             
-            storage.saveProjectsArray()
+            // localStorage.setItem("projectsContainer", JSON.stringify(projectsArray))
 
             // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
             projectsArray.length === 0? clearMainPage() : document.querySelector(`li[data-id="${prevOrNextProject.getId()}"] .list-items-container`).click();
@@ -240,8 +243,10 @@ export const displayProjects = (() =>{
             document.querySelector(`#${e.target.id} + .char-counter`).textContent = ""
             e.target.setAttribute("readonly", "")
             
-            project[e.target.name.split("-").at(-1)] = e.target.value.trim() // takes the last word of the input's name (title or description)
-            storage.saveProjectsArray()
+            projectsArray[0].title = e.target.value.trim() // takes the last word of the input's name (title or description)
+            console.log(projectsArray)
+            // localStorage.setItem("projectsContainer", JSON.stringify(projectsArray))
+            
             
             updateProjectListTitle(project)
         }

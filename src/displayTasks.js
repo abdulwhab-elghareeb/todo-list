@@ -5,7 +5,7 @@ import expandIcon from "./assets/chevron-down.svg"
 import { projectsContainer } from "./projectsContainer.js"
 import { createTask } from "./createTask.js"
 import * as helper from "./helper.js"
-import * as storage from "./storage.js"
+// import * as storage from "./storage.js"
 import { intlFormatDistance } from "date-fns";
 import { format } from "date-fns"
 import { displayProjects } from "./displayProjects.js"
@@ -65,6 +65,7 @@ export const displayTasks = (() =>{
 
     // 1-renders project selection form elem, 2-selects the current project, 3-adjusts text of dialog submit btn, 4- opens the dialog
     function openTaskDialog(e){
+        document.querySelector("#tasks-dialog form").reset()
         renderProjectSelection()
         selectCurrentProject()
         selectDefaultDate()
@@ -121,7 +122,7 @@ export const displayTasks = (() =>{
         const task = createTask(taskFormElements[0].value.trim(), taskFormElements[1].value.trim(), taskFormElements[2].value, taskFormElements[3].value, taskFormElements[4].selectedIndex - 1)
         
         projectsArray[task.parentProjectIdx].addTask(task)
-        storage.saveProjectsArray()
+        // storage.saveProjectsArray()
 
         return task
     }
@@ -153,7 +154,7 @@ export const displayTasks = (() =>{
                 taskFormElements.forEach(formElement => {
                     (formElement.id == "task-project")? selectCurrentProject(e) : task[`${helper.toCamelCase(formElement.id, 1)}`] = formElement.value 
                 }) 
-                storage.saveProjectsArray()
+                // storage.saveProjectsArray()
                 updateDisplayedTask(task)
                 renderProjectTasks(getCurrentProject())
 
@@ -161,8 +162,14 @@ export const displayTasks = (() =>{
                 tasksDialog.close()
             }
             saveBtn.addEventListener("click", saveBtnHandler, {once:true}) // setting once to avoid duplicate listeners
+
+            document.querySelector(".task-close-btn").addEventListener("click", () =>{
+                tasksDialog.close()
+                saveBtn.removeEventListener("click", saveBtnHandler)
+            }, {once:true})
         }
         taskCardContainer.addEventListener("click", taskContainerClickHandler)
+
 
         return taskCardContainer
     }
@@ -182,7 +189,7 @@ export const displayTasks = (() =>{
             task.toggleState();
             updateCheckBtn(task, e.currentTarget)
 
-            storage.saveProjectsArray()
+            // storage.saveProjectsArray()
         }
         checkBtn.addEventListener("click", checkBtnClickHandler)
         
@@ -217,7 +224,7 @@ export const displayTasks = (() =>{
             projectsArray[task.parentProjectIdx].removeTask(task)
             e.target.closest(".task-card").remove()
 
-            storage.saveProjectsArray()
+            // storage.saveProjectsArray()
         }
         delBtn.addEventListener("click", delBtnClickHandler )
 

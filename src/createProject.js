@@ -17,17 +17,7 @@ export function createProject(title, description, projectId=crypto.randomUUID())
     const id = projectId
     const getId = () => id
 
-    const toJSON = () =>{
-        return{
-            title,
-            description,
-            id,
-            tasksArray,
-        }
-    }
-
     return{
-        toJSON,
         title,
         description,
         getAllTasks,

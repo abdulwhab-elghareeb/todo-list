@@ -6,20 +6,9 @@ export function createTask(title, description, dueDate, priority, parentProjectI
     const completed = () => isComplete,
           toggleState = () => isComplete? isComplete = false : isComplete = true
 
-        
-    const toJSON = () =>{
-        return{
-            title,
-            description,
-            dueDate,
-            priority,
-            parentProjectIdx,
-            isComplete
-        }
-    }
+    
 
     return {
-        toJSON,
         title,
         description,
         dueDate,

@@ -18,12 +18,11 @@ export const projectsContainer = (() =>{
         projectsArray.splice(projectsArray.indexOf(project), 1)
     }
 
-    const toJSON = () =>{
-        return projectsArray
-    }
+    // const toJSON = () =>{
+    //     return projectsArray
+    // }
 
     return{
-        toJSON,
         getMaxLength,
         getProjectsArray,
         addProject,
