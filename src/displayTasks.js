@@ -5,9 +5,6 @@ import expandIcon from "./assets/chevron-down.svg"
 import { projectsContainer } from "./projectsContainer.js"
 import { createTask } from "./createTask.js"
 import * as helper from "./helper.js"
-// import * as storage from "./storage.js"
-import { intlFormatDistance } from "date-fns";
-import { format } from "date-fns"
 import { displayProjects } from "./displayProjects.js"
 
 export const displayTasks = (() =>{
