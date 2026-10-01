@@ -219,7 +219,8 @@ body{
 
 .hover,
 #sidebar button,
-#project-container .project-page-loader{
+#project-container .project-page-loader,
+.add-subtask-btn{
   background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
@@ -228,7 +229,8 @@ body{
   transition: all 0.4s;
 }
 
-#sidebar #project-dialog-show-btn{
+#sidebar #project-dialog-show-btn,
+.add-subtask-btn{
   padding: 1px 12px;
   font-size: 1.3rem;
   color: hsl(120, 100%, 30%);
@@ -432,11 +434,14 @@ select{
 }
 
 .task-card{
+  height: 70px;
+
   position: relative;
 
   display: grid;
   grid-template-columns: max-content 1fr max-content max-content;
   align-items: center;
+  align-content: start;
   gap: 1.5rem;
   
   padding: 1rem 2.5rem 1rem 1rem;
@@ -445,15 +450,13 @@ select{
   
   box-shadow: var(--shadow-elevation-low);
 
+  overflow: hidden;
   transition: all 0.4s;
   cursor: pointer;
 }
 
 .task-title{
   font-size: 20px;
-}
-
-.task-due-date{
 }
 
 .task-card:hover{
@@ -522,7 +525,8 @@ select{
   height: 20px;
 }
 
-.task-del-btn:hover{
+.task-del-btn:hover,
+.add-subtask-btn:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 32));
 }
 
@@ -537,4 +541,28 @@ select{
   display: grid;
   grid-auto-rows: max-content;
   gap: 1rem;
+}
+
+.task-card.expanded{
+  height: 200px;
+}
+
+ul.subtasks-list{
+  padding: 0 40px;
+  position: relative;
+  grid-column: span 4;
+}
+
+.subtasks-list li{
+  border-left: 1px solid black;
+  position: relative;
+}
+.subtasks-list li::before{
+  content: 'L';
+  position: absolute;
+  top: 15px;
+  left: -10px;
+  width: 15px;
+  height: 1px;
+  background-color: black;
 }

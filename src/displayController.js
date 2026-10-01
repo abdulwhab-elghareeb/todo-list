@@ -9,6 +9,7 @@ import { createTask } from "./createTask.js"
 import {toCamelCase, replaceEventListener, createDOMElement} from "./helper.js"
 import { intlFormatDistance } from "date-fns";
 import { format } from "date-fns"
+import { createSubtask } from "./createSubtask.js"
 
 
 const projectsArray = projectsContainer.getProjectsArray()
@@ -561,15 +562,40 @@ function createTaskDelBtn(task){
 
 
 
-function createExpandBtn(){
+function createExpandBtn(task){
     const expandBtn = createDOMElement({elemType:"button", className:"task-expand-btn"})
     const expandBtnImg = createDOMElement({elemType:"img", src:expandIcon, height:"20"})
     expandBtn.appendChild(expandBtnImg)
 
+    function expandBtnClickHandler(e){
+        e.stopPropagation()
+        const taskCardContainer = expandBtn.closest(".task-card")
+        toggleCardExpandedClass(taskCardContainer)
+
+        if (isExpanded(taskCardContainer)){
+            addInitialSubtasksList(taskCardContainer)
+
+        }else{
+            clearList(taskCardContainer)
+        }
+    }
+    expandBtn.addEventListener("click", expandBtnClickHandler)
+
     return expandBtn
 }
 
+function toggleCardExpandedClass(card){
+    card.classList.toggle("expanded")
+}
 
+function isExpanded(card){
+    return card.classList.contains("expanded")
+}
+
+function clearList(card){
+    const list = document.querySelector(`.task-card[data-id="${card.dataset.id}"] .subtasks-list`)
+    list.remove()
+}
 
 function renderProjectTasks(project){
     if (!project) return
@@ -581,7 +607,7 @@ function renderProjectTasks(project){
         const taskTitle = createTaskMainContent(task).cardTaskTitle
         const taskDueDate = createTaskMainContent(task).cardTaskDueDate
         const taskDelBtn = createTaskDelBtn(task)
-        const taskExpandBtn = createExpandBtn()
+        const taskExpandBtn = createExpandBtn(task)
         const cardsContainer = document.querySelector("#cards-container")
         const projectPage = document.querySelector("#project-page .wrapper")
 
@@ -611,3 +637,33 @@ document.querySelector("#tasks-dialog form").addEventListener("submit", formSubm
 //     addAllSavedTasks()
 //     displayProjects.renderProjectPage(getCurrentProject())
 // }
+
+
+// ---------------------------------------
+
+function addInitialSubtasksList(currentTaskCard){
+    const subtasksList = createSubtasksList()
+    const subtasksListItem = createASubtaskListItem()
+    const addSubtaskBtn = createAddSubtaskBtn()
+
+    subtasksList.appendChild(subtasksListItem)
+    subtasksListItem.appendChild(addSubtaskBtn)
+
+    currentTaskCard.appendChild(subtasksList)
+
+}
+
+function createSubtasksList(){
+    const subtasksList = createDOMElement({elemType:"ul", className:"subtasks-list"})
+    return subtasksList
+}
+
+function createASubtaskListItem(){
+    const subtasksListItem = createDOMElement({elemType:"li", className:"subtask-list-item"})
+    return subtasksListItem
+}
+
+function createAddSubtaskBtn(){
+    const addSubtaskBtn = createDOMElement({elemType:"button", className:"add-subtask-btn", textContent:"+"})
+    return addSubtaskBtn
+}
