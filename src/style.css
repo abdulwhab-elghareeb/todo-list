@@ -469,7 +469,7 @@ select{
 
 .task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
   content: "";
-  height: calc(100% + 1.5rem);
+  height: 70px;
   width: 1px;
 
   position: absolute;
@@ -477,6 +477,11 @@ select{
   bottom: -12px;
     
   background-color: hsl(from var(--light-gray) h s calc(l + 35));
+}
+
+.task-card.expanded > .task-check-btn::after{
+  height: 300px;
+  top:-1rem;
 }
 
 .task-card > .task-check-btn::before{ /* the check mark circle */
@@ -508,10 +513,22 @@ select{
   right: 15.5px;
 }
 
+.subtask-card > .task-check-btn:not(.checked):hover::before{
+  opacity: 1;
+  top: 6px;
+  right: 7px;
+}
+
 .task-card > .task-check-btn.checked::before{
   opacity: 1;
   top: 11px;
   right: 15.5px;
+}
+
+.subtask-card > .task-check-btn.checked::before{
+  opacity: 1;
+  top: 6px;
+  right: 7px;
 }
 
 .task-del-btn{
@@ -544,25 +561,66 @@ select{
 }
 
 .task-card.expanded{
-  height: 200px;
+  height: 300px;
 }
 
 ul.subtasks-list{
-  padding: 0 40px;
-  position: relative;
   grid-column: span 4;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 0 40px;
 }
 
 .subtasks-list li{
-  border-left: 1px solid black;
   position: relative;
+  margin-left: 1rem;
+
 }
 .subtasks-list li::before{
-  content: 'L';
+  content: '';
   position: absolute;
-  top: 15px;
-  left: -10px;
-  width: 15px;
+  top: 16px;
+  width: 16px;
   height: 1px;
-  background-color: black;
+  background-color: hsl(from var(--light-gray) h s calc(l + 20));
+}
+
+.subtasks-list li div:has(.add-subtask-btn){
+  padding-left: 1rem;
+}
+
+.subtask-card{
+  height: 2rem;
+  width: 300px;
+
+  display: flex;
+
+  padding: 0 8px;
+  margin-left: 1rem;
+
+  border-color: inherit;
+}
+
+.subtask-card .task-title{
+  font-size: 15px;
+}
+
+.subtask-card .task-check-btn img{
+  width: 25px;
+  height: 25px;
+}
+
+.subtask-card .task-del-btn{
+  margin-left: auto;
+}
+
+.subtask-card .task-del-btn{
+  width: 22px;
+  height: 22px;
+}
+.subtask-card button{
+  padding: 2px;
 }

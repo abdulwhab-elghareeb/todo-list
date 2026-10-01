@@ -444,6 +444,7 @@ function createCardContainer(task){
     return taskCardContainer
 }
 
+
 function setupFormElementsValues(taskFormElements, task){
     taskFormElements.forEach(formElement =>{
         if (formElement.id === "task-project"){
@@ -536,18 +537,20 @@ function updateCheckBtn(task, checkBtn){
 
 
 function createTaskMainContent(task){
-    const cardTaskTitle = createDOMElement({elemType:"div", className:"task-title", textContent:task.title})
+    const cardTaskTitle = createCardTitleDOMElem(task)
     const cardTaskDueDate = createDOMElement({elemType:"div", className:"task-due-date", textContent:intlFormatDistance(task.dueDate, new Date())})
 
     return {cardTaskTitle, cardTaskDueDate}
 }
 
+function createCardTitleDOMElem(task){
+    const cardTaskTitle = createDOMElement({elemType:"div", className:"task-title", textContent:task.title})
+    return cardTaskTitle
+}
 
 
 function createTaskDelBtn(task){
-    const delBtn = createDOMElement({elemType:"button", className:"task-del-btn"})
-    const delBtnImg = createDOMElement({elemType:"img", src:delIcon, height:"20"})
-    delBtn.appendChild(delBtnImg)
+    const delBtn = createDelBtnDOMElem()
 
     function delBtnClickHandler(e){
         e.stopPropagation()
@@ -556,6 +559,14 @@ function createTaskDelBtn(task){
 
     }
     delBtn.addEventListener("click", delBtnClickHandler )
+
+    return delBtn
+}
+
+function createDelBtnDOMElem(){
+    const delBtn = createDOMElement({elemType:"button", className:"task-del-btn"})
+    const delBtnImg = createDOMElement({elemType:"img", src:delIcon, height:"20"})
+    delBtn.appendChild(delBtnImg)
 
     return delBtn
 }
@@ -644,13 +655,14 @@ document.querySelector("#tasks-dialog form").addEventListener("submit", formSubm
 function addInitialSubtasksList(currentTaskCard){
     const subtasksList = createSubtasksList()
     const subtasksListItem = createASubtaskListItem()
-    const addSubtaskBtn = createAddSubtaskBtn()
+    const subtaskContainer = createSubtaskContainer()
+    const addSubtaskBtn = createAddSubtaskBtn(currentTaskCard)
 
     subtasksList.appendChild(subtasksListItem)
-    subtasksListItem.appendChild(addSubtaskBtn)
+    subtasksListItem.appendChild(subtaskContainer)
+    subtaskContainer.appendChild(addSubtaskBtn)
 
     currentTaskCard.appendChild(subtasksList)
-
 }
 
 function createSubtasksList(){
@@ -663,7 +675,35 @@ function createASubtaskListItem(){
     return subtasksListItem
 }
 
-function createAddSubtaskBtn(){
+function createSubtaskContainer(){
+    const subtaskContainer = createDOMElement({elemType:"div", className:"subtask-container"})
+    return subtaskContainer
+}
+
+function createAddSubtaskBtn(currentTaskCard){
     const addSubtaskBtn = createDOMElement({elemType:"button", className:"add-subtask-btn", textContent:"+"})
+
+    addSubtaskBtn.addEventListener("click", (e) => {
+        e.stopPropagation()
+        const subtaskList = addSubtaskList(currentTaskCard)
+
+        e.currentTarget.closest("ul").appendChild(subtaskList)
+
+    })
     return addSubtaskBtn
+}
+
+
+function addSubtaskList(currentTaskCard){
+    const subtask = createSubtask("antything")
+    const checkBtn = createCheckBtn(subtask)
+    const title = createCardTitleDOMElem(subtask)
+    const delBtn = createDelBtnDOMElem()
+    const listCard = createCardContainer(subtask)
+    const li = createASubtaskListItem()
+    listCard.append(checkBtn, title, delBtn)
+    listCard.classList.add("subtask-card")
+    li.append(listCard)
+
+    return li
 }
