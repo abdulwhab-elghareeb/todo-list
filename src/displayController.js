@@ -584,7 +584,8 @@ function createExpandBtn(task){
         toggleCardExpandedClass(taskCardContainer)
 
         if (isExpanded(taskCardContainer)){
-            addInitialSubtasksList(taskCardContainer)
+            if (!subtasksLimitReached(task)) addInitialSubtasksList(taskCardContainer,task)
+            renderTaskSubtasks(task)
 
         }else{
             clearList(taskCardContainer)
@@ -604,8 +605,8 @@ function isExpanded(card){
 }
 
 function clearList(card){
-    const list = document.querySelector(`.task-card[data-id="${card.dataset.id}"] .subtasks-list`)
-    list.remove()
+    const ul = document.querySelector(`.task-card[data-id="${card.dataset.id}"] .subtasks-list`)
+    ul.replaceChildren()
 }
 
 function renderProjectTasks(project){
@@ -652,58 +653,139 @@ document.querySelector("#tasks-dialog form").addEventListener("submit", formSubm
 
 // ---------------------------------------
 
-function addInitialSubtasksList(currentTaskCard){
-    const subtasksList = createSubtasksList()
-    const subtasksListItem = createASubtaskListItem()
-    const subtaskContainer = createSubtaskContainer()
-    const addSubtaskBtn = createAddSubtaskBtn(currentTaskCard)
+function addInitialSubtasksList(currentTaskCard, task){
+    const subtasksList = currentTaskCard.querySelector("ul") || createDOMElement({elemType:"ul", className:"subtasks-list"})
+    subtasksList.addEventListener("click", (e)=> e.stopPropagation())
+    const addBtnList = createAddSubtaskBtnList(task)
 
-    subtasksList.appendChild(subtasksListItem)
-    subtasksListItem.appendChild(subtaskContainer)
-    subtaskContainer.appendChild(addSubtaskBtn)
-
+    subtasksList.appendChild(addBtnList)
     currentTaskCard.appendChild(subtasksList)
 }
 
-function createSubtasksList(){
-    const subtasksList = createDOMElement({elemType:"ul", className:"subtasks-list"})
-    return subtasksList
-}
 
-function createASubtaskListItem(){
+
+function createAddSubtaskBtnList(task){
     const subtasksListItem = createDOMElement({elemType:"li", className:"subtask-list-item"})
-    return subtasksListItem
-}
-
-function createSubtaskContainer(){
     const subtaskContainer = createDOMElement({elemType:"div", className:"subtask-container"})
-    return subtaskContainer
-}
-
-function createAddSubtaskBtn(currentTaskCard){
     const addSubtaskBtn = createDOMElement({elemType:"button", className:"add-subtask-btn", textContent:"+"})
+
+    subtasksListItem.appendChild(subtaskContainer)
+    subtaskContainer.appendChild(addSubtaskBtn)
 
     addSubtaskBtn.addEventListener("click", (e) => {
         e.stopPropagation()
-        const subtaskList = addSubtaskList(currentTaskCard)
+        const subtaskObj = createSubtaskObject(task)
+        const subtaskList = createDisplaySubtask(task, subtaskObj)
+        const subtaskTitleInput = subtaskList.querySelector("input")    
+        const addBtnList = addSubtaskBtn.closest("li")
 
-        e.currentTarget.closest("ul").appendChild(subtaskList)
+        addBtnList.before(subtaskList)
+        subtaskTitleInput.focus()
+
+        if (subtasksLimitReached(task)) addBtnList.remove()
+        
 
     })
-    return addSubtaskBtn
+    return subtasksListItem
 }
 
+function subtasksLimitReached(task){
+    return task.getSubtasks().length === task.getMaxLength()
+}
 
-function addSubtaskList(currentTaskCard){
-    const subtask = createSubtask("antything")
+function getSubtasksList(childElem="", taskId=""){
+    if (childElem) return childElem.closest("ul")
+    if (taskId) return document.querySelector(`.task-card[data-id="${taskId}"] ul`)
+}
+
+function createDisplaySubtask(task, subtask){
     const checkBtn = createCheckBtn(subtask)
-    const title = createCardTitleDOMElem(subtask)
-    const delBtn = createDelBtnDOMElem()
-    const listCard = createCardContainer(subtask)
-    const li = createASubtaskListItem()
-    listCard.append(checkBtn, title, delBtn)
-    listCard.classList.add("subtask-card")
-    li.append(listCard)
+    const title = createSubtaskTitleInput(subtask)
+    const delBtn = createSubTaskDelBtn(subtask, task)
+    const listCard = createSubtaskCardContainer(subtask)
+    const li = createDOMElement({elemType:"li", className:"subtask-list-item"})
 
+    listCard.append(checkBtn, title, delBtn)
+    li.append(listCard)
+    
     return li
+}
+
+function createSubTaskDelBtn(subtask, task){
+    console.table(subtask)
+    const delBtn = createDelBtnDOMElem()
+    delBtn.addEventListener("click", () =>{
+        if (subtasksLimitReached(task)){
+            getSubtasksList(delBtn).appendChild(createAddSubtaskBtnList(task))
+        }
+
+        const subtaskLi = document.querySelector(`li:has(.subtask-card[data-id="${subtask.getId()}"])`)
+        subtaskLi.remove()    
+        task.removeSubtask(subtask)
+    })
+
+    return delBtn
+}
+
+function createSubtaskObject(task, titleValue=""){
+    const subtask = createSubtask(titleValue)
+    task.addSubtask(subtask)
+    return subtask
+}
+
+function createSubtaskTitleInput(subtask){
+    const subtaskTitleInput = createDOMElement({elemType:"input"})
+    Object.assign(subtaskTitleInput, {
+        type: "text",
+        name: "subtask-title",
+        id: "subtask-title",
+        placeholder: "Title",
+        minLength: "2",
+        maxLength: "20",
+        pattern: "^\S{1,}.*",
+        autofocus: true,
+        required:true,
+    })
+    addListenersToSubtaskInput(subtaskTitleInput, subtask)
+    return subtaskTitleInput
+}
+
+function createSubtaskCardContainer(subtask){
+    const container = createCardContainer(subtask).cloneNode()
+    container.classList.add("subtask-card")
+    return container
+}
+
+function addListenersToSubtaskInput(subtaskTitleInput, subtask){
+    subtaskTitleInput.addEventListener("keydown",(e) => {
+        if (e.key === "Enter" && subtaskTitleInput.value.trim().length > 0){
+            subtask.title = subtaskTitleInput.value.trim()
+            subtaskTitleInput.setAttribute("readOnly", "")
+        }
+    })
+
+    subtaskTitleInput.addEventListener("dblclick", (e) =>{
+        e.stopPropagation()
+        subtaskTitleInput.removeAttribute("readOnly")
+    })
+
+    // subtaskTitleInput.addEventListener("blur", () =>{
+    //     const subtaskDelBtn = subtaskTitleInput.nextSibling
+    //     const inputValue = subtaskTitleInput.value.trim()
+    //     if(inputValue.length == 0){
+    //         subtaskDelBtn.click()
+    //     }else{
+    //         subtask.title = inputValue
+    //     }
+    // })
+}
+
+function renderTaskSubtasks(task){
+    task.getSubtasks().forEach((subtask) =>{
+        const displaySubtask = createDisplaySubtask(task, subtask)
+        const subtasksUl = getSubtasksList("", task.getId())
+        subtasksUl.querySelector("li:has(.add-subtask-btn)").before(displaySubtask)
+        subtasksUl.querySelector(`li:has(*[data-id="${subtask.getId()}"]) input`).value = subtask.title
+        updateCheckBtn(subtask, subtasksUl.querySelector(`li:has(*[data-id="${subtask.getId()}"]) .task-check-btn`))
+    })
 }

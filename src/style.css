@@ -99,10 +99,14 @@ body{
   color: var(--text-color);
 }
 
+/* scrollbar */
+
 /* Sidebar */
 #sidebar{
   overflow: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
+  position: fixed;
   width: 300px;
+  height: 100vh;
 
   background-color: var(--sidebar-background);
 
@@ -118,13 +122,15 @@ body{
 
 }
 
-#sidebar #sidebar-toggling-btn{
-  position: absolute;
+#sidebar-toggling-btn{
+  position: fixed;
+  z-index: 2;
   left: 250px;
   top: 20px;
 
   text-align: center;
   padding: 6px;
+  border-radius: 1rem;
 }
 
 /* sidebar closing/opening transition */
@@ -133,7 +139,7 @@ body{
   padding: 0;
 }
 
-#sidebar #sidebar-toggling-btn.sidebar-close{
+#sidebar-toggling-btn.sidebar-close{
   left: 15px;
 }
 
@@ -149,6 +155,16 @@ body{
   font-weight: 500;
   white-space: pre;
 }
+
+#project-page{
+  margin-left: 300px;
+  transition: margin-left 0.4s;
+}
+
+#project-page.sidebar-close{
+  margin-left: 0;
+}
+
 
 #project-container-header{
   display: flex;
@@ -251,7 +267,8 @@ body{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
 }
 
-#sidebar button:hover{
+#sidebar button:hover,
+#sidebar-toggling-btn:hover{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 20));  
 }
 
@@ -384,24 +401,27 @@ select{
   flex-grow: 1;
 
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
 .wrapper{
   flex-grow: 1;
-
-  min-height: 100%;
-  max-width: 1100px;
-
-  display: grid;
-  grid-auto-rows: max-content;
-
+  
+  min-height: max-content;
+  max-width: 1080px;
+    
   padding: 2rem;
+}
+
+div:has(#project-page-title){
+  position: sticky;
+  top: -1px;
+  z-index: 2;
 }
 
 #project-page-title{
   font-weight: 500;
+  
 }
 
 #project-page-description{
@@ -572,6 +592,8 @@ ul.subtasks-list{
   gap: 8px;
 
   padding: 0 40px;
+  cursor: default;
+
 }
 
 .subtasks-list li{
@@ -598,7 +620,7 @@ ul.subtasks-list{
 
   display: flex;
 
-  padding: 0 8px;
+  padding: 3px 10px;
   margin-left: 1rem;
 
   border-color: inherit;
@@ -609,8 +631,8 @@ ul.subtasks-list{
 }
 
 .subtask-card .task-check-btn img{
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
 }
 
 .subtask-card .task-del-btn{
@@ -618,9 +640,17 @@ ul.subtasks-list{
 }
 
 .subtask-card .task-del-btn{
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
+
 .subtask-card button{
   padding: 2px;
+}
+
+.subtask-card #subtask-title{
+  background-color: transparent;
+  font-weight: inherit;
+  padding: 0;
+
 }
