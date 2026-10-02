@@ -166,6 +166,12 @@ body{
   font-weight: bold;
 }
 
+#sidebar #projects-list{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 #project-page{
   margin-left: 300px;
   transition: margin-left 0.4s;
@@ -479,6 +485,7 @@ div:has(#project-page-title){
   align-items: center;
   align-content: start;
   column-gap: 1.5rem;
+  row-gap: 14px;
   
   padding: 10px 8px;
   border-radius: 8px;

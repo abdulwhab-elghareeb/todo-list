@@ -11,6 +11,8 @@ import { intlFormatDistance } from "date-fns";
 import { format } from "date-fns"
 import { createSubtask } from "./createSubtask.js"
 
+import * as dom from "./dom.js"
+
 
 const projectsArray = projectsContainer.getProjectsArray()
 projectsContainer.addProjectToArray(createProject("Default", "This is the default project Good luck"))
@@ -41,11 +43,7 @@ function updateProjectsCounterText(projectsNumCounter){
 
 function inputsEventHandler(e){
     const currentInput = e.currentTarget
-    
-    if (inputIsRequired(currentInput)){
-        updateFormSubmitBtnAvailability(currentInput)
-    }
-
+    if (inputIsRequired(currentInput)) updateFormSubmitBtnAvailability(currentInput)
     updateCharCount(currentInput)
 }
 
@@ -56,26 +54,26 @@ function inputIsRequired(input){
 
 function updateFormSubmitBtnAvailability(requiredInput){
     const activeFormDialog = requiredInput.closest("dialog")
-    const formSubmitBtn = document.querySelector(`#${activeFormDialog.id} button[id*="submit"]`);
+    const formSubmitBtn = activeFormDialog.querySelector("button[type='submit']");
 
     (requiredInput.checkValidity())? formSubmitBtn.removeAttribute("disabled") : formSubmitBtn.setAttribute("disabled","")
 }
 
 function updateCharCount(textInput){
-    const charCounter = document.querySelector(`#${textInput.id} + .char-counter`)
+    const charCounter = textInput.nextElementSibling
 
     charCounter.textContent = `${textInput.value.length} / ${textInput.maxLength}`
 }
 
 function resetCharCounters(){
-    Array.from(document.querySelectorAll(".char-counter")).forEach(charCounter =>{
+    [...document.querySelectorAll(".char-counter")].forEach(charCounter =>{
         charCounter.textContent = ""
     })
 }
 
 
 function openDialog(){
-    document.querySelector("#project-dialog").showModal()
+    document.getElementById("project-dialog").showModal()
     addInputEventToTextInputs()
 }
 
@@ -88,8 +86,8 @@ document.querySelector("#sidebar-add-project-btn").addEventListener("click", ope
 
 
 function addProject(){
-    const projectTitleInput = document.querySelector("#project-title")
-    const projectDescriptionInput = document.querySelector("#project-description")
+    const projectTitleInput = document.getElementById("project-title")
+    const projectDescriptionInput = document.getElementById("project-description")
 
     const project = createProject(projectTitleInput.value.trim(), projectDescriptionInput.value.trim())
     projectsContainer.addProjectToArray(project)
@@ -103,20 +101,8 @@ function updateProjectPageId(project){
 }
 
 
-
-function createProjectSidebarList(project){
-    const projectListItem = createDOMElement({elemType:"li", dataId:project.getId()})
-    const projectListTitle = createDOMElement({elemType:"div", textContent:project.title, className:"project-title"})
-
-    return {projectListItem, projectListTitle}
-}
-
-
-
-function createRemoveProjectBtn(project){
-    const removeProjectBtn = createDOMElement({elemType:"button", className:"project-remove-btn"})
-    const removeBtnImg = createDOMElement({elemType:"img", src:delIcon, height:"15"})
-    removeProjectBtn.appendChild(removeBtnImg)
+function createProjectRemoveBtn(project){
+    const removeProjectBtn = dom.createProjectRemoveBtn()
 
     function removeBtnClickHandler(e){
         e.stopPropagation();
@@ -149,12 +135,12 @@ function getProjectSidebarList(project){
 
 
 function clearProjectPage(){
-    Array.from(document.querySelectorAll("#project-page .wrapper > div")).forEach(container => container.replaceChildren())
+    [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
 }
 
 
 
-function renderProjectPage(project, e){
+function renderProjectPage(project){
     clearProjectPage()
     renderProjectTasks(project)
     updateProjectPageId(project)
@@ -163,57 +149,30 @@ function renderProjectPage(project, e){
 }
 
 function renderProjectInputs(project){
-    const projectPageTitleInput = createDOMElement({elemType:"input", value:project.title})
-    Object.assign(projectPageTitleInput, {
-        type: "text",
-        name: "project-title",
-        id: "project-page-title",
-        placeholder: "Title",
-        minLength: "2",
-        maxLength: "50",
-        pattern: "^\S{1,}.*",
-        readOnly: true,
-    })
+    const projectPageTitleInput = dom.createProjectPageTitleInput(project)
+    const projectPageDescriptionInput = dom.createProjectPageDescInput(project)
+    const charCounter = dom.createInputCharCounter()
+    const note = dom.createProjectPageNote()
 
-    const titleCharCounter = createDOMElement({elemType:"span", className:"char-counter"})
-    const titleNote = createDOMElement({elemType:"span", className:"note", textContent:"Double click to edit"})
+    document.querySelector("#project-page .title-container").append(projectPageTitleInput, charCounter, note)
+    document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, charCounter.cloneNode(), note.cloneNode())
 
-    document.querySelector("#project-page .title-container").append(projectPageTitleInput, titleCharCounter, titleNote)
-
-    const projectPageDescriptionInput = createDOMElement({elemType:"input", value:project.description})
-    Object.assign(projectPageDescriptionInput, {
-        type: "text",
-        name: "project-description",
-        id: "project-page-description",
-        autocorrect: "on",
-        placeholder: "Description",
-        maxLength: "80",
-        readOnly: true,
-    })
-
-    const descCharCounter = createDOMElement({elemType:"span", className:"char-counter"})
-    const descNote = createDOMElement({elemType:"span", className:"note", textContent:"Double click to edit"})
-
-    document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, descCharCounter, descNote)
-
-    // inputs events
+    
     function inputsDoubleClickHandler(e){
         const projectPageInput = e.currentTarget
         projectPageInput.removeAttribute("readonly")
-        titleNote.remove()
+        note.remove()
     }
 
     function inputChangeEventHandler(e){
         const projectPageInput = e.currentTarget
-
         projectPageInput.setAttribute("readonly", "")
 
         const lastWordOfInputName = projectPageInput.name.split("-").at(-1) // either title or description
         project[lastWordOfInputName] = projectPageInput.value.trim() 
-
         updateProjectListTitle(project)
 
-        document.querySelector(`#${projectPageInput.id} + .char-counter`).textContent = ""
+        projectPageInput.nextElementSibling.textContent = ""
     }
 
     [projectPageTitleInput, projectPageDescriptionInput].forEach((projectPageInput) =>{
@@ -228,16 +187,15 @@ function updateProjectListTitle(project){
 }
 
 function focusCurrentProjectLi(e){
-    const allLiElem = Array.from(document.querySelectorAll("#sidebar li"))
+    const allLiElem = [...document.querySelectorAll("#sidebar li")]
     allLiElem.forEach(projectLi => projectLi.querySelector(".project-page-loader").classList.remove("selected-project"))
-
     e.currentTarget.classList.add("selected-project")
 }
 
 function createProjectPageLoader(project){
-    const projectPageLoader = createDOMElement({elemType:"button", className:"project-page-loader"})
+    const projectPageLoader = dom.createProjectPageLoader()
     projectPageLoader.addEventListener("click", (e) => {
-        renderProjectPage(project, e)
+        renderProjectPage(project)
         focusCurrentProjectLi(e)
     })
     projectPageLoader.click()
@@ -251,9 +209,9 @@ function renderProjects(){
     projectsArray.forEach(project =>{
         if (projectAlreadyExists(project)) return
 
-        const projectListItem = createProjectSidebarList(project).projectListItem
-        const projectListTitle = createProjectSidebarList(project).projectListTitle
-        const removeProjectBtn = createRemoveProjectBtn(project)
+        const projectListItem = dom.createProjectSidebarListItem(project)
+        const projectListTitle = dom.createProjectSidebarListTitle(project)
+        const removeProjectBtn = createProjectRemoveBtn(project)
         const projectPageLoader = createProjectPageLoader(project)
         
         projectPageLoader.append(projectListTitle, removeProjectBtn)
@@ -267,23 +225,19 @@ function projectAlreadyExists(project){
     return document.querySelector(`li[data-id='${project.getId()}'`)
 }
 
-
+function disableFormSubmissionBtn(){
+    [...document.querySelectorAll("button[id*='submit']")].forEach((btn) => btn.setAttribute("disabled", ""))
+}
 
 function formSubmissionHandler(e){
     addProject()
     renderProjects()
-    e.currentTarget.reset()
     updateProjectsNumCounter()
     disableFormSubmissionBtn()
     resetCharCounters()
+    e.currentTarget.reset()
 }
-
-function disableFormSubmissionBtn(){
-    Array.from(document.querySelectorAll("button[id*='submit']")).forEach((btn) => btn.setAttribute("disabled", ""))
-}
-
 document.querySelector("#project-dialog > form").addEventListener('submit', formSubmissionHandler)
-
 
 export function initialRendering(){
     renderProjects()
@@ -372,7 +326,7 @@ function addTask(){
 }
 
 function getAllTaskFormElements(){
-    return Array.from(document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select"))
+    return [...document.querySelectorAll("#tasks-dialog form input, #tasks-dialog form select")]
 }
 
 
