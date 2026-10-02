@@ -28,15 +28,8 @@ function toggleSidebar(e){
 document.querySelector("#sidebar-toggling-btn").addEventListener("click", toggleSidebar)
 
 
-
 function updateProjectsNumCounter(){ 
-    const projectsNumCounter = document.querySelector("#projects-counter")
-
-    updateProjectsCounterText(projectsNumCounter)
-}
-
-function updateProjectsCounterText(projectsNumCounter){
-    projectsNumCounter.textContent = projectsArray.length
+    document.getElementById("projects-counter").textContent = projectsArray.length
 }
 
 
@@ -46,7 +39,6 @@ function inputsEventHandler(e){
     if (inputIsRequired(currentInput)) updateFormSubmitBtnAvailability(currentInput)
     updateCharCount(currentInput)
 }
-
 
 function inputIsRequired(input){
     return input.hasAttribute("required")
@@ -61,26 +53,22 @@ function updateFormSubmitBtnAvailability(requiredInput){
 
 function updateCharCount(textInput){
     const charCounter = textInput.nextElementSibling
-
     charCounter.textContent = `${textInput.value.length} / ${textInput.maxLength}`
 }
 
 function resetCharCounters(){
-    [...document.querySelectorAll(".char-counter")].forEach(charCounter =>{
-        charCounter.textContent = ""
-    })
+    [...document.querySelectorAll(".char-counter")].forEach(charCounter => charCounter.textContent = "")
 }
 
-
-function openDialog(){
-    document.getElementById("project-dialog").showModal()
-    addInputEventToTextInputs()
-}
 
 function addInputEventToTextInputs(){
     Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
 }
 
+function openDialog(){
+    document.getElementById("project-dialog").showModal()
+    addInputEventToTextInputs()
+}
 document.querySelector("#sidebar-add-project-btn").addEventListener("click", openDialog)
 
 
@@ -97,7 +85,7 @@ function addProject(){
 }
 
 function updateProjectPageId(project){
-    document.querySelector("#project-page").dataset.id = project.getId()
+    document.getElementById("project-page").dataset.id = project.getId()
 }
 
 
@@ -118,7 +106,6 @@ function createProjectRemoveBtn(project){
         // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
         if(projectsArray.length === 0){
             clearProjectPage() 
-
         }else{   
             const prevOrNextProjectPageLoader = document.querySelector(`li[data-id="${prevOrNextProject.getId()}"] .project-page-loader`) 
             prevOrNextProjectPageLoader.click()
@@ -138,14 +125,11 @@ function clearProjectPage(){
     [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
 }
 
-
-
 function renderProjectPage(project){
     clearProjectPage()
     renderProjectTasks(project)
     updateProjectPageId(project)
     renderProjectInputs(project)
-
 }
 
 function renderProjectInputs(project){
@@ -155,13 +139,12 @@ function renderProjectInputs(project){
     const note = dom.createProjectPageNote()
 
     document.querySelector("#project-page .title-container").append(projectPageTitleInput, charCounter, note)
-    document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, charCounter.cloneNode(), note.cloneNode())
+    document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, charCounter.cloneNode(), note.cloneNode(true))
 
-    
     function inputsDoubleClickHandler(e){
         const projectPageInput = e.currentTarget
         projectPageInput.removeAttribute("readonly")
-        note.remove()
+        projectPageInput.parentNode.querySelector(".note").remove()
     }
 
     function inputChangeEventHandler(e){
@@ -216,7 +199,7 @@ function renderProjects(){
         
         projectPageLoader.append(projectListTitle, removeProjectBtn)
         projectListItem.append(projectPageLoader)
-        document.querySelector("#projects-list").appendChild(projectListItem)
+        document.getElementById("projects-list").appendChild(projectListItem)
 
     })
 }
