@@ -18,6 +18,6 @@ export function createDOMElement(obj){
     if (obj.src) createdElement.src = obj.src
     if (obj.height || obj.width) createdElement.height = createdElement.width = obj.height
     if (obj.value) createdElement.value = obj.value
-
+    if (obj.type) createdElement.type = obj.type
     return createdElement
 }

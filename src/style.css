@@ -64,6 +64,9 @@ h1, h2, h3, h4, h5, h6 {
     0.5px 0.5px 1.1px hsl(var(--shadow-color) / 0),
     0.8px 0.8px 1.7px hsl(var(--shadow-color) / 0.11),
     1.6px 1.5px 3.3px hsl(var(--shadow-color) / 0.22);
+
+    scrollbar-color: hsl(from var(--text-color) h s calc(l + 30)) var(--main-background);
+    scrollbar-gutter: stable;
 }
 
 button,
@@ -72,13 +75,12 @@ textarea,
 select{
   border: none;
   outline: none;
-  cursor: pointer;
-
   transition: all 0.4s;
 }
 
 button{
   background-color: inherit;
+  cursor: pointer;
 }
 
 ul{
@@ -103,9 +105,12 @@ body{
 
 /* Sidebar */
 #sidebar{
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+
   overflow-x: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
   position: fixed;
-  width: 300px;
+  width: 310px;
   height: 100vh;
 
   background-color: var(--sidebar-background);
@@ -241,7 +246,9 @@ body{
 .hover,
 #sidebar button,
 #project-container .project-page-loader,
-.add-subtask-btn{
+.add-subtask-btn,
+.subtask-add,
+.subtask-cancel{
   background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
@@ -251,18 +258,21 @@ body{
 }
 
 #sidebar #project-dialog-show-btn,
-.add-subtask-btn{
+.add-subtask-btn,
+.subtask-add{
   padding: 1px 12px;
   font-size: 1.3rem;
   color: hsl(120, 100%, 30%);
 }
 
-#sidebar .project-remove-btn{
+#sidebar .project-remove-btn,
+.subtask-cancel{
   margin-left: auto;
   padding: 5px 8px;
 }
 
-.project-remove-btn img{
+.project-remove-btn img,
+.subtask-cancel img{
   min-width: 17px;
   min-height: 20px;
 }
@@ -355,7 +365,7 @@ form > div:has(button){ /* form buttons */
   margin-top: auto;
 }
 
-form button{
+dialog form button{
   height: 50px;
   width: 120px;
 
@@ -458,7 +468,8 @@ div:has(#project-page-title){
   background-color: hsl(from var(--light-gray) h s calc(l + 40));
 }
 
-.task-card{
+.task-card,
+.subtask-form > form{
   height: 70px;
 
   position: relative;
@@ -505,7 +516,7 @@ div:has(#project-page-title){
 }
 
 .task-card.expanded > .task-check-btn::after{
-  height: 300px;
+  height: 370px;
   top:-1rem;
 }
 
@@ -540,8 +551,8 @@ div:has(#project-page-title){
 
 .subtask-card > .task-check-btn:not(.checked):hover::before{
   opacity: 1;
-  top: 6px;
-  right: 7px;
+  top: 10px;
+  right: 5px;
 }
 
 .task-card > .task-check-btn.checked::before{
@@ -552,8 +563,8 @@ div:has(#project-page-title){
 
 .subtask-card > .task-check-btn.checked::before{
   opacity: 1;
-  top: 6px;
-  right: 7px;
+  top: 10px;
+  right: 5px;
 }
 
 .task-del-btn{
@@ -568,7 +579,9 @@ div:has(#project-page-title){
 }
 
 .task-del-btn:hover,
-.add-subtask-btn:hover{
+.add-subtask-btn:hover,
+.subtask-add:hover,
+.subtask-cancel:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 32));
 }
 
@@ -585,8 +598,8 @@ div:has(#project-page-title){
   gap: 1rem;
 }
 
-.task-card.expanded{
-  height: 300px;
+.task-card.expanded {
+  height:370px;
 }
 
 ul.subtasks-list{
@@ -594,7 +607,7 @@ ul.subtasks-list{
 
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 
   padding: 0 40px;
   cursor: default;
@@ -609,7 +622,7 @@ ul.subtasks-list{
 .subtasks-list li::before{
   content: '';
   position: absolute;
-  top: 16px;
+  top: 18px;
   width: 16px;
   height: 1px;
   background-color: hsl(from var(--light-gray) h s calc(l + 20));
@@ -617,11 +630,12 @@ ul.subtasks-list{
 
 .subtasks-list li div:has(.add-subtask-btn){
   padding-left: 1rem;
+  margin-top: 2px;
 }
 
 .subtask-card{
-  height: 2rem;
-  width: 300px;
+  height: 40px;
+  width: 350px;
 
   display: flex;
 
@@ -631,31 +645,52 @@ ul.subtasks-list{
   border-color: inherit;
 }
 
-.subtask-card .task-title{
+.subtask-card .subtask-title{
   font-size: 15px;
+  padding: 4px;
+
+  background-color: transparent;
+  font-weight: inherit;
 }
 
 .subtask-card .task-check-btn img{
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
 }
 
 .subtask-card .task-del-btn{
   margin-left: auto;
 }
 
-.subtask-card .task-del-btn{
-  width: 24px;
-  height: 24px;
+.subtask-card .task-del-btn img{
+  width: 22px;
+  height: 17px;
 }
 
 .subtask-card button{
   padding: 2px;
 }
 
-.subtask-card #subtask-title{
-  background-color: transparent;
-  font-weight: inherit;
-  padding: 0;
+.subtask-form > form{
+  height: min-content;
+  padding: 2px 8px;
+  margin: 1rem;
 
+  grid-template-columns: 1fr max-content;
+  gap: 2px;
+  align-items: center;
+  grid-template-areas:
+  "input btns";
+}
+
+.subtask-form .subtask-title{
+  grid-area: input;
+  font-size: 1.20rem;
+  background-color: transparent;
+}
+
+.subtask-form .subtask-btns{
+  grid-area: btns;
+  display: flex;
+  gap: 1rem;
 }
