@@ -103,7 +103,7 @@ body{
 
 /* Sidebar */
 #sidebar{
-  overflow: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
+  overflow-x: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
   position: fixed;
   width: 300px;
   height: 100vh;
@@ -124,7 +124,7 @@ body{
 
 #sidebar-toggling-btn{
   position: fixed;
-  z-index: 2;
+  z-index: 3;
   left: 250px;
   top: 20px;
 
@@ -154,6 +154,11 @@ body{
 
   font-weight: 500;
   white-space: pre;
+}
+
+#sidebar button.selected-project{
+  background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
+  font-weight: bold;
 }
 
 #project-page{
@@ -242,7 +247,7 @@ body{
   padding: 5px 16px;
 
   cursor: pointer;
-  transition: all 0.4s;
+  transition: all 0.3s;
 }
 
 #sidebar #project-dialog-show-btn,

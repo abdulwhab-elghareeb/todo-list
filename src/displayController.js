@@ -13,9 +13,6 @@ import { createSubtask } from "./createSubtask.js"
 
 
 const projectsArray = projectsContainer.getProjectsArray()
-const projectsArrayMaxLength = projectsContainer.getMaxArrayLength()
-
-
 
 function toggleSidebar(e){
     const sidebar = document.querySelector("#sidebar")
@@ -31,23 +28,10 @@ function updateProjectsNumCounter(){
     const projectsNumCounter = document.querySelector("#projects-counter")
 
     updateProjectsCounterText(projectsNumCounter)
-    updateProjectsCounterColor(projectsNumCounter)
 }
 
 function updateProjectsCounterText(projectsNumCounter){
-    projectsNumCounter.textContent = `${projectsArray.length} / ${projectsArrayMaxLength}`;
-}
-
-function updateProjectsCounterColor(projectsNumCounter){
-    if (projectsArray.length === projectsArrayMaxLength){
-        projectsNumCounter.style.color = "red"
-
-    }else if (projectsArray.length >= projectsArrayMaxLength / 2){
-        projectsNumCounter.style.color = "orange"
-
-    }else{
-        projectsNumCounter.style.color = "green"
-    }
+    projectsNumCounter.textContent = projectsArray.length
 }
 
 
@@ -156,7 +140,6 @@ function createRemoveProjectBtn(project){
         projectsContainer.removeProjectFromArray(project)
 
         updateProjectsNumCounter()
-        updateProjectAddBtnAvailability();
 
         // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
         if(projectsArray.length === 0){
@@ -176,18 +159,6 @@ function getProjectSidebarList(project){
     return document.querySelector(`li[data-id="${project.getId()}"]`)
 }
 
-function updateProjectAddBtnAvailability(){ 
-    const projectAddBtn = document.querySelector("#sidebar-add-project-btn")
-
-    if (projectsArray.length === projectsArrayMaxLength){
-        projectAddBtn.classList = "disable"
-        projectAddBtn.style.color = "red"
-
-    }else{
-        projectAddBtn.classList.remove("disable")
-        projectAddBtn.style.color = "green"
-    }
-}
 
 function clearProjectPage(){
     Array.from(document.querySelectorAll("#project-page .wrapper > div")).forEach(container => container.replaceChildren())
@@ -195,11 +166,12 @@ function clearProjectPage(){
 
 
 
-function renderProjectPage(project){
+function renderProjectPage(project, e){
     clearProjectPage()
     renderProjectTasks(project)
     updateProjectPageId(project)
     renderProjectInputs(project)
+    focusCurrentProjectLi(e)
 
 }
 
@@ -267,9 +239,16 @@ function updateProjectListTitle(project){
     document.querySelector(`li[data-id="${project.getId()}"] .project-title`).textContent = project.title
 }
 
+function focusCurrentProjectLi(e){
+    const allLiElem = Array.from(document.querySelectorAll("#sidebar li"))
+    allLiElem.forEach(projectLi => projectLi.querySelector(".project-page-loader").classList.remove("selected-project"))
+    
+    e.currentTarget.classList.add("selected-project")
+}
+
 function createProjectPageLoader(project){
     const projectPageLoader = createDOMElement({elemType:"button", className:"project-page-loader"})
-    projectPageLoader.addEventListener("click", () => renderProjectPage(project))
+    projectPageLoader.addEventListener("click", (e) => renderProjectPage(project, e))
     projectPageLoader.click()
     
     return projectPageLoader
@@ -278,7 +257,6 @@ function createProjectPageLoader(project){
 
 
 function renderProjects(){
-    if (projectsArray.length > projectsArrayMaxLength) return
     projectsArray.forEach(project =>{
         if (projectAlreadyExists(project)) return
 
@@ -305,7 +283,6 @@ function formSubmissionHandler(e){
     renderProjects()
     e.currentTarget.reset()
     updateProjectsNumCounter()
-    updateProjectAddBtnAvailability()
     disableFormSubmissionBtn()
 }
 
@@ -319,7 +296,6 @@ document.querySelector("#project-dialog > form").addEventListener('submit', form
 export function initialRendering(){
     renderProjects()
     updateProjectsNumCounter()
-    updateProjectAddBtnAvailability()
 }
 
 // -------------------------------------
