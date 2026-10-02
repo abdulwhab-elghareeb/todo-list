@@ -254,7 +254,7 @@ body{
   padding: 5px 16px;
 
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.4s;
 }
 
 #sidebar #project-dialog-show-btn,
@@ -470,7 +470,7 @@ div:has(#project-page-title){
 
 .task-card,
 .subtask-form > form{
-  height: 70px;
+  height: 77px;
 
   position: relative;
 
@@ -478,9 +478,9 @@ div:has(#project-page-title){
   grid-template-columns: max-content 1fr max-content max-content;
   align-items: center;
   align-content: start;
-  gap: 1.5rem;
+  column-gap: 1.5rem;
   
-  padding: 1rem 2.5rem 1rem 1rem;
+  padding: 10px 8px;
   border-radius: 8px;
   border: 1px solid;
   
@@ -495,6 +495,7 @@ div:has(#project-page-title){
   font-size: 20px;
 }
 
+
 .task-card:hover{
   background-color: hsl(from var(--light-gray) h s calc(l + 47));
 }
@@ -505,19 +506,14 @@ div:has(#project-page-title){
 
 .task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
   content: "";
-  height: 70px;
+  height: 400px;
   width: 1px;
 
   position: absolute;
   right: -10px;
-  bottom: -12px;
+  top: -10px;
     
   background-color: hsl(from var(--light-gray) h s calc(l + 35));
-}
-
-.task-card.expanded > .task-check-btn::after{
-  height: 370px;
-  top:-1rem;
 }
 
 .task-card > .task-check-btn::before{ /* the check mark circle */
@@ -588,8 +584,12 @@ div:has(#project-page-title){
 .task-expand-btn{
   padding: 4px;
   position: absolute;
-  right: 4px;
-  top: 1px;
+  right: 8px;
+  bottom: 0;
+}
+
+.task-card.expanded > .task-expand-btn{
+  rotate: 180deg;
 }
 
 #cards-container{
@@ -687,6 +687,12 @@ ul.subtasks-list{
   grid-area: input;
   font-size: 1.20rem;
   background-color: transparent;
+}
+
+.subtask-title + .char-counter{
+  bottom: 2px;
+  right: 120px;
+  font-size: 12px;
 }
 
 .subtask-form .subtask-btns{

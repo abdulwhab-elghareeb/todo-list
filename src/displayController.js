@@ -13,6 +13,9 @@ import { createSubtask } from "./createSubtask.js"
 
 
 const projectsArray = projectsContainer.getProjectsArray()
+projectsContainer.addProjectToArray(createProject("Default", "This is the default project Good luck"))
+renderProjects()
+updateProjectsNumCounter()
 
 function toggleSidebar(e){
     const sidebar = document.querySelector("#sidebar")
@@ -38,11 +41,7 @@ function updateProjectsCounterText(projectsNumCounter){
 
 function inputsEventHandler(e){
     const currentInput = e.currentTarget
-
-    if (inputIsATitleInput(currentInput)){
-        validateTitleInput(currentInput)
-    }
-
+    
     if (inputIsRequired(currentInput)){
         updateFormSubmitBtnAvailability(currentInput)
     }
@@ -50,22 +49,6 @@ function inputsEventHandler(e){
     updateCharCount(currentInput)
 }
 
-function inputIsATitleInput(input){
-    return input.name.includes("project-title")
-}
-
-function validateTitleInput(titleInput){
-    if (projectTitleExists(titleInput)){
-        titleInput.setCustomValidity("Project already exists")
-
-    }else{
-        titleInput.setCustomValidity("")
-    }
-}
-
-function projectTitleExists(titleInput){
-    return projectsArray.some(project => project.title === titleInput.value)
-}
 
 function inputIsRequired(input){
     return input.hasAttribute("required")
@@ -84,6 +67,11 @@ function updateCharCount(textInput){
     charCounter.textContent = `${textInput.value.length} / ${textInput.maxLength}`
 }
 
+function resetCharCounters(){
+    Array.from(document.querySelectorAll(".char-counter")).forEach(charCounter =>{
+        charCounter.textContent = ""
+    })
+}
 
 
 function openDialog(){
@@ -171,7 +159,6 @@ function renderProjectPage(project, e){
     renderProjectTasks(project)
     updateProjectPageId(project)
     renderProjectInputs(project)
-    focusCurrentProjectLi(e)
 
 }
 
@@ -213,6 +200,7 @@ function renderProjectInputs(project){
     function inputsDoubleClickHandler(e){
         const projectPageInput = e.currentTarget
         projectPageInput.removeAttribute("readonly")
+        titleNote.remove()
     }
 
     function inputChangeEventHandler(e){
@@ -248,7 +236,10 @@ function focusCurrentProjectLi(e){
 
 function createProjectPageLoader(project){
     const projectPageLoader = createDOMElement({elemType:"button", className:"project-page-loader"})
-    projectPageLoader.addEventListener("click", (e) => renderProjectPage(project, e))
+    projectPageLoader.addEventListener("click", (e) => {
+        renderProjectPage(project, e)
+        focusCurrentProjectLi(e)
+    })
     projectPageLoader.click()
     
     return projectPageLoader
@@ -284,6 +275,7 @@ function formSubmissionHandler(e){
     e.currentTarget.reset()
     updateProjectsNumCounter()
     disableFormSubmissionBtn()
+    resetCharCounters()
 }
 
 function disableFormSubmissionBtn(){
@@ -319,6 +311,7 @@ function renderTaskForm(e){
     selectCurrentProject()
     selectDefaultDate()
     adjustTaskSubmitBtnText(e.currentTarget)
+    
 }
 
 function renderProjectSelection(){
@@ -397,6 +390,7 @@ function createCardContainer(task){
         
         const taskFormElements = getAllTaskFormElements()
         setupFormElementsValues(taskFormElements, task)
+        updateFormSubmitBtnAvailability(taskFormElements.find(input => input.required))
 
         function saveBtnHandler(e){
             e.preventDefault()
@@ -513,10 +507,9 @@ function updateCheckBtn(task, checkBtn){
 
 
 function createTaskMainContent(task){
-    const cardTaskTitle = createCardTitleDOMElem(task)
-    const cardTaskDueDate = createDOMElement({elemType:"div", className:"task-due-date", textContent:intlFormatDistance(task.dueDate, new Date())})
-
-    return {cardTaskTitle, cardTaskDueDate}
+    const cardTitle = createCardTitleDOMElem(task)
+    const cardDueDate = createDOMElement({elemType:"div", className:"task-due-date", textContent:intlFormatDistance(task.dueDate, new Date())})
+    return {cardTitle, cardDueDate}
 }
 
 function createCardTitleDOMElem(task){
@@ -592,14 +585,14 @@ function renderProjectTasks(project){
 
         const taskCardContainer = createCardContainer(task)
         const taskCheckBtn = createCheckBtn(task)
-        const taskTitle = createTaskMainContent(task).cardTaskTitle
-        const taskDueDate = createTaskMainContent(task).cardTaskDueDate
+        const taskTitle = createTaskMainContent(task).cardTitle
+        const taskDueDate = createTaskMainContent(task).cardDueDate
         const taskDelBtn = createTaskDelBtn(task)
         const taskExpandBtn = createExpandBtn(task)
         const cardsContainer = document.querySelector("#cards-container")
         const projectPage = document.querySelector("#project-page .wrapper")
-
-        taskCardContainer.append(taskCheckBtn, taskTitle, taskDueDate, taskDelBtn, taskExpandBtn)
+        
+        taskCardContainer.append(taskCheckBtn, taskTitle,  taskDueDate, taskDelBtn, taskExpandBtn)
         cardsContainer.appendChild(taskCardContainer)
         projectPage.appendChild(cardsContainer)
         displayPriority(task)
@@ -616,6 +609,7 @@ function formSubmitHandler(e){
     addTask()
     renderProjectTasks(getCurrentProject())
     e.currentTarget.reset()
+    resetCharCounters()
 }
 
 document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
@@ -652,7 +646,10 @@ function createAddSubtaskBtnList(task){
         e.stopPropagation()
         const form = createSubtaskForm(task)       
         subtasksListItem.before(form)
-        form.querySelector("input").focus()
+
+        const input = form.querySelector("input")
+        input.focus()
+        input.addEventListener("input", (e) => updateCharCount(e.currentTarget))
 
         subtasksListItem.remove()
 
@@ -711,13 +708,20 @@ function createSubtaskTitleInput(subtaskTitle=""){
         name: "subtask-title",
         placeholder: "Title",
         className:"subtask-title",
+        id:"subtask-title",
         minLength: "2",
-        maxLength: "20",
+        maxLength: "28",
         pattern: "^\\S{1,}.*",
         autofocus: true,
         required:true,
     })
-    addListenersToSubtaskInput(subtaskTitleInput)
+
+    subtaskTitleInput.addEventListener("dblclick", (e) =>{
+        e.stopPropagation()
+        subtaskTitleInput.removeAttribute("readOnly")
+    })
+
+
     return subtaskTitleInput
 }
 
@@ -727,12 +731,6 @@ function createSubtaskCardContainer(subtask){
     return container
 }
 
-function addListenersToSubtaskInput(subtaskTitleInput){
-    subtaskTitleInput.addEventListener("dblclick", (e) =>{
-        e.stopPropagation()
-        subtaskTitleInput.removeAttribute("readOnly")
-    })
-}
 
 function renderTaskSubtasks(task){
     task.getSubtasks().forEach((subtask) =>{
@@ -740,7 +738,7 @@ function renderTaskSubtasks(task){
 
         const displaySubtask = createDisplaySubtask(task, subtask)
         const subtasksUl = getSubtasksList("", task.getId())
-
+        console.log(subtasksUl)
         if (addSubtaskBtnExists(subtasksUl)){
             subtasksUl.querySelector("li:has(.add-subtask-btn)").before(displaySubtask)
         }else{
@@ -758,6 +756,7 @@ function addSubtaskBtnExists(ul){
 
 function createSubtaskForm(task){
     const input = createSubtaskTitleInput()
+    const charCounter = createDOMElement({elemType:"span", className:"char-counter" })
     const subtaskForm =  createDOMElement({elemType:"form"})
     const listItem = createDOMElement({elemType:"li", className:"subtask-form"})
     const btnsContainer = createDOMElement({elemType:"div", className:"subtask-btns"})
@@ -767,10 +766,9 @@ function createSubtaskForm(task){
 
     cancelBtn.appendChild(cancelBtnImg)
     btnsContainer.append(addBtn, cancelBtn)
-    subtaskForm.append(input, btnsContainer)
+    subtaskForm.append(input, charCounter, btnsContainer)
     listItem.appendChild(subtaskForm)
 
-    
     cancelBtn.addEventListener("click", (e)=>{
         e.currentTarget.closest("li").remove()
 
