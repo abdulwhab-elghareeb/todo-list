@@ -1,6 +1,6 @@
 
 import { projectsContainer } from "./projectsContainer.js"
-import { createProject } from "./createProject.js"
+import { Project } from "./Project.js"
 import { createTask } from "./createTask.js"
 
 import {toCamelCase, replaceEventListener} from "./helper.js"
@@ -15,7 +15,7 @@ import * as storage from "./storage.js"
 // Projects
 
 const projectsArray = projectsContainer.projectsArray
-projectsContainer.addProjectToArray(createProject("Default", "This is the default project"))
+projectsContainer.addProjectToArray(new Project("Default", "This is the default project"))
 renderProjects()
 
 function toggleSidebar(e){
@@ -70,7 +70,7 @@ function createProjectObj(){
     const projectTitleInput = document.getElementById("project-title")
     const projectDescriptionInput = document.getElementById("project-description")
 
-    const project = createProject(projectTitleInput.value.trim(), projectDescriptionInput.value.trim())
+    const project = new Project(projectTitleInput.value.trim(), projectDescriptionInput.value.trim())
     projectsContainer.addProjectToArray(project)
     updateProjectPageId(project)
 
@@ -78,7 +78,7 @@ function createProjectObj(){
 }
 
 function updateProjectPageId(project){
-    document.getElementById("project-page").dataset.id = project.getId()
+    document.getElementById("project-page").dataset.id = project.id
 }
 
 
@@ -98,7 +98,7 @@ function createProjectRemoveBtn(project){
         if(projectsArray.length === 0){
             clearProjectPage() 
         }else{   
-            const prevOrNextProjectPageLoader = document.querySelector(`li[data-id="${prevOrNextProject.getId()}"] .project-page-loader`) 
+            const prevOrNextProjectPageLoader = document.querySelector(`li[data-id="${prevOrNextproject.id}"] .project-page-loader`) 
             prevOrNextProjectPageLoader.click()
         }
     }
@@ -108,7 +108,7 @@ function createProjectRemoveBtn(project){
 }
 
 function getProjectSidebarList(project){
-    return document.querySelector(`li[data-id="${project.getId()}"]`)
+    return document.querySelector(`li[data-id="${project.id}"]`)
 }
 
 
@@ -158,7 +158,7 @@ function renderProjectPageInputs(project){
 }
 
 function updateProjectListTitle(project){
-    document.querySelector(`li[data-id="${project.getId()}"] .project-title`).textContent = project.title
+    document.querySelector(`li[data-id="${project.id}"] .project-title`).textContent = project.title
 }
 
 function focusCurrentProjectLi(e){
@@ -196,7 +196,7 @@ function renderProjects(){
 }
 
 function projectAlreadyExists(project){
-    return document.querySelector(`li[data-id='${project.getId()}'`)
+    return document.querySelector(`li[data-id='${project.id}'`)
 }
 
 function disableFormSubmissionBtn(){
@@ -220,7 +220,7 @@ export function initialRendering(){
 
 function getCurrentProject(){
     const currentPageId = document.querySelector("#project-page").dataset.id
-    return projectsArray.find((project) => project.getId() === currentPageId)
+    return projectsArray.find((project) => project.id === currentPageId)
 }
 
 
@@ -467,7 +467,7 @@ function clearList(card){
 
 function renderProjectTasks(project){
     if (!project) return
-    project.getAllTasks().forEach((task) => {
+    project.tasksArray.forEach((task) => {
         if (taskAlreadyDisplayed(task)) return
         
         const cardMainContent = createTaskMainContent(task)

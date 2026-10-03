@@ -5,7 +5,7 @@ import expandIcon from "./assets/chevron-down.svg"
 import { intlFormatDistance } from "date-fns";
 
 export function createProjectSidebarListItem(project){
-    return createDOMElement({elemType:"li", dataId:project.getId()})
+    return createDOMElement({elemType:"li", dataId:project.id})
 }
 
 export function createProjectSidebarListTitle(project){
@@ -78,7 +78,7 @@ export function createPlaceholderOption(){
 }
 
 export function createProjectOption(project){
-    return createDOMElement({elemType:"option", textContent:project.title, dataId:project.getId()})
+    return createDOMElement({elemType:"option", textContent:project.title, dataId:project.id})
 }
 
 export function createTaskCardContainer(task){
