@@ -14,7 +14,7 @@ import * as storage from "./storage.js"
 
 // Projects
 
-const projectsArray = projectsContainer.getProjectsArray()
+const projectsArray = projectsContainer.projectsArray
 projectsContainer.addProjectToArray(createProject("Default", "This is the default project"))
 renderProjects()
 

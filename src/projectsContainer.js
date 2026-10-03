@@ -1,18 +1,15 @@
-export const projectsContainer = (() =>{
-    const projectsArray = []
-    const getProjectsArray = () =>  projectsArray
-    const addProjectToArray = (project) => projectsArray.push(project)
-    const removeProjectFromArray = (project) => projectsArray.splice(projectsArray.indexOf(project), 1)
+export const projectsContainer = {
+    _projectsArray: [],
+    
+    get projectsArray(){
+        return this._projectsArray
+    },
 
+    addProjectToArray: function(project){
+        this._projectsArray.push(project)
+    },
 
-
-    // const toJSON = () =>{
-    //     return projectsArray
-    // }
-
-    return{
-        getProjectsArray,
-        addProjectToArray,
-        removeProjectFromArray,
-    }
-})()
+    removeProjectFromArray: function(project){
+        this._projectsArray.splice(projectsArray.indexOf(project), 1)
+    },
+}
