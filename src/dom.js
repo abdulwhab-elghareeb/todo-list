@@ -1,5 +1,8 @@
 import { createDOMElement } from "./helper.js"
 import delIcon  from "./assets/close.svg"
+import circleIcon from "./assets/circle-outline.svg"
+import expandIcon from "./assets/chevron-down.svg"
+import { intlFormatDistance } from "date-fns";
 
 export function createProjectSidebarListItem(project){
     return createDOMElement({elemType:"li", dataId:project.getId()})
@@ -59,4 +62,55 @@ export function createProjectPageNote(){
 
 export function createProjectPageLoader(){
     return createDOMElement({elemType:"button", className:"project-page-loader"})
+}
+
+export function createPlaceholderOption(){
+    const placeholder = document.createElement('option')
+    Object.assign(placeholder, {
+        textContent: "Project",
+        disabled: true,
+        selected: true,
+        hidden: true,
+        value: "",
+    })
+
+    return placeholder
+}
+
+export function createProjectOption(project){
+    return createDOMElement({elemType:"option", textContent:project.title, dataId:project.getId()})
+}
+
+export function createTaskCardContainer(task){
+    return createDOMElement({elemType:"div", className:"task-card", dataId:task.getId()})
+}
+
+export function createCheckBtn(){
+    const checkBtn = createDOMElement({elemType:"button", className:"task-check-btn"})
+    const checkBtnImg = createDOMElement({elemType:"img", src:circleIcon, height:"35"})
+    checkBtn.appendChild(checkBtnImg)
+
+    return checkBtn
+}
+
+export function createCardTitle(task){
+    return createDOMElement({elemType:"div", className:"task-title", textContent:task.title})
+}
+
+export function createCardDueDate(task){
+    return createDOMElement({elemType:"div", className:"task-due-date", textContent:intlFormatDistance(task.dueDate, new Date())})
+}
+
+export function createCardDelBtn(){
+    const delBtn = createDOMElement({elemType:"button", className:"task-del-btn"})
+    const delBtnImg = createDOMElement({elemType:"img", src:delIcon, height:"20"})
+    delBtn.appendChild(delBtnImg)
+    return delBtn
+}
+
+export function createExpandBtn(){
+        const expandBtn = createDOMElement({elemType:"button", className:"task-expand-btn"})
+        const expandBtnImg = createDOMElement({elemType:"img", src:expandIcon, height:"20"})
+        expandBtn.appendChild(expandBtnImg)
+        return expandBtn
 }
