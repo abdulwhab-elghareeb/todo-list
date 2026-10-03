@@ -3,6 +3,7 @@ import delIcon  from "./assets/close.svg"
 import circleIcon from "./assets/circle-outline.svg"
 import expandIcon from "./assets/chevron-down.svg"
 import { intlFormatDistance } from "date-fns";
+import { formatDistanceWithOptions } from "date-fns/fp";
 
 export function createProjectSidebarListItem(project){
     return createDOMElement({elemType:"li", dataId:project.getId()})
@@ -113,4 +114,59 @@ export function createExpandBtn(){
         const expandBtnImg = createDOMElement({elemType:"img", src:expandIcon, height:"20"})
         expandBtn.appendChild(expandBtnImg)
         return expandBtn
+}
+
+export function createSubtasksUL(){
+   return createDOMElement({elemType:"ul", className:"subtasks-list"})
+}
+
+export function createAddBtnList(){
+    const subtasksListItem = createDOMElement({elemType:"li", className:"subtask-list-item"})
+    const subtaskContainer = createDOMElement({elemType:"div", className:"subtask-container"})
+    const addSubtaskBtn = createDOMElement({elemType:"button", className:"add-subtask-btn", textContent:"+"})
+
+    subtasksListItem.appendChild(subtaskContainer)
+    subtaskContainer.appendChild(addSubtaskBtn)
+
+    return subtasksListItem
+}
+
+
+export function createSubtaskLI(){
+    return createDOMElement({elemType:"li", className:"subtask-list-item"})
+}
+
+export function createSubtaskTitleInput(subtaskTitle){
+    const subtaskTitleInput = createDOMElement({elemType:"input", value:subtaskTitle})
+    Object.assign(subtaskTitleInput, {
+        type: "text",
+        name: "subtask-title",
+        placeholder: "Title",
+        className:"subtask-title",
+        id:"subtask-title",
+        minLength: "2",
+        maxLength: "28",
+        pattern: "^\\S{1,}.*",
+        autofocus: true,
+        required:true,
+    })
+
+    return subtaskTitleInput
+}
+
+export function createFormList(){
+    const charCounter = createDOMElement({elemType:"span", className:"char-counter" })
+    const subtaskForm =  createDOMElement({elemType:"form"})
+    const listItem = createDOMElement({elemType:"li", className:"subtask-form"})
+    const btnsContainer = createDOMElement({elemType:"div", className:"subtask-btns"})
+    const addBtn = createDOMElement({elemType:"button", className:"subtask-add", textContent:"+"})
+    const cancelBtn = createDOMElement({elemType:"button", className:"subtask-cancel", type:"button"})
+    const cancelBtnImg = createDOMElement({elemType:"img", src:delIcon, height:"20",})
+
+    cancelBtn.appendChild(cancelBtnImg)
+    btnsContainer.append(addBtn, cancelBtn)
+    subtaskForm.append(charCounter, btnsContainer)
+    listItem.appendChild(subtaskForm)
+
+    return listItem
 }
