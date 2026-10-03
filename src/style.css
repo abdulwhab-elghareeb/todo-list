@@ -197,15 +197,7 @@ body{
   position: relative;
 
   display: grid;
-  gap: 2rem;
-}
-
-#projects-counter{
-  position: absolute;
-  top: 50px; 
-  right: 15px;
-
-  font-size: 0.9rem;
+  gap: 1rem;
 }
 
 .low{

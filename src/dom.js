@@ -3,7 +3,6 @@ import delIcon  from "./assets/close.svg"
 import circleIcon from "./assets/circle-outline.svg"
 import expandIcon from "./assets/chevron-down.svg"
 import { intlFormatDistance } from "date-fns";
-import { formatDistanceWithOptions } from "date-fns/fp";
 
 export function createProjectSidebarListItem(project){
     return createDOMElement({elemType:"li", dataId:project.getId()})

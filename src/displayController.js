@@ -1,12 +1,9 @@
-import delIcon  from "./assets/close.svg"
-import circleIcon from "./assets/circle-outline.svg"
-import expandIcon from "./assets/chevron-down.svg"
 
 import { projectsContainer } from "./projectsContainer.js"
 import { createProject } from "./createProject.js"
 import { createTask } from "./createTask.js"
 
-import {toCamelCase, replaceEventListener, createDOMElement} from "./helper.js"
+import {toCamelCase, replaceEventListener} from "./helper.js"
 import { intlFormatDistance } from "date-fns";
 import { format } from "date-fns"
 import { createSubtask } from "./createSubtask.js"
@@ -14,10 +11,12 @@ import { createSubtask } from "./createSubtask.js"
 import * as dom from "./dom.js"
 import * as storage from "./storage.js"
 
+
+// Projects
+
 const projectsArray = projectsContainer.getProjectsArray()
-projectsContainer.addProjectToArray(createProject("Default", "This is the default project Good luck"))
+projectsContainer.addProjectToArray(createProject("Default", "This is the default project"))
 renderProjects()
-updateProjectsNumCounter()
 
 function toggleSidebar(e){
     const sidebar = document.querySelector("#sidebar")
@@ -26,12 +25,6 @@ function toggleSidebar(e){
     [e.currentTarget, sidebar, projectPage].forEach(sidebarTransitionElem => sidebarTransitionElem.classList.toggle("sidebar-close"))
 }
 document.querySelector("#sidebar-toggling-btn").addEventListener("click", toggleSidebar)
-
-
-function updateProjectsNumCounter(){ 
-    document.getElementById("projects-counter").textContent = projectsArray.length
-}
-
 
 
 function inputsEventHandler(e){
@@ -62,7 +55,7 @@ function resetCharCounters(){
 
 
 function addInputEventToTextInputs(){
-    Array.from(document.querySelectorAll("input[type='text']")).forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
+    [...document.querySelectorAll("input[type='text']")].forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
 }
 
 function openDialog(){
@@ -73,7 +66,7 @@ document.querySelector("#sidebar-add-project-btn").addEventListener("click", ope
 
 
 
-function addProject(){
+function createProjectObj(){
     const projectTitleInput = document.getElementById("project-title")
     const projectDescriptionInput = document.getElementById("project-description")
 
@@ -101,8 +94,6 @@ function createProjectRemoveBtn(project){
         getProjectSidebarList(project).remove()
         projectsContainer.removeProjectFromArray(project)
 
-        updateProjectsNumCounter()
-
         // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
         if(projectsArray.length === 0){
             clearProjectPage() 
@@ -129,10 +120,10 @@ function renderProjectPage(project){
     clearProjectPage()
     renderProjectTasks(project)
     updateProjectPageId(project)
-    renderProjectInputs(project)
+    renderProjectPageInputs(project)
 }
 
-function renderProjectInputs(project){
+function renderProjectPageInputs(project){
     const projectPageTitleInput = dom.createProjectPageTitleInput(project)
     const projectPageDescriptionInput = dom.createProjectPageDescInput(project)
     const charCounter = dom.createInputCharCounter()
@@ -140,6 +131,7 @@ function renderProjectInputs(project){
 
     document.querySelector("#project-page .title-container").append(projectPageTitleInput, charCounter, note)
     document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, charCounter.cloneNode(), note.cloneNode(true))
+    // note.cloneNode(true) -> to clone the textContent too
 
     function inputsDoubleClickHandler(e){
         const projectPageInput = e.currentTarget
@@ -187,7 +179,6 @@ function createProjectPageLoader(project){
 }
 
 
-
 function renderProjects(){
     projectsArray.forEach(project =>{
         if (projectAlreadyExists(project)) return
@@ -213,9 +204,8 @@ function disableFormSubmissionBtn(){
 }
 
 function formSubmissionHandler(e){
-    addProject()
+    createProjectObj()
     renderProjects()
-    updateProjectsNumCounter()
     disableFormSubmissionBtn()
     resetCharCounters()
     e.currentTarget.reset()
@@ -224,7 +214,6 @@ document.querySelector("#project-dialog > form").addEventListener('submit', form
 
 export function initialRendering(){
     renderProjects()
-    updateProjectsNumCounter()
 }
 
 // -------------------------------------
@@ -518,14 +507,6 @@ function formSubmitHandler(e){
 }
 document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
 
-// function initialRendering(){
-//     if (projectsArray.length === 0) return
-//     addAllSavedTasks()
-//     displayProjects.renderProjectPage(getCurrentProject())
-// }
-
-
-// ---------------------------------------
 
 function addInitialSubtasksList(currentTaskCard, task){
     const subtasksList = currentTaskCard.querySelector("ul") || dom.createSubtasksUL()
