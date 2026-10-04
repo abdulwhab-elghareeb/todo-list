@@ -1,12 +1,12 @@
-import { createTask } from "./createTask.js"
+import { Task } from "./Task.js"
 
 export function createSubtask(title, taskState=false){
-    const {getId, completed, toggleState} = createTask(title, ...[,,,], taskState)
+    const {id, isCompleted, toggleState} = new Task(title)
 
     return{
       title,
       getId,
-      completed,
+      isCompleted,
       toggleState,
     }
 }

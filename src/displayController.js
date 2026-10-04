@@ -1,7 +1,7 @@
 
 import { projectsContainer } from "./projectsContainer.js"
 import { Project } from "./Project.js"
-import { createTask } from "./createTask.js"
+import { Task } from "./Task.js"
 
 import {toCamelCase, replaceEventListener} from "./helper.js"
 import { intlFormatDistance } from "date-fns";
@@ -282,7 +282,7 @@ function addTask(){
     const priorityValue = taskFormElements[3].value
     const selectedProjectIdx = taskFormElements[4].selectedIndex - 1
 
-    const task = createTask(titleValue, descriptionValue, dueDateValue, priorityValue)
+    const task = new Task(titleValue, descriptionValue, dueDateValue, priorityValue)
     projectsArray[selectedProjectIdx].addTask(task)
 
     return task
@@ -358,8 +358,8 @@ function moveTaskToSelectedProjects(projSelection, task){
 }
 
 function updateDisplayedTask(task){
-    const taskTitle = document.querySelector(`.task-card[data-id='${task.getId()}'] .task-title`)
-    const taskDueDate = document.querySelector(`.task-card[data-id='${task.getId()}'] .task-due-date`)
+    const taskTitle = document.querySelector(`.task-card[data-id='${task.id}'] .task-title`)
+    const taskDueDate = document.querySelector(`.task-card[data-id='${task.id}'] .task-due-date`)
 
     taskTitle.textContent = task.title
     taskDueDate.textContent = intlFormatDistance(task.dueDate, new Date())
@@ -367,7 +367,7 @@ function updateDisplayedTask(task){
 }
 
 function displayPriority(task){
-    const taskContainer = document.querySelector(`.task-card[data-id='${task.getId()}'`)
+    const taskContainer = document.querySelector(`.task-card[data-id='${task.id}'`)
     switch(Number(task.priority)){
         case 4:
             taskContainer.style.borderColor = "hsl(0, 100%, 50%)"
@@ -397,7 +397,7 @@ function createCheckBtn(task){
     const checkBtn = dom.createCheckBtn()
     function checkBtnClickHandler(e){
         e.stopPropagation()
-        task.toggleState();
+        task.toggleState()
         updateCheckBtn(task, e.currentTarget)
     }
     checkBtn.addEventListener("click", checkBtnClickHandler)
@@ -406,7 +406,7 @@ function createCheckBtn(task){
 }
 
 function updateCheckBtn(task, checkBtn){
-    (task.completed())? checkBtn.classList.add("checked") : checkBtn.classList.remove("checked")
+    (task.isCompleted)? checkBtn.classList.add("checked") : checkBtn.classList.remove("checked")
 }
 
 
@@ -442,10 +442,10 @@ function createExpandBtn(task){
         if (isExpanded(taskCardContainer)){
             if (!subtasksLimitReached(task)) addInitialSubtasksList(taskCardContainer,task)
             renderTaskSubtasks(task)
-            storage.saveTaskExpanded(task.getId(), true) 
+            storage.saveTaskExpanded(task.id, true) 
         }else{
             clearList(taskCardContainer)
-            storage.saveTaskExpanded(task.getId(), false) 
+            storage.saveTaskExpanded(task.id, false) 
         }
     }
     expandBtn.addEventListener("click", expandBtnClickHandler)
@@ -491,12 +491,12 @@ function renderProjectTasks(project){
 }
 
 function taskAlreadyDisplayed(task){
-    return document.querySelector(`*[data-id='${task.getId()}'`)
+    return document.querySelector(`*[data-id='${task.id}'`)
 }
 
 
 function checkIfTaskIsExpanded(task){
-    return JSON.parse(sessionStorage.getItem(task.getId()))
+    return JSON.parse(sessionStorage.getItem(task.id))
 }
 
 function formSubmitHandler(e){
@@ -537,7 +537,7 @@ function createAddSubtaskBtnList(task){
 }
 
 function subtasksLimitReached(task){
-    return task.getSubtasks().length === task.getMaxLength()
+    return task.subtasksArray.length === task.maxArrayLength
 }
 
 function getSubtasksList(childElem="", taskId=""){
@@ -565,7 +565,7 @@ function createSubTaskDelBtn(subtask, task){
             getSubtasksList(delBtn).appendChild(createAddSubtaskBtnList(task))
         }
 
-        const subtaskLi = document.querySelector(`li:has(.subtask-card[data-id="${subtask.getId()}"])`)
+        const subtaskLi = document.querySelector(`li:has(.subtask-card[data-id="${subtask.id}"])`)
         subtaskLi.remove()    
         task.removeSubtask(subtask)
     })
@@ -597,11 +597,11 @@ function createSubtaskCardContainer(subtask){
 
 
 function renderTaskSubtasks(task){
-    task.getSubtasks().forEach((subtask) =>{
+    task.subtasksArray.forEach((subtask) =>{
         if(subtaskAlreadyDisplayed(subtask)) return
 
         const displaySubtask = createDisplaySubtask(task, subtask)
-        const subtasksUl = getSubtasksList("", task.getId())
+        const subtasksUl = getSubtasksList("", task.id)
 
         if (addSubtaskBtnExists(subtasksUl)){
             subtasksUl.querySelector("li:has(.add-subtask-btn)").before(displaySubtask)
@@ -609,13 +609,13 @@ function renderTaskSubtasks(task){
             subtasksUl.appendChild(displaySubtask)
         }
 
-        subtasksUl.querySelector(`li:has(*[data-id="${subtask.getId()}"]) input`).value = subtask.title
-        updateCheckBtn(subtask, subtasksUl.querySelector(`li:has(*[data-id="${subtask.getId()}"]) .task-check-btn`))
+        subtasksUl.querySelector(`li:has(*[data-id="${subtask.id}"]) input`).value = subtask.title
+        updateCheckBtn(subtask, subtasksUl.querySelector(`li:has(*[data-id="${subtask.id}"]) .task-check-btn`))
     })
 }
 
 function subtaskAlreadyDisplayed(subtask){
-    return document.querySelector(`*[data-id="${subtask.getId()}"]`)
+    return document.querySelector(`*[data-id="${subtask.id}"]`)
 }
 
 function addSubtaskBtnExists(ul){
@@ -634,7 +634,7 @@ function createSubtaskForm(task){
         e.currentTarget.closest("li").remove()
 
         if (!subtasksLimitReached(task)){    
-            getSubtasksList("",task.getId()).append(createAddSubtaskBtnList(task))
+            getSubtasksList("",task.id).append(createAddSubtaskBtnList(task))
         }
     })
 

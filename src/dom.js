@@ -82,7 +82,7 @@ export function createProjectOption(project){
 }
 
 export function createTaskCardContainer(task){
-    return createDOMElement({elemType:"div", className:"task-card", dataId:task.getId()})
+    return createDOMElement({elemType:"div", className:"task-card", dataId:task.id})
 }
 
 export function createCheckBtn(){

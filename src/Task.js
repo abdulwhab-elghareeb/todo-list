@@ -1,0 +1,46 @@
+import { Project } from "./Project.js"
+
+export class Task{
+    #subtasksArray = []
+    #id = crypto.randomUUID()
+    #isCompleted = false
+    #maxArrayLength = 5
+    title
+    description
+    dueDate
+    priority
+    constructor(title, description, dueDate, priority){
+        ({title: this.title, description: this.description, id:this.#id} = new Project(title, description))
+        this.dueDate = dueDate
+        this.priority = priority
+    }
+
+    get id(){
+        return this.#id
+    }
+
+    get subtasksArray(){
+        return this.#subtasksArray
+    }
+
+    get isCompleted(){
+        return this.#isCompleted
+    }
+
+    get maxArrayLength(){
+        return this.#maxArrayLength
+    }
+
+    addSubtask(subtask){
+        this.#subtasksArray.push(subtask)
+    }
+
+    removeSubtask(subtask){
+        this.#subtasksArray.splice(this.#subtasksArray.indexOf(subtask), 1)
+    }
+
+    toggleState(){
+        this.#isCompleted? this.#isCompleted = false : this.#isCompleted = true
+    }
+    
+}
