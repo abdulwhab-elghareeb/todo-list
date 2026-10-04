@@ -21,6 +21,7 @@ if (!localStorage.getItem("projectsArray")){
     storage.saveProjectsArray(projectsArray)
 }else{
     loadProjects()
+    sessionStorage.clear()
 }
 
 
@@ -151,13 +152,15 @@ function getProjectSidebarList(project){
 
 function clearProjectPage(){
     [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
+    if(document.getElementById("task-add-btn")) document.getElementById("task-add-btn").remove()
 }
 
 function renderProjectPage(project){
     clearProjectPage()
-    renderProjectTasks(project)
-    updateProjectPageId(project)
     renderProjectPageInputs(project)
+    renderAddTaskBtn(project)
+    updateProjectPageId(project)
+    renderProjectTasks(project)
 }
 
 function renderProjectPageInputs(project){
@@ -216,6 +219,19 @@ function createProjectPageLoader(project){
     return projectPageLoader
 }
 
+function renderAddTaskBtn(){
+    const addTaskBtn = dom.createTaskAddBtn()
+    function openTaskDialog(e){
+        document.querySelector("#tasks-dialog form").reset()
+        renderTaskForm(e)
+        document.querySelector("#tasks-dialog").showModal()
+    }
+    addTaskBtn.addEventListener("click", openTaskDialog)
+
+    document.querySelector("#project-page .description-container").after(addTaskBtn)
+
+}
+
 
 function renderProjects(){
     projectsArray.forEach(project =>{
@@ -262,13 +278,6 @@ function getCurrentProject(){
     return projectsArray.find((project) => project.id === currentPageId)
 }
 
-
-function openTaskDialog(e){
-    document.querySelector("#tasks-dialog form").reset()
-    renderTaskForm(e)
-    document.querySelector("#tasks-dialog").showModal()
-}
-document.querySelector("#task-add-btn").addEventListener("click", openTaskDialog)
 
 function renderTaskForm(e){
     renderProjectSelection()

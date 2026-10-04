@@ -64,6 +64,11 @@ export function createProjectPageLoader(){
     return createDOMElement({elemType:"button", className:"project-page-loader"})
 }
 
+export function createTaskAddBtn(){
+    return createDOMElement({elemType:"button", id:"task-add-btn", textContent:"+"})
+}
+
+
 export function createPlaceholderOption(){
     const placeholder = document.createElement('option')
     Object.assign(placeholder, {
