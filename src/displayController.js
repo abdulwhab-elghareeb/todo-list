@@ -12,11 +12,46 @@ import * as dom from "./dom.js"
 import * as storage from "./storage.js"
 
 
-// Projects
 
 const projectsArray = projectsContainer.projectsArray
-projectsContainer.addProjectToArray(new Project("Default", "This is the default project"))
-renderProjects()
+// localStorage initial loading
+
+if (!localStorage.getItem("projectsArray")){
+    addDefaultProject()
+    storage.saveProjectsArray(projectsArray)
+}else{
+    loadProjects()
+}
+
+
+function loadProjects(){
+    storage.getProjectsArray().forEach(project => {
+        const newProject = new Project(project.title, project.description)
+        projectsContainer.addProjectToArray(newProject)
+
+        project.tasksArray.forEach(task =>{
+            const newTask = new Task(task.title, task.description, task.dueDate, task.priority)
+            newProject.addTask(newTask)
+
+            task.subtasksArray.forEach(subtask =>{
+                const newSubtask = new Subtask(subtask.title)
+                newTask.addSubtask(newSubtask)
+            })
+        })
+
+        renderProjects()
+        
+    })
+}
+
+// Projects
+function addDefaultProject(){
+    const defaultProject = new Project("Default", "This is the default project")
+    defaultProject.default = true
+    projectsContainer.addProjectToArray(defaultProject)
+    renderProjects()    
+    storage.saveProjectsArray(projectsArray)
+}
 
 function toggleSidebar(e){
     const sidebar = document.querySelector("#sidebar")
@@ -98,9 +133,11 @@ function createProjectRemoveBtn(project){
         if(projectsArray.length === 0){
             clearProjectPage() 
         }else{   
-            const prevOrNextProjectPageLoader = document.querySelector(`li[data-id="${prevOrNextproject.id}"] .project-page-loader`) 
+            const prevOrNextProjectPageLoader = document.querySelector(`li[data-id="${prevOrNextProject.id}"] .project-page-loader`) 
             prevOrNextProjectPageLoader.click()
         }
+
+        storage.saveProjectsArray(projectsArray)
     }
     removeProjectBtn.addEventListener("click", removeBtnClickHandler)
 
@@ -148,6 +185,7 @@ function renderProjectPageInputs(project){
         updateProjectListTitle(project)
 
         projectPageInput.nextElementSibling.textContent = ""
+        storage.saveProjectsArray(projectsArray)
     }
 
     [projectPageTitleInput, projectPageDescriptionInput].forEach((projectPageInput) =>{
@@ -209,6 +247,7 @@ function formSubmissionHandler(e){
     disableFormSubmissionBtn()
     resetCharCounters()
     e.currentTarget.reset()
+    storage.saveProjectsArray(projectsArray)
 }
 document.querySelector("#project-dialog > form").addEventListener('submit', formSubmissionHandler)
 
@@ -222,7 +261,6 @@ function getCurrentProject(){
     const currentPageId = document.querySelector("#project-page").dataset.id
     return projectsArray.find((project) => project.id === currentPageId)
 }
-
 
 
 function openTaskDialog(e){
@@ -285,6 +323,7 @@ function addTask(){
     const task = new Task(titleValue, descriptionValue, dueDateValue, priorityValue)
     projectsArray[selectedProjectIdx].addTask(task)
 
+    storage.saveProjectsArray(projectsArray)
     return task
 }
 
@@ -315,6 +354,7 @@ function createCardContainer(task){
 
             document.querySelector("#tasks-dialog form").reset()
             tasksDialog.close()
+            storage.saveProjectsArray(projectsArray)
         }
         saveBtn.addEventListener("click", saveBtnHandler, {once:true}) // setting once to avoid duplicate listeners
 
@@ -355,6 +395,7 @@ function moveTaskToSelectedProjects(projSelection, task){
     if (selectedProject === getCurrentProject()) return
     getCurrentProject().removeTask(task)
     selectedProject.addTask(task)
+    storage.saveProjectsArray(projectsArray)
 }
 
 function updateDisplayedTask(task){
@@ -423,6 +464,7 @@ function createTaskDelBtn(task){
         e.stopPropagation()
         getCurrentProject().removeTask(task)
         e.target.closest(".task-card").remove()
+        storage.saveProjectsArray(projectsArray)
 
     }
     delBtn.addEventListener("click", delBtnClickHandler )
@@ -504,6 +546,7 @@ function formSubmitHandler(e){
     renderProjectTasks(getCurrentProject())
     e.currentTarget.reset()
     resetCharCounters()
+    storage.saveProjectsArray(projectsArray)
 }
 document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
 
@@ -568,6 +611,7 @@ function createSubTaskDelBtn(subtask, task){
         const subtaskLi = document.querySelector(`li:has(.subtask-card[data-id="${subtask.id}"])`)
         subtaskLi.remove()    
         task.removeSubtask(subtask)
+        storage.saveProjectsArray(projectsArray)
     })
 
     return delBtn
@@ -644,6 +688,7 @@ function createSubtaskForm(task){
         renderTaskSubtasks(task)
         e.currentTarget.reset()
         cancelBtn.click()
+        storage.saveProjectsArray(projectsArray)
     })
 
     return listItem

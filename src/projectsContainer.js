@@ -10,6 +10,6 @@ export const projectsContainer = {
     },
 
     removeProjectFromArray: function(project){
-        this._projectsArray.splice(projectsArray.indexOf(project), 1)
+        this._projectsArray.splice(this._projectsArray.indexOf(project), 1)
     },
 }

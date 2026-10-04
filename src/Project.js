@@ -6,6 +6,13 @@ export class Project{
     constructor(title, description, projectId){
         this.title = title
         this.description = description
+        this.toJSON = function(){
+            return {
+                title: this.title,
+                description: this.description,
+                tasksArray: this.#tasksArray
+            }
+        }
     }
 
     get id(){

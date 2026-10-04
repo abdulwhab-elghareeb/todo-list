@@ -26,15 +26,13 @@ export function saveTaskExpanded(taskId, expandedValue){
     if (!storageAvailable("sessionStorage")) return
     sessionStorage.setItem(taskId, expandedValue)
 }
-// export function saveProjectsArray(){
-//     if (!storageAvailable("localStorage")) return
 
-//     localStorage.setItem("projectsContainer", JSON.stringify(projectsContainer))
-// }
 
-// export function getSavedProjectsArray(){
-//     if (!storageAvailable("localStorage")) return
+export function saveProjectsArray(projectsContainerArray){
+  if(!storageAvailable("localStorage")) return
+  localStorage.setItem("projectsArray", JSON.stringify(projectsContainerArray))
+}
 
-//     // Returns the projectArray
-//     return JSON.parse(localStorage.getItem("projectsContainer"))
-// }
+export function getProjectsArray(){
+  return JSON.parse(localStorage.getItem("projectsArray"))
+}

@@ -13,6 +13,18 @@ export class Task{
         ({title: this.title, description: this.description, id:this.#id} = new Project(title, description))
         this.dueDate = dueDate
         this.priority = priority
+
+        this.toJSON = function(){
+            return{
+                title: this.title,
+                description: this.description,
+                dueDate: this.dueDate,
+                priority: this.priority,
+                subtasksArray: this.#subtasksArray
+
+            }
+
+        }
     }
 
     get id(){
