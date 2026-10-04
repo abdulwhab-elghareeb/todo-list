@@ -6,7 +6,7 @@ import { Task } from "./Task.js"
 import {toCamelCase, replaceEventListener} from "./helper.js"
 import { intlFormatDistance } from "date-fns";
 import { format } from "date-fns"
-import { createSubtask } from "./createSubtask.js"
+import { Subtask } from "./Subtask.js"
 
 import * as dom from "./dom.js"
 import * as storage from "./storage.js"
@@ -574,7 +574,7 @@ function createSubTaskDelBtn(subtask, task){
 }
 
 function createSubtaskObject(task, titleValue=""){
-    const subtask = createSubtask(titleValue)
+    const subtask = new Subtask(titleValue)
     task.addSubtask(subtask)
     return subtask
 }
