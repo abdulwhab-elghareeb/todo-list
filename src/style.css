@@ -603,6 +603,8 @@ div:has(#project-page-title){
 
 ul.subtasks-list{
   grid-column: span 4;
+  border-color: inherit;
+  width: max-content;
 
   display: flex;
   flex-direction: column;
@@ -614,6 +616,7 @@ ul.subtasks-list{
 }
 
 .subtasks-list li{
+  border-color: inherit;
   position: relative;
   margin-left: 1rem;
 

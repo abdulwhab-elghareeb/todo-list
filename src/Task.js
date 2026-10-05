@@ -9,10 +9,11 @@ export class Task{
     description
     dueDate
     priority
-    constructor(title, description, dueDate, priority){
+    constructor(title, description, dueDate, priority, taskState=false){
         ({title: this.title, description: this.description, id:this.#id} = new Project(title, description))
         this.dueDate = dueDate
         this.priority = priority
+        this.#isCompleted = taskState
 
         this.toJSON = function(){
             return{
@@ -20,7 +21,8 @@ export class Task{
                 description: this.description,
                 dueDate: this.dueDate,
                 priority: this.priority,
-                subtasksArray: this.#subtasksArray
+                subtasksArray: this.#subtasksArray,
+                isCompleted: this.#isCompleted
 
             }
 
