@@ -175,8 +175,11 @@ function renderProjectPageInputs(project){
 
     function inputsDoubleClickHandler(e){
         const projectPageInput = e.currentTarget
+        const note = projectPageInput.parentNode.querySelector(".note")
         projectPageInput.removeAttribute("readonly")
-        projectPageInput.parentNode.querySelector(".note").remove()
+        projectPageInput.focus()
+        projectPageInput.select()
+        if(note) note.remove()
     }
 
     function inputChangeEventHandler(e){

@@ -52,8 +52,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :root{
-  --sidebar-background: hsl(0, 0%, 98%);
-  --main-background: hsl(0 0 99);
+  --sidebar-background: hsl(0, 0%, 99%);
+  --main-background: hsl(0 0 98);
   --text-color: hsl(0 0 15);
   --font-family: "Roboto";
 
@@ -175,6 +175,7 @@ body{
 #project-page{
   margin-left: 300px;
   transition: margin-left 0.4s;
+  background-color: var(--main-background);
 }
 
 #project-page.sidebar-close{
@@ -434,13 +435,16 @@ div:has(#project-page-title){
 
 #project-page-title{
   font-weight: 500;
-  
+
+  background-color: transparent;
 }
 
 #project-page-description{
   height: max-content;
   font-size: 1.1rem;
   color: hsl(from var(--light-gray) h s calc(l - 20));
+
+  background-color: transparent;
 }
 
 .note{
