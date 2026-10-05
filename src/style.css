@@ -52,18 +52,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :root{
-  --sidebar-background: hsl(0, 0%, 99%);
-  --main-background: hsl(0 0 98);
+  --sidebar-background: hsl(45 50 94);
+  --main-background: hsl(43 89 96);
   --text-color: hsl(0 0 15);
   --font-family: "Roboto";
 
   --light-gray: hsl(0 0 50);
 
-  --shadow-color: 0deg 0% 79%;
-  --shadow-elevation-low:
-    0.5px 0.5px 1.1px hsl(var(--shadow-color) / 0),
-    0.8px 0.8px 1.7px hsl(var(--shadow-color) / 0.11),
-    1.6px 1.5px 3.3px hsl(var(--shadow-color) / 0.22);
+  --shadow-color: 40deg 29% 60%;
+  --shadow:
+    0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.34),
+    0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.34),
+    1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.34);
 
     scrollbar-color: hsl(from var(--text-color) h s calc(l + 30)) var(--main-background);
     scrollbar-gutter: stable;
@@ -99,6 +99,8 @@ body{
 
   font-family: var(--font-family);
   color: var(--text-color);
+
+  background-color: var(--main-background);
 }
 
 /* scrollbar */
@@ -121,7 +123,7 @@ body{
   gap: 2rem;
   padding: 1rem;
   
-  box-shadow: var(--shadow-elevation-low);
+  box-shadow: var(--shadow);
 
   transition: width 0.4s, padding 0.4s;
 
@@ -175,7 +177,6 @@ body{
 #project-page{
   margin-left: 300px;
   transition: margin-left 0.4s;
-  background-color: var(--main-background);
 }
 
 #project-page.sidebar-close{
@@ -295,13 +296,13 @@ dialog{
   border: none;
   border-radius: 6px;
 
-  box-shadow: var(--shadow-elevation-low);
+  box-shadow: var(--shadow);
 }
 
 dialog input,
 dialog select, 
 dialog button{
-  box-shadow: var(--shadow-elevation-low);
+  box-shadow: var(--shadow);
 }
 
 dialog form{
@@ -343,6 +344,10 @@ input[name="project-description"]{
   color: var(--light-gray);
 }
 
+#project-page .char-counter{
+  background-color: var(--main-background);
+}
+
 input + .char-counter{
   bottom: 5px;
   right: 15px;
@@ -373,7 +378,7 @@ dialog form button{
   font-size: 1.1rem;
   font-weight: 500;
   background-color: transparent;
-  box-shadow: var(--shadow-elevation-low);
+  box-shadow: var(--shadow);
   border-radius: 8px;
 
   transition:all 0.4s;
@@ -425,16 +430,20 @@ select{
   max-width: 1080px;
     
   padding: 2rem;
+
 }
 
 div:has(#project-page-title){
   position: sticky;
-  top: -1px;
+  top: 0;
   z-index: 2;
+
+  background-color: var(--main-background);
 }
 
 #project-page-title{
   font-weight: 500;
+  font-size: 2rem;
 
   background-color: transparent;
 }
@@ -462,12 +471,8 @@ div:has(#project-page-title){
   border-radius: 1rem;
   font-size: 40px; 
   background-color: transparent;
-  box-shadow: var(--shadow-elevation-low);
+  box-shadow: var(--shadow);
   margin: 1rem 0;
-}
-
-#task-add-btn:hover{
-  background-color: hsl(from var(--light-gray) h s calc(l + 40));
 }
 
 .task-card,
@@ -487,7 +492,7 @@ div:has(#project-page-title){
   border-radius: 8px;
   border: 1px solid;
   
-  box-shadow: var(--shadow-elevation-low);
+  box-shadow: var(--shadow);
 
   overflow: hidden;
   transition: all 0.4s;
@@ -499,12 +504,14 @@ div:has(#project-page-title){
 }
 
 
-.task-card:hover{
-  background-color: hsl(from var(--light-gray) h s calc(l + 47));
+.task-card:hover,
+#task-add-btn:hover{
+  background-color: hsl(from var(--main-background) h s calc(l - 3));
 }
 
 .task-card > .task-check-btn{
   position: relative;
+  transition: none; /* the task itself won't have any transition effects */
 }
 
 .task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
