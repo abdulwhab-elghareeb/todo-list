@@ -54,15 +54,6 @@ function addDefaultProject(){
     storage.saveProjectsArray(projectsArray)
 }
 
-function toggleSidebar(e){
-    const sidebar = document.querySelector("#sidebar")
-    const projectPage = document.querySelector("#project-page");
-    
-    [e.currentTarget, sidebar, projectPage].forEach(sidebarTransitionElem => sidebarTransitionElem.classList.toggle("sidebar-close"))
-}
-document.querySelector("#sidebar-toggling-btn").addEventListener("click", toggleSidebar)
-
-
 function inputsEventHandler(e){
     const currentInput = e.currentTarget
     if (inputIsRequired(currentInput)) updateFormSubmitBtnAvailability(currentInput)
@@ -434,17 +425,17 @@ function displayPriority(task){
             break
 
         case 3:
-            taskContainer.style.borderColor = "hsl(19, 100%, 60%)"
+            taskContainer.style.borderColor = "hsl(19, 100%, 50%)"
             taskContainer.style.fontWeight = "600"
             break
 
         case 2:
-            taskContainer.style.borderColor = "hsl(55, 100%, 40%)"
+            taskContainer.style.borderColor = "hsl(55, 100%, 45%)"
             taskContainer.style.fontWeight = "500"
             break
 
         case 1:
-            taskContainer.style.borderColor = "hsl(120, 100%,40%)"
+            taskContainer.style.borderColor = "hsl(120, 100%,50%)"
             taskContainer.style.fontWeight = "500"
     }
 }

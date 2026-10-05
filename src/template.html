@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todos</title>
+    <style>
+        body.preload *{
+            display: none !important;
+        }
+    </style>
 </head>
-<body>
-    <button id="sidebar-toggling-btn"><img src="./assets/menu.svg" alt="" height="23" width="23"></button>
+<body class="preload">
+    <button id="mode" type="button"><img src="./assets/dark-mode.svg" alt="moon shaped icon" width="20" height="20"></button>
+
+    <button id="sidebar-toggling-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  height="23" width="23"><path d="M3,8V7H20V8H3M20,12V13H3V12H20M3,17H20V18H3V17Z" /></svg></button>
     <div id="sidebar">
         <div class="user hover">
             <img src="./assets/account-circle-outline.svg" alt="" height="33" width="33">
@@ -18,7 +25,7 @@
                     <div class="title">Projects</div>
 
                     <!--opens the dialog that contains the project adding form-->
-                    <button id="sidebar-add-project-btn" class="low">+</button> 
+                    <button id="sidebar-add-project-btn">+</button> 
                 </div>
 
                 <ul id="projects-list">

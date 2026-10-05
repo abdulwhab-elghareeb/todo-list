@@ -52,30 +52,57 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :root{
-  --sidebar-background: hsl(45 50 94);
-  --main-background: hsl(43 89 96);
-  --text-color: hsl(0 0 15);
   --font-family: "Roboto";
 
   --light-gray: hsl(0 0 50);
+  --submit-btns: hsl(150, 62%, 52%);
 
-  --shadow-color: 40deg 29% 60%;
   --shadow:
     0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.34),
     0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.34),
     1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.34);
 
-    scrollbar-color: hsl(from var(--text-color) h s calc(l + 30)) var(--main-background);
+    scrollbar-color: var(--text-color) var(--main-background);
     scrollbar-gutter: stable;
+}
+
+:root.light{
+  --sidebar-background: hsl(45 50 94);
+  --main-background: hsl(43 89 96);
+  --text-color: hsl(0 0 15);
+  --shadow-color: 40deg 29% 60%;
+  --light-gray: hsl(0 0 50);
+  --submit-btns: hsl(150, 62%, 72%);
+
+
+}
+
+:root.dark{
+  --sidebar-background: hsl(300 5 20);
+  --main-background: hsl(270 10 10);
+  --text-color: hsl(0 0 80);
+  --shadow-color: 0deg 0% 5%;
+  --light-gray: hsl(0 0 70);
+  --submit-btns: hsl(150, 62%, 32%);
+
+
 }
 
 button,
 input,
 textarea,
 select{
+  transition: background-color 0.4s;
+  background-color: hsl(from var(--main-background) h s calc(l + 10));
+}
+
+button,
+input,
+textarea,
+select,
+dialog{
   border: none;
   outline: none;
-  transition: all 0.4s;
 }
 
 button{
@@ -91,11 +118,11 @@ li{
   list-style:none;
 }
 
+
 body{
   height: 100vh;
 
   display: flex;
-  
 
   font-family: var(--font-family);
   color: var(--text-color);
@@ -103,16 +130,36 @@ body{
   background-color: var(--main-background);
 }
 
-/* scrollbar */
+/* switching modes btn */
+#mode{
+  position: absolute;
+  right: 5px;
+  top: 10px;
+
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+
+  box-shadow: var(--shadow);
+  background-color: hsl(from var(--main-background) h s calc(l - 10));
+  z-index: 3;
+}
+
+#mode > img{
+  width: 100%;
+  height: 100%;
+}
+
 
 /* Sidebar */
 #sidebar{
   scrollbar-gutter: stable;
   scrollbar-width: thin;
 
-  overflow-x: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
+  overflow-x: hidden; /* so content inside of sidebar don't overflow when sidebar is closed */
   position: fixed;
-  width: 310px;
+  width: 320px;
   height: 100vh;
 
   background-color: var(--sidebar-background);
@@ -125,7 +172,7 @@ body{
   
   box-shadow: var(--shadow);
 
-  transition: width 0.4s, padding 0.4s;
+  transition: all 0.4s;
 
 }
 
@@ -138,6 +185,14 @@ body{
   text-align: center;
   padding: 6px;
   border-radius: 1rem;
+
+  background-color: transparent;
+
+  transition: all 0.4s;
+}
+ 
+#sidebar-toggling-btn{
+  fill:var(--text-color);
 }
 
 /* sidebar closing/opening transition */
@@ -152,6 +207,7 @@ body{
 
 
 #sidebar .user{
+
   display: flex;
   align-items: center;
   justify-content: start;
@@ -161,6 +217,8 @@ body{
 
   font-weight: 500;
   white-space: pre;
+
+  background-color: var(--sidebar-background);
 }
 
 #sidebar button.selected-project{
@@ -202,18 +260,6 @@ body{
   gap: 1rem;
 }
 
-.low{
-  color: green;
-}
-
-.mid{
-  color: hsl(39, 100%, 40%);
-}
-
-.max{
-  color: red;
-}
-
 .disable{
   pointer-events: none;
 }
@@ -247,22 +293,21 @@ body{
 #sidebar button,
 #project-container .project-page-loader,
 .add-subtask-btn,
-.subtask-add,
+.subtask-submit,
 .subtask-cancel{
   background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
 
   cursor: pointer;
-  transition: all 0.4s;
+  transition: background-color 0.4s;
 }
 
-#sidebar #project-dialog-show-btn,
+#sidebar-add-project-btn,
 .add-subtask-btn,
-.subtask-add{
-  padding: 1px 12px;
-  font-size: 1.3rem;
-  color: hsl(120, 100%, 30%);
+.subtask-submit{
+  color: hsl(120, 100%, 40%);
+  font-size: 1.1rem;
 }
 
 #sidebar .project-remove-btn,
@@ -293,10 +338,14 @@ dialog{
   width: 700px;
   height: 700px;
 
-  border: none;
   border-radius: 6px;
 
   box-shadow: var(--shadow);
+  background-color: var(--main-background);
+}
+
+select{
+  cursor: pointer;
 }
 
 dialog input,
@@ -385,16 +434,16 @@ dialog form button{
 }
 
 form button[id*='submit']{
-  background-color:hsl(120, 100%, 60%);;
+  background-color: var(--submit-btns)
 }
 
 form button[id*='submit']:disabled{
-  background-color: hsl(from var(--light-gray) h s calc(l + 10));
+  background-color: hsl(from var(--light-gray) h s calc(l - 10));
   cursor: not-allowed;
 }
 
 dialog button[command="close"]:hover{
-  background-color: hsl(from var(--light-gray) h s calc(l + 30));
+  background-color: hsl(from var(--main-background) h s calc(l + 10));
 }
 
 label{
@@ -470,7 +519,7 @@ div:has(#project-page-title){
   height: 80px;
   border-radius: 1rem;
   font-size: 40px; 
-  background-color: transparent;
+  background-color: var(--main-background);
   box-shadow: var(--shadow);
   margin: 1rem 0;
 }
@@ -543,7 +592,7 @@ div:has(#project-page-title){
 
 
 .task-card:has(> .task-check-btn.checked){
-  background-color: hsl(from var(--light-gray) h s calc(l + 37));
+  background-color: hsl(from var(--sidebar-background) h s calc(l - 8));
   text-decoration: line-through;
   opacity: 0.9;
   color: var(--light-gray);
@@ -586,9 +635,9 @@ div:has(#project-page-title){
 
 .task-del-btn:hover,
 .add-subtask-btn:hover,
-.subtask-add:hover,
+.subtask-submit:hover,
 .subtask-cancel:hover{
-  background-color: hsl(from var(--light-gray) h s calc(l + 32));
+  background-color: hsl(from var(--light-gray) h s calc(l + 28));
 }
 
 .task-expand-btn{

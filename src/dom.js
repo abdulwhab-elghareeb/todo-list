@@ -163,7 +163,7 @@ export function createFormList(){
     const subtaskForm =  createDOMElement({elemType:"form"})
     const listItem = createDOMElement({elemType:"li", className:"subtask-form"})
     const btnsContainer = createDOMElement({elemType:"div", className:"subtask-btns"})
-    const addBtn = createDOMElement({elemType:"button", className:"subtask-add", textContent:"+"})
+    const addBtn = createDOMElement({elemType:"button", className:"subtask-submit", textContent:"+"})
     const cancelBtn = createDOMElement({elemType:"button", className:"subtask-cancel", type:"button"})
     const cancelBtnImg = createDOMElement({elemType:"img", src:delIcon, height:"20",})
 

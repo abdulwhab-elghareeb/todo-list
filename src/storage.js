@@ -36,3 +36,8 @@ export function saveProjectsArray(projectsContainerArray){
 export function getProjectsArray(){
   return JSON.parse(localStorage.getItem("projectsArray"))
 }
+
+export function saveColorMode(currentMode){
+  if(!storageAvailable("localStorage")) return
+  localStorage.setItem("mode", currentMode)
+}
