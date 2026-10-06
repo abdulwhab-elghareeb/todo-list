@@ -690,6 +690,8 @@ function createDisplaySubtask(task, subtask){
 function checkBtnEventHandler(task, checkBtn, subtask){
     const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
 
+    if(task.subtasksArray.length === 0) return
+
     if(!subtask.isCompleted && task.isCompleted){ // all subtasks must be completed
         task.toggleState()
         updateCheckBtn(task, parentTaskCheckBtn)
@@ -735,15 +737,16 @@ function createSubtaskObject(task, titleValue=""){
     return subtask
 }
 
-function createSubtaskTitleInput(task, subtask){
-    const subtaskTitleInput = dom.createSubtaskTitleInput(subtask.title)
+function createSubtaskTitleInput(task, subtask, {option ="subtask"} = {}){
+
+    const subtaskTitleInput = (option === "form")? dom.createSubtaskTitleInput("") : dom.createSubtaskTitleInput(subtask.title)
 
     subtaskTitleInput.addEventListener("change", (e) =>{
         if(e.target.value.trim().length < 2) return
 
         e.stopPropagation()
 
-        subtask.title = e.target.value.trim()
+        if (option != "form") subtask.title = e.target.value.trim()
         e.target.blur()
         renderTaskSubtasks(task)
 
@@ -791,7 +794,7 @@ function addSubtaskBtnExists(ul){
 function createSubtaskForm(task){
     const listItem = dom.createFormList()
     const subtaskForm = listItem.querySelector("form")
-    const input = createSubtaskTitleInput()
+    const input = createSubtaskTitleInput(task, "", {option:"form"})
     const cancelBtn = subtaskForm.querySelector(".subtask-cancel")
 
     subtaskForm.prepend(input)
