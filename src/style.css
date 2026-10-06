@@ -277,6 +277,8 @@ body{
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  font-size: 0.8rem;
 }
 
 .project-title{
@@ -378,7 +380,7 @@ select{
 
 input[name="project-title"]{
   padding: 1rem;
-  min-height: 75px;
+  font-size: 28px;
 }
 
 div:has(input[name="project-title"]){
@@ -387,8 +389,7 @@ div:has(input[name="project-title"]){
 
 input[name="project-description"]{
   padding: 1rem;
-  font-size: 20px;
-  height: 80px;
+  font-size: 17px;
 }
 
 .char-counter{

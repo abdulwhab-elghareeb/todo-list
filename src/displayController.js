@@ -110,6 +110,7 @@ function addInputEventToTextInputs(){
 
 function openDialog(){
     document.getElementById("project-dialog").showModal()
+    updateFormSubmitBtnAvailability()
     addInputEventToTextInputs()
 }
 document.querySelector("#sidebar-add-project-btn").addEventListener("click", openDialog)
@@ -197,6 +198,8 @@ function renderProjectPageInputs(project){
     }
 
     function inputChangeEventHandler(e){
+        if(e.target.id == "project-page-title" && e.target.value.trim().length < 2) return
+
         const projectPageInput = e.currentTarget
         projectPageInput.setAttribute("readonly", "")
 
@@ -238,8 +241,10 @@ function createProjectPageLoader(project){
 
 function renderAddTaskBtn(){
     const addTaskBtn = dom.createTaskAddBtn()
+    const requiredInput = getAllTaskFormElements().find(input => input.required)
     function openTaskDialog(e){
         document.querySelector("#tasks-dialog form").reset()
+        updateFormSubmitBtnAvailability(requiredInput)
         renderTaskForm(e)
         document.querySelector("#tasks-dialog").showModal()
     }
@@ -734,16 +739,16 @@ function createSubtaskObject(task, titleValue=""){
 function createSubtaskTitleInput(task, subtask){
     const subtaskTitleInput = dom.createSubtaskTitleInput(subtask.title)
 
-    subtaskTitleInput.addEventListener("keydown", (e) =>{
-        if(e.key == "Enter" && e.target.value.trim().length >= 2){
-            e.stopPropagation()
-            
-            subtask.title = e.target.value.trim()
-            e.target.blur()
-            renderTaskSubtasks(task)
+    subtaskTitleInput.addEventListener("change", (e) =>{
+        if(e.target.value.trim().length < 2) return
 
-            storage.saveProjectsArray(projectsArray)
-        }
+        e.stopPropagation()
+
+        subtask.title = e.target.value.trim()
+        e.target.blur()
+        renderTaskSubtasks(task)
+
+        storage.saveProjectsArray(projectsArray)
     })
 
     return subtaskTitleInput
