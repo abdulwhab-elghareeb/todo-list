@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
     0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.34),
     1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.34);
 
-    scrollbar-color: var(--text-color) var(--main-background);
+    scrollbar-color: hsl(from var(--text-color) h s calc(l + 5)) var(--main-background);
     scrollbar-gutter: stable;
 }
 
@@ -233,7 +233,7 @@ body{
 }
 
 #project-page{
-  margin-left: 300px;
+  margin-left: 320px;
   transition: margin-left 0.4s;
 }
 

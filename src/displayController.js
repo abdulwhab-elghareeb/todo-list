@@ -296,7 +296,7 @@ function renderProjectSelection(){
 
 function selectCurrentProject(){
     const projectSelection = document.querySelector("#task-project")
-    projectSelection.value = getCurrentProject().title
+    projectSelection.selectedIndex = projectsArray.indexOf(getCurrentProject()) + 1
 }
 
 function selectDefaultDate(){
