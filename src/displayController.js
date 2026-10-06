@@ -672,7 +672,7 @@ function getSubtaskLI(subtask){
 
 function createDisplaySubtask(task, subtask){
     const checkBtn = createSubtaskCheckBtn(subtask, task)
-    const title = createSubtaskTitleInput(subtask.title)
+    const title = createSubtaskTitleInput(task, subtask)
     const delBtn = createSubTaskDelBtn(subtask, task)
     const listCard = createSubtaskCardContainer(subtask)
     const li = dom.createSubtaskLI()
@@ -731,11 +731,19 @@ function createSubtaskObject(task, titleValue=""){
     return subtask
 }
 
-function createSubtaskTitleInput(subtaskTitle=""){
-    const subtaskTitleInput = dom.createSubtaskTitleInput(subtaskTitle)
-    subtaskTitleInput.addEventListener("dblclick", (e) =>{
-        e.stopPropagation()
-        subtaskTitleInput.removeAttribute("readOnly")
+function createSubtaskTitleInput(task, subtask){
+    const subtaskTitleInput = dom.createSubtaskTitleInput(subtask.title)
+
+    subtaskTitleInput.addEventListener("keydown", (e) =>{
+        if(e.key == "Enter" && e.target.value.trim().length >= 2){
+            e.stopPropagation()
+            
+            subtask.title = e.target.value.trim()
+            e.target.blur()
+            renderTaskSubtasks(task)
+
+            storage.saveProjectsArray(projectsArray)
+        }
     })
 
     return subtaskTitleInput
