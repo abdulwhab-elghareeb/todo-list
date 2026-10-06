@@ -174,3 +174,11 @@ export function createFormList(){
 
     return listItem
 }
+
+export function createDescriptionContainer(task){
+    const container = createDOMElement({elemType:"div", className:"description-container"})
+    const description = createDOMElement({elemType:"span", className:"task-description", textContent: task.description})
+    container.appendChild(description)
+
+    return container
+}

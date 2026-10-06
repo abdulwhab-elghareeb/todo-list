@@ -559,9 +559,10 @@ function createExpandBtn(task){
                 ul.append(createAddSubtaskBtnList(task))
             }
             renderTaskSubtasks(task)
+            renderTaskDescription(task)
             storage.saveTaskExpanded(task.id, true) 
         }else{
-            clearList(taskCardContainer)
+            clearTask(taskCardContainer)
             storage.saveTaskExpanded(task.id, false) 
         }
     }
@@ -577,9 +578,10 @@ function isExpanded(card){
     return card.classList.contains("expanded")
 }
 
-function clearList(card){
+function clearTask(card){
     const ul = card.querySelector(".subtasks-list")
     ul.replaceChildren()
+    card.querySelector(".description-container").remove()
 }
 
 function renderProjectTasks(project){
@@ -635,11 +637,6 @@ function addInitialSubtasksList(currentTaskCard){
     return subtasksList
 }
 
-
-function getCurrentSubtask(){
-
-
-}
 
 function createAddSubtaskBtnList(task){
     
@@ -776,7 +773,6 @@ function subtaskAlreadyDisplayed(subtask){
 }
 
 function addSubtaskBtnExists(ul){
-    console.log(ul)
     return ul.querySelector("li:has(.add-subtask-btn)")
 }
 
@@ -808,4 +804,11 @@ function createSubtaskForm(task){
     })
 
     return listItem
+}
+
+function renderTaskDescription(task){
+    const container = dom.createDescriptionContainer(task)
+    getTaskContainer(task).appendChild(container)
+    console.log(container)
+
 }
