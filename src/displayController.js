@@ -80,18 +80,18 @@ function updateFormSubmitBtnAvailability(requiredInput){
 }
 
 function adjustInputSize(input){
-    input.style.width = 'auto';
-    input.style.width = (input.scrollWidth + 20) + 'px';
+//     input.style.width = 'auto';
+//     input.style.width = (input.scrollWidth + 20) + 'px';
 
-    const currentFontSize = parseInt(getComputedStyle(input).fontSize)
-    const maxFontSize = input.closest("div").offsetHeight / 2
-    console.log(maxFontSize)
-    if (input.clientWidth >= input.closest("div").clientWidth){
-        input.style.fontSize = `${currentFontSize - 1}px`
-    }else{
-        if (currentFontSize > maxFontSize) return
-        input.style.fontSize = `${currentFontSize + 1}px`
-    }
+//     const currentFontSize = parseInt(getComputedStyle(input).fontSize)
+//     const maxFontSize = input.closest("div").offsetHeight / 2
+
+//     if (input.clientWidth >= input.closest("div").clientWidth){
+//         input.style.fontSize = `${currentFontSize - 1.5}px`
+//     }else{
+//         if (currentFontSize > maxFontSize) return
+//         input.style.fontSize = `${currentFontSize + 3}px`
+//     }
 }
 
 function updateCharCount(textInput){
@@ -490,10 +490,6 @@ function checkBtnClickHandler(e, task){
         revertSubtasks(task)
     }
 
-    if(isExpanded(getTaskContainer(task)) && addSubtaskBtnExists(getSubtasksUL("", task.id))){
-        updateAddTaskBtn(task)
-    }
-
     storage.saveProjectsArray(projectsArray)
 }
 
@@ -515,25 +511,6 @@ function checkAllSubtasks(task){
 
 }
 
-function updateAddTaskBtn(task){
-    if (task.isCompleted){
-        disableAddTaskBtn(task)
-    }else{
-        enableAddTaskBtn(task)
-    }
-}
-
-function disableAddTaskBtn(task){
-    const addTaskBtn = getSubtasksUL("", task.id).querySelector(".add-subtask-btn")
-    addTaskBtn.disabled = true
-    addTaskBtn.style.color = "darkred"
-}
-
-function enableAddTaskBtn(task){
-    const addTaskBtn = getSubtasksUL("", task.id).querySelector(".add-subtask-btn")
-    addTaskBtn.disabled = false
-    addTaskBtn.style.color = "green"
-}
 
 function revertSubtasks(task){
     if (!task.subtasksArray ) return // if it's called from subtask
@@ -659,8 +636,13 @@ function addInitialSubtasksList(currentTaskCard){
 }
 
 
+function getCurrentSubtask(){
+
+
+}
 
 function createAddSubtaskBtnList(task){
+    
     const subtasksListItem = dom.createAddBtnList()
     const addSubtaskBtn = subtasksListItem.querySelector("button")
     addSubtaskBtn.addEventListener("click", (e) => {
@@ -683,7 +665,6 @@ function subtasksLimitReached(task){
 }
 
 function getSubtasksUL(childElem="", taskId=""){
-    console.log(taskId)
     if (childElem) return childElem.closest("ul")
     if (taskId) return document.querySelector(`.task-card[data-id="${taskId}"] ul`)
 }
@@ -705,25 +686,26 @@ function createDisplaySubtask(task, subtask){
     return li
 }
 
+function checkBtnEventHandler(task, checkBtn, subtask){
+    const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
+
+    if(!subtask.isCompleted && task.isCompleted){ // all subtasks must be completed
+        task.toggleState()
+        updateCheckBtn(task, parentTaskCheckBtn)
+    }
+
+    if(task.subtasksArray.every(subtask => subtask.isCompleted) && !task.isCompleted){ // if every subtask is completed then the task is completed
+        task.toggleState()
+        updateCheckBtn(task, parentTaskCheckBtn)
+    }
+
+    storage.saveProjectsArray(projectsArray)
+
+}
+
 function createSubtaskCheckBtn(subtask, task){
     const checkBtn = createCheckBtn(subtask)
-    function checkBtnEventHandler(){
-        const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
-
-        if(!subtask.isCompleted && task.isCompleted){ // all subtasks must be completed
-            task.toggleState()
-            updateCheckBtn(task, parentTaskCheckBtn)
-        }
-
-        if(task.subtasksArray.every(subtask => subtask.isCompleted) && !task.isCompleted){ // if every subtask is completed then the task is completed
-            task.toggleState()
-            updateCheckBtn(task, parentTaskCheckBtn)
-        }
-
-        storage.saveProjectsArray(projectsArray)
-
-    }
-    checkBtn.addEventListener("click", checkBtnEventHandler)
+    checkBtn.addEventListener("click", () => checkBtnEventHandler(task, checkBtn, subtask))
 
     return checkBtn
 }
@@ -736,8 +718,10 @@ function createSubTaskDelBtn(subtask, task){
             getSubtasksUL(delBtn).appendChild(createAddSubtaskBtnList(task))
         }
 
-        getSubtaskLI(subtask).remove()    
         task.removeSubtask(subtask)
+        checkBtnEventHandler(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
+        getSubtaskLI(subtask).remove()    
+
         storage.saveProjectsArray(projectsArray)
     })
 
@@ -773,7 +757,6 @@ function renderTaskSubtasks(task){
 
         const displaySubtask = createDisplaySubtask(task, subtask)
         const subtasksUl = getSubtasksUL("", task.id)
-        console.log(subtasksUl)
 
         if (addSubtaskBtnExists(subtasksUl)){
             subtasksUl.querySelector("li:has(.add-subtask-btn)").before(displaySubtask)
@@ -786,9 +769,6 @@ function renderTaskSubtasks(task){
         updateCheckBtn(subtask, subtaskLI.querySelector(".task-check-btn"))
     })
 
-    if(getSubtasksUL("", task.id).querySelector(".add-subtask-btn")){
-        updateAddTaskBtn(task)
-    }
 }
 
 function subtaskAlreadyDisplayed(subtask){
@@ -818,8 +798,10 @@ function createSubtaskForm(task){
 
     subtaskForm.addEventListener("submit", (e) =>{
         e.preventDefault()
-        createSubtaskObject(task, input.value.trim())
+
+        const subtask = createSubtaskObject(task, input.value.trim())
         renderTaskSubtasks(task)
+        checkBtnEventHandler(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
         e.currentTarget.reset()
         cancelBtn.click()
         storage.saveProjectsArray(projectsArray)

@@ -372,7 +372,7 @@ dialog form{
 input,
 select{
   width: 100%;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 0.6rem 0.8rem;
 }
 
@@ -481,7 +481,7 @@ select{
   flex-grow: 1;
   
   min-height: max-content;
-  max-width: 1080px;
+  max-width: 1110px;
     
   padding: 2rem;
 
@@ -508,6 +508,10 @@ div:has(#project-page-title){
   color: hsl(from var(--light-gray) h s calc(l - 20));
 
   background-color: transparent;
+}
+
+div:has(#project-page-description){
+  text-overflow: ellipsis;
 }
 
 .note{

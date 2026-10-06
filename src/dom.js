@@ -23,7 +23,6 @@ export function createProjectRemoveBtn(){
 
 export function createProjectPageTitleInput(project){
     const projectPageTitleInput = createDOMElement({elemType:"input", value:project.title})
-    projectPageTitleInput.style.fontSize = "36px"
     Object.assign(projectPageTitleInput, {
         type: "text",
         name: "project-title",
