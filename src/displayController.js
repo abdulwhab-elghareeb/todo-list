@@ -65,6 +65,7 @@ function inputsEventHandler(e){
     const currentInput = e.currentTarget
     if (inputIsRequired(currentInput)) updateFormSubmitBtnAvailability(currentInput)
     updateCharCount(currentInput)
+    adjustInputSize(currentInput)
 }
 
 function inputIsRequired(input){
@@ -76,6 +77,21 @@ function updateFormSubmitBtnAvailability(requiredInput){
     const formSubmitBtn = activeFormDialog.querySelector("button[type='submit']");
 
     (requiredInput.checkValidity())? formSubmitBtn.removeAttribute("disabled") : formSubmitBtn.setAttribute("disabled","")
+}
+
+function adjustInputSize(input){
+    input.style.width = 'auto';
+    input.style.width = (input.scrollWidth + 20) + 'px';
+
+    const currentFontSize = parseInt(getComputedStyle(input).fontSize)
+    const maxFontSize = input.closest("div").offsetHeight / 2
+    console.log(maxFontSize)
+    if (input.clientWidth >= input.closest("div").clientWidth){
+        input.style.fontSize = `${currentFontSize - 1}px`
+    }else{
+        if (currentFontSize > maxFontSize) return
+        input.style.fontSize = `${currentFontSize + 1}px`
+    }
 }
 
 function updateCharCount(textInput){
@@ -420,7 +436,7 @@ function moveTaskToSelectedProjects(projSelection, task){
 
 function updateDisplayedTask(task){
     const taskContainer = getTaskContainer(task)
-    const taskTitle = taskContainer.querySelector('.task-title')
+    const taskTitle = taskContainer.querySelector('.task-displayed-title')
     const taskDueDate = taskContainer.querySelector('.task-due-date')
 
     taskTitle.textContent = task.title
@@ -474,8 +490,7 @@ function checkBtnClickHandler(e, task){
         revertSubtasks(task)
     }
 
-    if(isExpanded(getTaskContainer(task))){
-        console.log(`this ran from ${e.currentTarget}`)
+    if(isExpanded(getTaskContainer(task)) && addSubtaskBtnExists(getSubtasksUL("", task.id))){
         updateAddTaskBtn(task)
     }
 
@@ -562,7 +577,10 @@ function createExpandBtn(task){
         expandCard(taskCardContainer)
 
         if (isExpanded(taskCardContainer)){
-            if (!subtasksLimitReached(task)) addInitialSubtasksList(taskCardContainer,task)
+            const ul = addInitialSubtasksList(taskCardContainer)
+            if (!subtasksLimitReached(task)){
+                ul.append(createAddSubtaskBtnList(task))
+            }
             renderTaskSubtasks(task)
             storage.saveTaskExpanded(task.id, true) 
         }else{
@@ -631,13 +649,13 @@ function formSubmitHandler(e){
 document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
 
 
-function addInitialSubtasksList(currentTaskCard, task){
+function addInitialSubtasksList(currentTaskCard){
     const subtasksList = currentTaskCard.querySelector("ul") || dom.createSubtasksUL()
     subtasksList.addEventListener("click", (e)=> e.stopPropagation())
-    const addBtnList = createAddSubtaskBtnList(task)
 
-    subtasksList.appendChild(addBtnList)
     currentTaskCard.appendChild(subtasksList)
+
+    return subtasksList
 }
 
 
@@ -665,6 +683,7 @@ function subtasksLimitReached(task){
 }
 
 function getSubtasksUL(childElem="", taskId=""){
+    console.log(taskId)
     if (childElem) return childElem.closest("ul")
     if (taskId) return document.querySelector(`.task-card[data-id="${taskId}"] ul`)
 }
@@ -754,6 +773,7 @@ function renderTaskSubtasks(task){
 
         const displaySubtask = createDisplaySubtask(task, subtask)
         const subtasksUl = getSubtasksUL("", task.id)
+        console.log(subtasksUl)
 
         if (addSubtaskBtnExists(subtasksUl)){
             subtasksUl.querySelector("li:has(.add-subtask-btn)").before(displaySubtask)
@@ -776,6 +796,7 @@ function subtaskAlreadyDisplayed(subtask){
 }
 
 function addSubtaskBtnExists(ul){
+    console.log(ul)
     return ul.querySelector("li:has(.add-subtask-btn)")
 }
 

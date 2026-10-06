@@ -34,5 +34,5 @@ function switchModes(){
 document.getElementById("mode").addEventListener("click", switchModes)
 
 
-// protecting the user from getting flash banged if the css did not load
+// protecting the user from getting flash banged if the css did not load in time
 window.addEventListener("load", () => document.body.classList.remove("preload"))

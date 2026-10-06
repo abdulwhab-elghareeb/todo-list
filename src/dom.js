@@ -23,6 +23,7 @@ export function createProjectRemoveBtn(){
 
 export function createProjectPageTitleInput(project){
     const projectPageTitleInput = createDOMElement({elemType:"input", value:project.title})
+    projectPageTitleInput.style.fontSize = "36px"
     Object.assign(projectPageTitleInput, {
         type: "text",
         name: "project-title",
@@ -99,7 +100,7 @@ export function createCheckBtn(){
 }
 
 export function createCardTitle(task){
-    return createDOMElement({elemType:"div", className:"task-title", textContent:task.title})
+    return createDOMElement({elemType:"div", className:"task-displayed-title", textContent:task.title})
 }
 
 export function createCardDueDate(task){
