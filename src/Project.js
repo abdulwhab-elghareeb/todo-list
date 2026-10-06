@@ -10,7 +10,7 @@ export class Project{
             return {
                 title: this.title,
                 description: this.description,
-                tasksArray: this.#tasksArray
+                tasksArray: this.#tasksArray,
             }
         }
     }

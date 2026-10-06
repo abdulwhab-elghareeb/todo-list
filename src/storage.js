@@ -41,3 +41,8 @@ export function saveColorMode(currentMode){
   if(!storageAvailable("localStorage")) return
   localStorage.setItem("mode", currentMode)
 }
+
+export function saveCurrentProject(projectIndex){
+  if(!storageAvailable("localStorage")) return
+  localStorage.setItem("currentProjectIdx", projectIndex)
+}

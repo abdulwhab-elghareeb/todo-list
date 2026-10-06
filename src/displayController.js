@@ -19,10 +19,12 @@ const projectsArray = projectsContainer.projectsArray
 if (!localStorage.getItem("projectsArray")){
     addDefaultProject()
     storage.saveProjectsArray(projectsArray)
+    storage.saveCurrentProject(0) // the default project
 }else{
     loadProjects()
     sessionStorage.clear()
 }
+showLastClickedProject()
 
 
 function loadProjects(){
@@ -43,6 +45,11 @@ function loadProjects(){
         renderProjects()
         
     })
+}
+
+function showLastClickedProject(){
+    const currentProjectIdx = localStorage.getItem("currentProjectIdx")
+    getProjectSidebarList(projectsArray[currentProjectIdx]).querySelector(".project-page-loader").click()
 }
 
 // Projects
@@ -116,7 +123,7 @@ function createProjectRemoveBtn(project){
         e.stopPropagation();
 
         const indexOfProject = projectsArray.indexOf(project)
-        const prevOrNextProject = projectsArray[indexOfProject - 1] || projectsArray[indexOfProject + 1];  
+        const prevOrNextProject = projectsArray[indexOfProject + 1] || projectsArray[indexOfProject - 1];  
 
         getProjectSidebarList(project).remove()
         projectsContainer.removeProjectFromArray(project)
@@ -207,9 +214,9 @@ function createProjectPageLoader(project){
     projectPageLoader.addEventListener("click", (e) => {
         renderProjectPage(project)
         focusCurrentProjectLi(e)
-    })
-    projectPageLoader.click()
-    
+        storage.saveCurrentProject(projectsArray.indexOf(getCurrentProject()))
+
+    })    
     return projectPageLoader
 }
 
@@ -257,9 +264,14 @@ function formSubmissionHandler(e){
     disableFormSubmissionBtn()
     resetCharCounters()
     e.currentTarget.reset()
+    clickNewProject()
     storage.saveProjectsArray(projectsArray)
 }
 document.querySelector("#project-dialog > form").addEventListener('submit', formSubmissionHandler)
+
+function clickNewProject(){
+    getProjectSidebarList(projectsArray.at(-1)).querySelector(".project-page-loader").click()
+}
 
 export function initialRendering(){
     renderProjects()
