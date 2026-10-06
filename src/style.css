@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
     0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.34),
     1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.34);
 
-    scrollbar-color: hsl(from var(--text-color) h s calc(l + 5)) var(--main-background);
+    scrollbar-color: hsl(from var(--text-color) h s calc(l + 5)) var(--sidebar-background);
     scrollbar-gutter: stable;
 }
 
@@ -154,10 +154,8 @@ body{
 
 /* Sidebar */
 #sidebar{
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-
   overflow-x: hidden; /* so content inside of sidebar don't overflow when sidebar is closed */
+  overflow-y: hidden;
   position: fixed;
   width: 320px;
   height: 100vh;
@@ -207,17 +205,12 @@ body{
 
 
 #sidebar .user{
-
   display: flex;
   align-items: center;
   justify-content: start;
   gap: 0.6rem;
 
-  margin-left: -0.4rem;
-
   font-weight: 500;
-  white-space: pre;
-
   background-color: var(--sidebar-background);
 }
 
@@ -227,6 +220,11 @@ body{
 }
 
 #sidebar #projects-list{
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  overflow-y: auto;
+  max-height: 80vh;
+
   display: flex;
   flex-direction: column;
   gap: 10px;

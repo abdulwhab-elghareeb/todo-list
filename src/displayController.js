@@ -110,7 +110,6 @@ function addInputEventToTextInputs(){
 
 function openDialog(){
     document.getElementById("project-dialog").showModal()
-    updateFormSubmitBtnAvailability()
     addInputEventToTextInputs()
 }
 document.querySelector("#sidebar-add-project-btn").addEventListener("click", openDialog)
