@@ -115,7 +115,6 @@ function openDialog(){
 document.querySelector("#sidebar-add-project-btn").addEventListener("click", openDialog)
 
 
-
 function createProjectObj(){
     const projectTitleInput = document.getElementById("project-title")
     const projectDescriptionInput = document.getElementById("project-description")
@@ -166,7 +165,7 @@ function getProjectSidebarList(project){
 
 function clearProjectPage(){
     [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
-    if(document.getElementById("task-add-btn")) document.getElementById("task-add-btn").remove()
+    if(document.getElementById("project-page-add-task-btn")) document.getElementById("project-page-add-task-btn").remove()
 }
 
 function renderProjectPage(project){
@@ -247,6 +246,7 @@ function renderAddTaskBtn(){
         renderTaskForm(e)
         document.querySelector("#tasks-dialog").showModal()
     }
+    replaceEventListener(document.getElementById("sidebar-add-task-btn"), "click", openTaskDialog)
     addTaskBtn.addEventListener("click", openTaskDialog)
 
     document.querySelector("#project-page .description-container").after(addTaskBtn)
@@ -307,7 +307,7 @@ function getCurrentProject(){
 
 function renderTaskForm(e){
     renderProjectSelection()
-    selectCurrentProject()
+    if(e.currentTarget.id === "project-page-add-task-btn")selectCurrentProject()
     selectDefaultDate()
     adjustTaskSubmitBtnText(e.currentTarget)
     
@@ -342,7 +342,7 @@ function selectDefaultDate(){
 
 function adjustTaskSubmitBtnText(showDialogBtn){
     const submitBtn = document.querySelector("#task-dialog-submit-btn")
-    showDialogBtn.id === "task-add-btn"? submitBtn.textContent = "Add" : submitBtn.textContent = "Save"
+    showDialogBtn.id.includes("add-task-btn")? submitBtn.textContent = "Add" : submitBtn.textContent = "Save"
 }
 
 

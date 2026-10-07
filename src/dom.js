@@ -65,7 +65,7 @@ export function createProjectPageLoader(){
 }
 
 export function createTaskAddBtn(){
-    return createDOMElement({elemType:"button", id:"task-add-btn", textContent:"+"})
+    return createDOMElement({elemType:"button", id:"project-page-add-task-btn", textContent:"+"})
 }
 
 
