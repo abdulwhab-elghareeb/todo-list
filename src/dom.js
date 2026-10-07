@@ -103,7 +103,8 @@ export function createCardTitle(task){
 }
 
 export function createCardDueDate(task){
-    return createDOMElement({elemType:"div", className:"task-due-date", textContent:intlFormatDistance(task.dueDate, new Date())})
+    const dueDate = (task.dueDate)? intlFormatDistance(task.dueDate, new Date()) : "Anytime"
+    return createDOMElement({elemType:"div", className:"task-due-date", textContent:dueDate})
 }
 
 export function createCardDelBtn(){

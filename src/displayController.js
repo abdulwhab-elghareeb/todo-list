@@ -336,7 +336,6 @@ function selectDefaultDate(){
     Object.assign(dateInput, {
         min: format(new Date(), 'yyyy-MM-dd'),
         max: '2100-12-20',
-        value: format((new Date()).setDate((new Date()).getDate() + 3),'yyyy-MM-dd') // set to after 3 days
     })
 }
 
