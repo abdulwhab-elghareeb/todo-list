@@ -79,21 +79,6 @@ function updateFormSubmitBtnAvailability(requiredInput){
     (requiredInput.checkValidity())? formSubmitBtn.removeAttribute("disabled") : formSubmitBtn.setAttribute("disabled","")
 }
 
-function adjustInputSize(input){
-//     input.style.width = 'auto';
-//     input.style.width = (input.scrollWidth + 20) + 'px';
-
-//     const currentFontSize = parseInt(getComputedStyle(input).fontSize)
-//     const maxFontSize = input.closest("div").offsetHeight / 2
-
-//     if (input.clientWidth >= input.closest("div").clientWidth){
-//         input.style.fontSize = `${currentFontSize - 1.5}px`
-//     }else{
-//         if (currentFontSize > maxFontSize) return
-//         input.style.fontSize = `${currentFontSize + 3}px`
-//     }
-}
-
 function updateCharCount(textInput){
     const charCounter = textInput.nextElementSibling
     charCounter.textContent = `${textInput.value.length} / ${textInput.maxLength}`
@@ -443,7 +428,7 @@ function updateDisplayedTask(task){
     const taskDueDate = taskContainer.querySelector('.task-due-date')
 
     taskTitle.textContent = task.title
-    taskDueDate.textContent = intlFormatDistance(task.dueDate, new Date())
+    taskDueDate.textContent = (task.dueDate)? intlFormatDistance(task.dueDate, new Date()) : "Anytime"
     displayPriority(task)
 }
 

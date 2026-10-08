@@ -45,7 +45,7 @@ export function createProjectPageDescInput(project){
         id: "project-page-description",
         autocorrect: "on",
         placeholder: "Description",
-        maxLength: "80",
+        maxLength: "120",
         readOnly: true,
     })
 
@@ -150,7 +150,7 @@ export function createSubtaskTitleInput(subtaskTitle){
         className:"subtask-title",
         id:"subtask-title",
         minLength: "2",
-        maxLength: "28",
+        maxLength: "35",
         pattern: "^\\S{1,}.*",
         autofocus: true,
         required:true,

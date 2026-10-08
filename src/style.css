@@ -342,8 +342,7 @@ body{
   padding: 5px 8px;
 }
 
-.project-remove-btn img,
-.subtask-cancel img{
+.project-remove-btn img{
   min-width: 17px;
   min-height: 20px;
 }
@@ -772,49 +771,54 @@ ul.subtasks-list{
 }
 
 .subtask-form > form{
-  height: min-content;
-  width: 400px;
-  padding: 3px 10px;
+  height: 35px;
+  width: 350px;
+  padding: 1px 12px 1px 10px;
   margin-left: 1rem;
+  border-color: inherit;
 
   grid-template-columns: 1fr max-content;
   gap: 2px;
   align-items: center;
+  align-content: center;
   grid-template-areas:
   "input btns";
 }
 
 .subtask-form .subtask-title{
   grid-area: input;
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   background-color: transparent;
+  padding: 2px;
 }
 
-.subtask-title + .char-counter{
-  bottom: 2px;
-  right: 120px;
-  font-size: 12px;
+#project-page .subtask-title + .char-counter{
+  bottom: 0;
+  right: 70px;
+  background-color: transparent;
+  font-size: 0.6rem;
 }
 
 .subtask-form .subtask-btns{
   grid-area: btns;
-  width: 40px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  align-items: center;
+  gap: 7px;
+}
+
+
+.subtask-cancel img{
+  height: 17px;
+  width: 15px;
+}
+.subtask-cancel,
+.subtask-submit{
+  padding: 3px;
 }
 
 .subtask-submit{
-  padding: 1px 4px;
-  font-size: 1.2rem;
-
-  background-color: var(--submit-btns);
-}
-
-.subtask-cancel{
-  padding: 2px 10px;
-  background-color: hsl(0, 100%,20%);
+  padding: 0 6px;
 }
 
 .task-card.expanded .description-container{
