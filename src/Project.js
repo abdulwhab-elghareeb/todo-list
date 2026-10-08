@@ -3,7 +3,7 @@ export class Project{
     #tasksArray = []
     title
     description
-    constructor(title, description, projectId){
+    constructor(title, description){
         this.title = title
         this.description = description
         this.toJSON = function(){
