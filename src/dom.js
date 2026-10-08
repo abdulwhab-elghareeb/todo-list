@@ -141,7 +141,7 @@ export function createSubtaskLI(){
     return createDOMElement({elemType:"li", className:"subtask-list-item"})
 }
 
-export function createSubtaskTitleInput(subtaskTitle){
+export function createFormSubtaskTitleInput(subtaskTitle){
     const subtaskTitleInput = createDOMElement({elemType:"input", value:subtaskTitle})
     Object.assign(subtaskTitleInput, {
         type: "text",
@@ -156,6 +156,12 @@ export function createSubtaskTitleInput(subtaskTitle){
         required:true,
     })
 
+    return subtaskTitleInput
+}
+
+export function createDisplaySubtaskTitleInput(subtaskTitle){
+    const subtaskTitleInput = createFormSubtaskTitleInput(subtaskTitle)
+    subtaskTitleInput.id = ""
     return subtaskTitleInput
 }
 

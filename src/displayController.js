@@ -470,35 +470,34 @@ function createCardContainer(task){
     return taskCardContainer
 }
 
-function createCheckBtn(task){
+function createCheckBtn(checkableElem){
     const checkBtn = dom.createCheckBtn()
-    checkBtn.addEventListener("click", (e) => checkBtnClickHandler(e, task))
+    function checkBtnClickHandler(e){
+        e.stopPropagation()
+        checkableElem.toggleState()
+        updateCheckBtn(checkableElem, e.currentTarget)
 
+        if(checkableElem.subtasksArray){ // if it's a task and has subtasks
+            if(checkableElem.isCompleted){  
+                checkAllSubtasks(checkableElem) 
+            }else{
+                revertSubtasks(checkableElem)
+            }
+        }
+        storage.saveProjectsArray(projectsArray)
+    }
+        
+    checkBtn.addEventListener("click", checkBtnClickHandler)
     return checkBtn
 }
 
-function checkBtnClickHandler(e, task){
-    e.stopPropagation()
-    task.toggleState()
-    updateCheckBtn(task, e.currentTarget)
 
-    if(task.isCompleted){
-        checkAllSubtasks(task)
-
-    }else{
-        revertSubtasks(task)
-    }
-
-    storage.saveProjectsArray(projectsArray)
-}
 
 function updateCheckBtn(task, checkBtn){
     (task.isCompleted)? checkBtn.classList.add("checked") : checkBtn.classList.remove("checked")
 }
 
 function checkAllSubtasks(task){
-    if (!task.subtasksArray ) return // if it's called from subtask
-
     task.subtasksArray.forEach(subtask => {
         subtask.originalState = subtask.isCompleted 
         subtask.isCompleted = true
@@ -511,8 +510,6 @@ function checkAllSubtasks(task){
 }
 
 function revertSubtasks(task){
-    if (!task.subtasksArray ) return
-
     task.subtasksArray.forEach(subtask => {
         subtask.isCompleted = subtask.originalState
 
@@ -654,7 +651,7 @@ function createSubtaskForm(task){
 
         const subtask = createSubtaskObject(task, input.value.trim())
         renderTaskSubtasks(task)
-        checkBtnEventHandler(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
+        updateParentCheckBtn(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
         e.currentTarget.reset()
         cancelBtn.click()
         storage.saveProjectsArray(projectsArray)
@@ -691,13 +688,13 @@ function renderTaskSubtasks(task){
 
         if (addSubtaskBtnExists(subtasksUl)){
             subtasksUl.querySelector("li:has(.add-subtask-btn)").before(li)
+            // adds the newSubtask before the add btn
         }else{
             subtasksUl.appendChild(li)
         }
 
-        const subtaskLI = getSubtaskLI(subtask)
-        subtaskLI.querySelector("input").value = subtask.title
-        updateCheckBtn(subtask, subtaskLI.querySelector(".task-check-btn"))
+        title.value = subtask.title
+        updateCheckBtn(subtask, checkBtn)
     })
 
 }
@@ -712,22 +709,22 @@ function addSubtaskBtnExists(ul){
 
 function createSubtaskCheckBtn(subtask, task){
     const checkBtn = createCheckBtn(subtask)
-    checkBtn.addEventListener("click", () => checkBtnEventHandler(task, checkBtn, subtask))
+    checkBtn.addEventListener("click", () => updateParentCheckBtn(task, checkBtn, subtask))
 
     return checkBtn
 }
 
-function checkBtnEventHandler(task, checkBtn, subtask){
-    const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
-
+function updateParentCheckBtn(task, checkBtn, subtask){
     if(task.subtasksArray.length === 0) return
 
-    if(!subtask.isCompleted && task.isCompleted){ // all subtasks must be completed
+    const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
+
+    if(!subtask.isCompleted && task.isCompleted){ // If a subtask is not completed then the task is not completed too
         task.toggleState()
         updateCheckBtn(task, parentTaskCheckBtn)
     }
 
-    if(task.subtasksArray.every(subtask => subtask.isCompleted) && !task.isCompleted){ // if every subtask is completed then the task is completed
+    if(task.subtasksArray.every(subtask => subtask.isCompleted) && !task.isCompleted){ // If every subtask is completed then the task is completed too
         task.toggleState()
         updateCheckBtn(task, parentTaskCheckBtn)
     }
@@ -735,21 +732,20 @@ function checkBtnEventHandler(task, checkBtn, subtask){
     storage.saveProjectsArray(projectsArray)
 }
 
-function createSubtaskTitleInput(task, subtask, {option ="subtask"} = {}){
-    const subtaskTitleInput = (option === "form")? dom.createSubtaskTitleInput("") : dom.createSubtaskTitleInput(subtask.title)
+function createSubtaskTitleInput(task, subtask, {option = "subtask"} = {}){
+    const subtaskTitleInput = (option === "form")? dom.createFormSubtaskTitleInput("") : dom.createDisplaySubtaskTitleInput(subtask.title)
 
     subtaskTitleInput.addEventListener("change", (e) =>{
         if(e.target.value.trim().length < 2) return
-
         e.stopPropagation()
 
-        if (option != "form") subtask.title = e.target.value.trim()
+        if (option == "subtask") subtask.title = e.target.value.trim()
         e.target.blur()
         renderTaskSubtasks(task)
 
         storage.saveProjectsArray(projectsArray)
     })
-
+    
     return subtaskTitleInput
 }
 
@@ -758,10 +754,11 @@ function createSubTaskDelBtn(subtask, task){
     delBtn.addEventListener("click", () =>{
         if (subtasksLimitReached(task)){
             getSubtasksUL(delBtn).appendChild(createAddSubtaskBtnList(task))
+            // Add the subtask add btn back
         }
 
         task.removeSubtask(subtask)
-        checkBtnEventHandler(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
+        updateParentCheckBtn(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask) // check 
         getSubtaskLI(subtask).remove()    
 
         storage.saveProjectsArray(projectsArray)
