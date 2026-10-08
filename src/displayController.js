@@ -572,6 +572,11 @@ function isExpanded(card){
     return card.classList.contains("expanded")
 }
 
+function renderTaskDescription(task){
+    const container = dom.createDescriptionContainer(task)
+    getTaskContainer(task).appendChild(container)
+}
+
 function clearTask(card){
     card.querySelector(".subtasks-list").remove()
     card.querySelector(".description-container").remove()
@@ -592,49 +597,30 @@ function addSubtasksList(currentTaskCard){
 function displayPriority(task){
     const taskContainer = getTaskContainer(task)
     const priorityList = ["urgent", 'important', 'less-important', 'not-important']
+    let priority;
     switch(Number(task.priority)){
         case 4:
-            replaceMultipleClasses(taskContainer, "urgent", priorityList)
+            priority = "urgent"
             break
 
         case 3:
-            replaceMultipleClasses(taskContainer, "important", priorityList)
+            priority = "important"
             break
 
         case 2:
-            replaceMultipleClasses(taskContainer, "less-important", priorityList)
+            priority = "less-important"
             break
 
         case 1:
-            replaceMultipleClasses(taskContainer, "not-important", priorityList)
+            priority = "not-important"
     }
+
+    replaceMultipleClasses(taskContainer, priority, priorityList)
 }
 
 
 // Subtasks
-function createAddSubtaskBtnList(task){
-    
-    const subtasksListItem = dom.createAddBtnList()
-    const addSubtaskBtn = subtasksListItem.querySelector("button")
-    addSubtaskBtn.addEventListener("click", (e) => {
-        e.stopPropagation()
-        const form = createSubtaskForm(task)       
-        subtasksListItem.before(form)
-
-        const input = form.querySelector("input")
-        input.focus()
-        input.select()
-        input.addEventListener("input", (e) => updateCharCount(e.currentTarget))
-
-        subtasksListItem.remove()
-    })
-    return subtasksListItem
-}
-
-function subtasksLimitReached(task){
-    return task.subtasksArray.length === task.maxArrayLength
-}
-
+// Subtask helpers
 function getSubtasksUL(childElem="", taskId=""){
     if (childElem) return childElem.closest("ul")
     if (taskId) return document.querySelector(`.task-card[data-id="${taskId}"] ul`)
@@ -644,123 +630,9 @@ function getSubtaskLI(subtask){
     return document.querySelector(`li:has(.subtask-card[data-id="${subtask.id}"])`)
 }
 
-function createDisplaySubtask(task, subtask){
-    const checkBtn = createSubtaskCheckBtn(subtask, task)
-    const title = createSubtaskTitleInput(task, subtask)
-    const delBtn = createSubTaskDelBtn(subtask, task)
-    const listCard = createSubtaskCardContainer(subtask)
-    const li = dom.createSubtaskLI()
-
-    listCard.append(checkBtn, title, delBtn)
-    li.append(listCard)
-    
-    return li
-}
-
-function checkBtnEventHandler(task, checkBtn, subtask){
-    const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
-
-    if(task.subtasksArray.length === 0) return
-
-    if(!subtask.isCompleted && task.isCompleted){ // all subtasks must be completed
-        task.toggleState()
-        updateCheckBtn(task, parentTaskCheckBtn)
-    }
-
-    if(task.subtasksArray.every(subtask => subtask.isCompleted) && !task.isCompleted){ // if every subtask is completed then the task is completed
-        task.toggleState()
-        updateCheckBtn(task, parentTaskCheckBtn)
-    }
-
-    storage.saveProjectsArray(projectsArray)
-
-}
-
-function createSubtaskCheckBtn(subtask, task){
-    const checkBtn = createCheckBtn(subtask)
-    checkBtn.addEventListener("click", () => checkBtnEventHandler(task, checkBtn, subtask))
-
-    return checkBtn
-}
 
 
-function createSubTaskDelBtn(subtask, task){
-    const delBtn = dom.createCardDelBtn()
-    delBtn.addEventListener("click", () =>{
-        if (subtasksLimitReached(task)){
-            getSubtasksUL(delBtn).appendChild(createAddSubtaskBtnList(task))
-        }
-
-        task.removeSubtask(subtask)
-        checkBtnEventHandler(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
-        getSubtaskLI(subtask).remove()    
-
-        storage.saveProjectsArray(projectsArray)
-    })
-
-    return delBtn
-}
-
-function createSubtaskObject(task, titleValue=""){
-    const subtask = new Subtask(titleValue)
-    task.addSubtask(subtask)
-    return subtask
-}
-
-function createSubtaskTitleInput(task, subtask, {option ="subtask"} = {}){
-
-    const subtaskTitleInput = (option === "form")? dom.createSubtaskTitleInput("") : dom.createSubtaskTitleInput(subtask.title)
-
-    subtaskTitleInput.addEventListener("change", (e) =>{
-        if(e.target.value.trim().length < 2) return
-
-        e.stopPropagation()
-
-        if (option != "form") subtask.title = e.target.value.trim()
-        e.target.blur()
-        renderTaskSubtasks(task)
-
-        storage.saveProjectsArray(projectsArray)
-    })
-
-    return subtaskTitleInput
-}
-
-function createSubtaskCardContainer(subtask){
-    const container = createCardContainer(subtask).cloneNode()
-    container.classList.add("subtask-card")
-    return container
-}
-
-
-function renderTaskSubtasks(task){
-    task.subtasksArray.forEach((subtask) =>{
-        if(subtaskAlreadyDisplayed(subtask)) return
-
-        const displaySubtask = createDisplaySubtask(task, subtask)
-        const subtasksUl = getSubtasksUL("", task.id)
-
-        if (addSubtaskBtnExists(subtasksUl)){
-            subtasksUl.querySelector("li:has(.add-subtask-btn)").before(displaySubtask)
-        }else{
-            subtasksUl.appendChild(displaySubtask)
-        }
-
-        const subtaskLI = getSubtaskLI(subtask)
-        subtaskLI.querySelector("input").value = subtask.title
-        updateCheckBtn(subtask, subtaskLI.querySelector(".task-check-btn"))
-    })
-
-}
-
-function subtaskAlreadyDisplayed(subtask){
-    return getSubtaskLI(subtask)
-}
-
-function addSubtaskBtnExists(ul){
-    return ul.querySelector("li:has(.add-subtask-btn)")
-}
-
+// Subtask form
 function createSubtaskForm(task){
     const listItem = dom.createFormList()
     const subtaskForm = listItem.querySelector("form")
@@ -791,7 +663,134 @@ function createSubtaskForm(task){
     return listItem
 }
 
-function renderTaskDescription(task){
-    const container = dom.createDescriptionContainer(task)
-    getTaskContainer(task).appendChild(container)
+function subtasksLimitReached(task){
+    return task.subtasksArray.length === task.maxArrayLength
+}
+
+function createSubtaskObject(task, titleValue=""){
+    const subtask = new Subtask(titleValue)
+    task.addSubtask(subtask)
+    return subtask
+}
+
+
+// Creating subtask
+function renderTaskSubtasks(task){
+    task.subtasksArray.forEach((subtask) =>{
+        if(subtaskAlreadyDisplayed(subtask)) return
+
+        const checkBtn = createSubtaskCheckBtn(subtask, task)
+        const title = createSubtaskTitleInput(task, subtask)
+        const delBtn = createSubTaskDelBtn(subtask, task)
+        const listCard = createSubtaskCardContainer(subtask)
+        const li = dom.createSubtaskLI()
+        const subtasksUl = getSubtasksUL("", task.id)
+
+        listCard.append(checkBtn, title, delBtn)
+        li.append(listCard)
+
+        if (addSubtaskBtnExists(subtasksUl)){
+            subtasksUl.querySelector("li:has(.add-subtask-btn)").before(li)
+        }else{
+            subtasksUl.appendChild(li)
+        }
+
+        const subtaskLI = getSubtaskLI(subtask)
+        subtaskLI.querySelector("input").value = subtask.title
+        updateCheckBtn(subtask, subtaskLI.querySelector(".task-check-btn"))
+    })
+
+}
+
+function subtaskAlreadyDisplayed(subtask){
+    return getSubtaskLI(subtask)
+}
+
+function addSubtaskBtnExists(ul){
+    return ul.querySelector("li:has(.add-subtask-btn)")
+}
+
+function createSubtaskCheckBtn(subtask, task){
+    const checkBtn = createCheckBtn(subtask)
+    checkBtn.addEventListener("click", () => checkBtnEventHandler(task, checkBtn, subtask))
+
+    return checkBtn
+}
+
+function checkBtnEventHandler(task, checkBtn, subtask){
+    const parentTaskCheckBtn = getSubtasksUL(checkBtn).closest(".task-card").querySelector(".task-check-btn")
+
+    if(task.subtasksArray.length === 0) return
+
+    if(!subtask.isCompleted && task.isCompleted){ // all subtasks must be completed
+        task.toggleState()
+        updateCheckBtn(task, parentTaskCheckBtn)
+    }
+
+    if(task.subtasksArray.every(subtask => subtask.isCompleted) && !task.isCompleted){ // if every subtask is completed then the task is completed
+        task.toggleState()
+        updateCheckBtn(task, parentTaskCheckBtn)
+    }
+
+    storage.saveProjectsArray(projectsArray)
+}
+
+function createSubtaskTitleInput(task, subtask, {option ="subtask"} = {}){
+    const subtaskTitleInput = (option === "form")? dom.createSubtaskTitleInput("") : dom.createSubtaskTitleInput(subtask.title)
+
+    subtaskTitleInput.addEventListener("change", (e) =>{
+        if(e.target.value.trim().length < 2) return
+
+        e.stopPropagation()
+
+        if (option != "form") subtask.title = e.target.value.trim()
+        e.target.blur()
+        renderTaskSubtasks(task)
+
+        storage.saveProjectsArray(projectsArray)
+    })
+
+    return subtaskTitleInput
+}
+
+function createSubTaskDelBtn(subtask, task){
+    const delBtn = dom.createCardDelBtn()
+    delBtn.addEventListener("click", () =>{
+        if (subtasksLimitReached(task)){
+            getSubtasksUL(delBtn).appendChild(createAddSubtaskBtnList(task))
+        }
+
+        task.removeSubtask(subtask)
+        checkBtnEventHandler(task, getSubtaskLI(subtask).querySelector(".task-check-btn"), subtask)
+        getSubtaskLI(subtask).remove()    
+
+        storage.saveProjectsArray(projectsArray)
+    })
+
+    return delBtn
+}
+
+function createSubtaskCardContainer(subtask){
+    const container = createCardContainer(subtask).cloneNode()
+    container.classList.add("subtask-card")
+    return container
+}
+
+
+function createAddSubtaskBtnList(task){
+    const subtasksListItem = dom.createAddBtnList()
+    const addSubtaskBtn = subtasksListItem.querySelector("button")
+    addSubtaskBtn.addEventListener("click", (e) => {
+        e.stopPropagation()
+        const form = createSubtaskForm(task)       
+        subtasksListItem.before(form)
+
+        const input = form.querySelector("input")
+        input.focus()
+        input.select()
+        input.addEventListener("input", (e) => updateCharCount(e.currentTarget))
+
+        subtasksListItem.remove()
+    })
+    return subtasksListItem
 }
