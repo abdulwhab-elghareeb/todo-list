@@ -1,7 +1,3 @@
-// import { projectsContainer } from "./projectsContainer.js";
-
-
-
 function storageAvailable(type) {
     let storage;
     try {

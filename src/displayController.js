@@ -1,9 +1,8 @@
-
 import { projectsContainer } from "./projectsContainer.js"
 import { Project } from "./Project.js"
 import { Task } from "./Task.js"
 
-import {toCamelCase, replaceEventListener} from "./helper.js"
+import { toCamelCase, replaceEventListener } from "./helper.js"
 import { intlFormatDistance, sub } from "date-fns";
 import { format } from "date-fns"
 import { Subtask } from "./Subtask.js"
@@ -14,8 +13,9 @@ import * as storage from "./storage.js"
 
 
 const projectsArray = projectsContainer.projectsArray
-// localStorage initial loading
 
+// Projects
+// Local storage & initial loading
 if (!localStorage.getItem("projectsArray")){
     addDefaultProject()
     storage.saveProjectsArray(projectsArray)
@@ -52,25 +52,38 @@ function showLastClickedProject(){
     getProjectSidebarList(projectsArray[currentProjectIdx]).querySelector(".project-page-loader").click()
 }
 
-// Projects
+
 function addDefaultProject(){
-    const defaultProject = new Project("Default", "This is the default project")
-    defaultProject.default = true
+    const defaultProject = new Project("Inbox", "")
     projectsContainer.addProjectToArray(defaultProject)
     renderProjects()    
     storage.saveProjectsArray(projectsArray)
+}
+
+
+
+// Projects helpers
+function getProjectSidebarList(project){
+    return document.querySelector(`li[data-id="${project.id}"]`)
+}
+
+
+
+// Project Inputs
+function addInputEventToTextInputs(){
+    [...document.querySelectorAll("input[type='text']")].forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
 }
 
 function inputsEventHandler(e){
     const currentInput = e.currentTarget
     if (inputIsRequired(currentInput)) updateFormSubmitBtnAvailability(currentInput)
     updateCharCount(currentInput)
-    adjustInputSize(currentInput)
 }
 
 function inputIsRequired(input){
     return input.hasAttribute("required")
 }
+
 
 function updateFormSubmitBtnAvailability(requiredInput){
     const activeFormDialog = requiredInput.closest("dialog")
@@ -84,21 +97,25 @@ function updateCharCount(textInput){
     charCounter.textContent = `${textInput.value.length} / ${textInput.maxLength}`
 }
 
-function resetCharCounters(){
-    [...document.querySelectorAll(".char-counter")].forEach(charCounter => charCounter.textContent = "")
-}
 
 
-function addInputEventToTextInputs(){
-    [...document.querySelectorAll("input[type='text']")].forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
-}
-
+// Projects dialog/form
 function openDialog(){
     document.getElementById("project-dialog").showModal()
     addInputEventToTextInputs()
 }
 document.querySelector("#sidebar-add-project-btn").addEventListener("click", openDialog)
 
+function formSubmissionHandler(e){
+    createProjectObj()
+    renderProjects()
+    disableFormSubmissionBtn()
+    resetCharCounters()
+    e.currentTarget.reset()
+    clickNewProject()
+    storage.saveProjectsArray(projectsArray)
+}
+document.querySelector("#project-dialog > form").addEventListener('submit', formSubmissionHandler)
 
 function createProjectObj(){
     const projectTitleInput = document.getElementById("project-title")
@@ -111,10 +128,51 @@ function createProjectObj(){
     return project
 }
 
-function updateProjectPageId(project){
-    document.getElementById("project-page").dataset.id = project.id
+function renderProjects(){
+    projectsArray.forEach(project =>{
+        if (projectAlreadyExists(project)) return
+
+        const projectListItem = dom.createProjectSidebarListItem(project)
+        const projectListTitle = dom.createProjectSidebarListTitle(project)
+        const removeProjectBtn = createProjectRemoveBtn(project)
+        const projectPageLoader = createProjectPageLoader(project)
+        
+        projectPageLoader.append(projectListTitle, removeProjectBtn)
+        projectListItem.append(projectPageLoader)
+        document.getElementById("projects-list").appendChild(projectListItem)
+
+    })
 }
 
+function projectAlreadyExists(project){
+    return document.querySelector(`li[data-id='${project.id}'`)
+}
+
+function disableFormSubmissionBtn(){
+    [...document.querySelectorAll("button[id*='submit']")].forEach((btn) => btn.setAttribute("disabled", ""))
+}
+
+function resetCharCounters(){
+    [...document.querySelectorAll(".char-counter")].forEach(charCounter => charCounter.textContent = "")
+}
+
+function clickNewProject(){
+    getProjectSidebarList(projectsArray.at(-1)).querySelector(".project-page-loader").click()
+}
+
+
+
+// Sidebar projects list
+function createProjectPageLoader(project){
+    const projectPageLoader = dom.createProjectPageLoader()
+    projectPageLoader.addEventListener("click", (e) => {
+        renderProjectPage(project)
+        focusCurrentProjectLi(e)
+        storage.saveCurrentProject(projectsArray.indexOf(getCurrentProject()))
+
+    })    
+    return projectPageLoader
+}
 
 function createProjectRemoveBtn(project){
     const removeProjectBtn = dom.createProjectRemoveBtn()
@@ -143,22 +201,35 @@ function createProjectRemoveBtn(project){
     return removeProjectBtn
 }
 
-function getProjectSidebarList(project){
-    return document.querySelector(`li[data-id="${project.id}"]`)
+function updateProjectListTitle(project){
+    document.querySelector(`li[data-id="${project.id}"] .project-title`).textContent = project.title
+}
+
+function focusCurrentProjectLi(e){
+    const allLiElem = [...document.querySelectorAll("#sidebar li")]
+    allLiElem.forEach(projectLi => projectLi.querySelector(".project-page-loader").classList.remove("selected-project"))
+    e.currentTarget.classList.add("selected-project")
 }
 
 
-function clearProjectPage(){
-    [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
-    if(document.getElementById("project-page-add-task-btn")) document.getElementById("project-page-add-task-btn").remove()
+function updateProjectPageId(project){
+    document.getElementById("project-page").dataset.id = project.id
 }
 
+
+
+// Project page
 function renderProjectPage(project){
     clearProjectPage()
     renderProjectPageInputs(project)
     renderAddTaskBtn(project)
     updateProjectPageId(project)
     renderProjectTasks(project)
+}
+
+function clearProjectPage(){
+    [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
+    if(document.getElementById("project-page-add-task-btn")) document.getElementById("project-page-add-task-btn").remove()
 }
 
 function renderProjectPageInputs(project){
@@ -201,27 +272,6 @@ function renderProjectPageInputs(project){
     addInputEventToTextInputs() 
 }
 
-function updateProjectListTitle(project){
-    document.querySelector(`li[data-id="${project.id}"] .project-title`).textContent = project.title
-}
-
-function focusCurrentProjectLi(e){
-    const allLiElem = [...document.querySelectorAll("#sidebar li")]
-    allLiElem.forEach(projectLi => projectLi.querySelector(".project-page-loader").classList.remove("selected-project"))
-    e.currentTarget.classList.add("selected-project")
-}
-
-function createProjectPageLoader(project){
-    const projectPageLoader = dom.createProjectPageLoader()
-    projectPageLoader.addEventListener("click", (e) => {
-        renderProjectPage(project)
-        focusCurrentProjectLi(e)
-        storage.saveCurrentProject(projectsArray.indexOf(getCurrentProject()))
-
-    })    
-    return projectPageLoader
-}
-
 function renderAddTaskBtn(){
     const addTaskBtn = dom.createTaskAddBtn()
     const requiredInput = getAllTaskFormElements().find(input => input.required)
@@ -239,51 +289,9 @@ function renderAddTaskBtn(){
 }
 
 
-function renderProjects(){
-    projectsArray.forEach(project =>{
-        if (projectAlreadyExists(project)) return
 
-        const projectListItem = dom.createProjectSidebarListItem(project)
-        const projectListTitle = dom.createProjectSidebarListTitle(project)
-        const removeProjectBtn = createProjectRemoveBtn(project)
-        const projectPageLoader = createProjectPageLoader(project)
-        
-        projectPageLoader.append(projectListTitle, removeProjectBtn)
-        projectListItem.append(projectPageLoader)
-        document.getElementById("projects-list").appendChild(projectListItem)
 
-    })
-}
-
-function projectAlreadyExists(project){
-    return document.querySelector(`li[data-id='${project.id}'`)
-}
-
-function disableFormSubmissionBtn(){
-    [...document.querySelectorAll("button[id*='submit']")].forEach((btn) => btn.setAttribute("disabled", ""))
-}
-
-function formSubmissionHandler(e){
-    createProjectObj()
-    renderProjects()
-    disableFormSubmissionBtn()
-    resetCharCounters()
-    e.currentTarget.reset()
-    clickNewProject()
-    storage.saveProjectsArray(projectsArray)
-}
-document.querySelector("#project-dialog > form").addEventListener('submit', formSubmissionHandler)
-
-function clickNewProject(){
-    getProjectSidebarList(projectsArray.at(-1)).querySelector(".project-page-loader").click()
-}
-
-export function initialRendering(){
-    renderProjects()
-}
-
-// -------------------------------------
-
+// Tasks
 function getCurrentProject(){
     const currentPageId = document.querySelector("#project-page").dataset.id
     return projectsArray.find((project) => project.id === currentPageId)
