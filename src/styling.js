@@ -22,6 +22,15 @@ function toggleSidebar(e){
 document.querySelector("#sidebar-toggling-btn").addEventListener("click", toggleSidebar)
 
 
+// Project page title
+
+window.addEventListener("scroll", () =>{
+    const projectPageTitle = document.getElementById("project-page-title").closest("div")
+    const triggeringTop = parseInt(window.getComputedStyle(projectPageTitle).top)
+    const currentTop = projectPageTitle.getBoundingClientRect().top
+    projectPageTitle.classList.toggle("sticky-triggered", triggeringTop == currentTop)
+})
+
 // dark mode
 function switchModes(){
     const newMode = (root.className == "dark")? "light" : "dark"
@@ -36,3 +45,4 @@ document.getElementById("mode").addEventListener("click", switchModes)
 
 // protecting the user from getting flash banged if the css did not load in time
 window.addEventListener("load", () => document.body.classList.remove("preload"))
+

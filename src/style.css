@@ -62,30 +62,28 @@ h1, h2, h3, h4, h5, h6 {
     0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.34),
     1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.34);
 
-    scrollbar-color: hsl(from var(--text-color) h s calc(l + 5)) var(--sidebar-background);
+    scrollbar-color: var(--scrollbar) transparent;
     scrollbar-gutter: stable;
 }
 
 :root.light{
   --sidebar-background: hsl(48, 48%, 94%);
   --main-background: hsl(43 89 96);
-  --text-color: hsl(0, 0%, 15%);
+  --text-color: hsl(0, 0%, 20%);
   --shadow-color: 40deg 29% 60%;
   --light-gray: hsl(0 0 50);
   --submit-btns: hsl(150, 62%, 72%);
-
-
+  --scrollbar : hsl(from var(--sidebar-background) h s calc(l - 20))
 }
 
 :root.dark{
   --sidebar-background: hsl(300 5 20);
-  --main-background: hsl(270 10 10);
-  --text-color: hsl(0 0 80);
+  --main-background: hsl(300 10 10);
+  --text-color: hsl(0 0 75);
   --shadow-color: 0deg 0% 5%;
-  --light-gray: hsl(0 0 70);
+  --light-gray: hsl(0 0 65);
   --submit-btns: hsl(150, 62%, 37%);
-
-
+  --scrollbar : hsl(from var(--sidebar-background) h s calc(l + 20))
 }
 
 button,
@@ -126,9 +124,14 @@ body{
 
   font-family: var(--font-family);
   color: var(--text-color);
-
   background-color: var(--main-background);
 }
+
+/* General rules */
+.disable{
+  pointer-events: none;
+}
+
 
 /* switching modes btn */
 #mode{
@@ -154,8 +157,7 @@ body{
 
 /* Sidebar */
 #sidebar{
-  overflow-x: hidden; /* so content inside of sidebar don't overflow when sidebar is closed */
-  overflow-y: hidden;
+  overflow: hidden; /* so content inside of sidebar doesn't overflow when sidebar is closed */
   position: fixed;
   width: 320px;
   height: 100vh;
@@ -166,48 +168,13 @@ body{
   grid-auto-rows: max-content;
   
   gap: 2rem;
-  padding: 1rem;
+  padding: 18px 16px 16px 20px;
   
   box-shadow: var(--shadow);
-
-  transition: all 0.4s;
-
-}
-
-#sidebar-toggling-btn{
-  position: fixed;
-  z-index: 3;
-  left: 270px;
-  top: 20px;
-
-  text-align: center;
-  padding: 6px;
-  border-radius: 1rem;
-
-  background-color: transparent;
-
   transition: all 0.4s;
 }
- 
-#sidebar-toggling-btn{
-  fill:var(--text-color);
-  width: 37px;
-  height: 37px;
-  rotate: 90deg;
-}
 
-/* sidebar closing/opening transition */
-#sidebar.sidebar-close{
-  width: 0;
-  padding: 0;
-}
-
-#sidebar-toggling-btn.sidebar-close{
-  left: 15px;
-  rotate: 270deg;
-}
-
-
+/* Sidebar user */
 #sidebar .user{
   display: flex;
   align-items: center;
@@ -218,6 +185,7 @@ body{
   background-color: var(--sidebar-background);
 }
 
+/* Sidebar add task */
 #sidebar #sidebar-add-task-btn{
   border-radius: 12px;
   padding: 8px 10px;
@@ -240,31 +208,13 @@ body{
   color: hsl(120, 100%, 22%);
 }
 
-#sidebar button.selected-project{
-  background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
-  font-weight: bold;
+/* Projects UL */
+#project-container{
+  position: relative;
+
+  display: grid;
+  gap: 1rem;
 }
-
-#sidebar #projects-list{
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  overflow-y: auto;
-  max-height: 80vh;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-#project-page{
-  margin-left: 320px;
-  transition: margin-left 0.4s;
-}
-
-#project-page.sidebar-close{
-  margin-left: 50px;
-}
-
 
 #project-container-header{
   display: flex;
@@ -277,22 +227,16 @@ body{
   font-weight: 600;
 }
 
-#project-container{
-  position: relative;
+#sidebar #projects-list{
+  /* a scrollbar just for the UL not for the whole sidebar */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  overflow-y: auto;
+  max-height: 80vh;
 
-  display: grid;
-  gap: 1rem;
-}
-
-.disable{
-  pointer-events: none;
-}
-
-.project-list-btn::before{
-  content: "#";
-  font-size: 1.2rem;
-  margin-right: 8px;
-  color: var(--light-gray);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 #sidebar .project-list-btn{
@@ -305,6 +249,18 @@ body{
   font-size: 0.82rem;
 }
 
+/* Works as a replacer for the normal UL bullets */
+.project-list-btn::before{
+  content: "#";
+  font-size: 1.2rem;
+  margin-right: 8px;
+  color: var(--light-gray);
+}
+
+#project-container .project-list-btn:hover{
+  background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
+}
+
 .project-title{
   word-break: break-all; /* If the user inputs a long word */
 
@@ -315,16 +271,19 @@ body{
   overflow: hidden;
 }
 
+.project-remove-btn img{
+  min-width: 17px;
+  min-height: 20px;
+}
+
 #sidebar button,
 #project-container .project-list-btn,
 .add-subtask-btn,
 .subtask-submit,
 .subtask-cancel{
-  background-color: transparent;
   border-radius: 16px;
   padding: 5px 16px;
 
-  cursor: pointer;
   transition: background-color 0.4s;
 }
 
@@ -341,20 +300,57 @@ body{
   padding: 5px 8px;
 }
 
-.project-remove-btn img{
-  min-width: 17px;
-  min-height: 20px;
-}
-
-.hover:hover,
-#project-container .project-list-btn:hover{
-  background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
-}
-
 #sidebar button:hover,
 #sidebar-toggling-btn:hover{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 20));  
 }
+
+
+
+/* Sidebar toggling transition */
+/* When sidebar is opened */
+#sidebar-toggling-btn{
+  position: fixed;
+  z-index: 3;
+  left: 270px;
+  top: 20px;
+
+  text-align: center;
+  padding: 6px;
+  border-radius: 1rem;
+
+  background-color: transparent;
+  transition: all 0.4s;
+}
+
+#sidebar-toggling-btn{
+  fill:var(--text-color);
+  width: 37px;
+  height: 37px;
+
+  rotate: 90deg;
+}
+
+#project-page{
+  margin-left: 320px;
+  transition: margin-left 0.4s;
+}
+
+/* When sidebar is closed */
+#sidebar.sidebar-close{
+  width: 0;
+  padding: 0;
+}
+
+#sidebar-toggling-btn.sidebar-close{
+  left: 15px; 
+  rotate: 270deg;
+}
+
+#project-page.sidebar-close{
+  margin-left: 50px;
+}
+
 
 
 /* Dialog */
@@ -377,7 +373,6 @@ dialog select,
 dialog button{
   box-shadow: var(--shadow);
 }
-
 
 dialog form{
   height: 100%;
@@ -405,10 +400,6 @@ input[name="project-title"]{
   font-size: 28px;
 }
 
-div:has(input[name="project-title"]){
-  max-height: 75px;
-}
-
 input[name="project-description"]{
   padding: 1rem;
   font-size: 17px;
@@ -417,16 +408,12 @@ input[name="project-description"]{
 .char-counter{
   position: absolute;
   font-weight: 500;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   color: var(--light-gray);
 }
 
-#project-page .char-counter{
-  background-color: var(--main-background);
-}
-
 input + .char-counter{
-  bottom: 0;
+  bottom: 1px;
   right: 10px;
 }
 
@@ -458,7 +445,7 @@ dialog form button{
   box-shadow: var(--shadow);
   border-radius: 8px;
 
-  transition:all 0.4s;
+  transition: all 0.4s;
 }
 
 form button[id*='submit']{
@@ -481,7 +468,7 @@ label{
 label:has(+ *:required)::after{
   content: "*";
   color: red;
-  margin-left: 2px;
+  margin-left: 3px;
 }
 
 *:required{
@@ -492,7 +479,7 @@ select{
   background-color: transparent;
 }
 
-/* Main content */
+/* Project page */
 #project-page{
   flex-grow: 1;
 
@@ -504,7 +491,7 @@ select{
   flex-grow: 1;
   
   min-height: max-content;
-  max-width: 1110px;
+  max-width: 1100px;
     
   padding: 2rem;
 
@@ -512,48 +499,60 @@ select{
 
 div:has(> #project-page-title){
   position: sticky;
+  height: 75px;
   top: 0;
   z-index: 2;
 
   background-color: var(--main-background);
 }
 
+div.sticky-triggered > .note{
+  display: none;
+}
+
+div.sticky-triggered > #project-page-title{
+  font-size: 1.2rem;
+}
+
+
+
 #project-page-title{
   font-weight: 500;
-  font-size: 1.8rem;
-
-  background-color: transparent;
+  font-size: 1.7rem;
+  
+  transition: all 0.3s;
 }
 
 #project-page-description{
-  height: max-content;
   font-size: 1.1rem;
   color: hsl(from var(--light-gray) h s calc(l - 20));
-
-  background-color: transparent;
 }
 
-div:has(#project-page-description){
-  text-overflow: ellipsis;
+#project-page-title,
+#project-page-description{
+  background-color: transparent;
 }
 
 .note{
   position:absolute;
-  top: 6px;
+  top: 4px;
   right: 1rem;
 
-  font-size: 0.7rem;
-  color: var(--light-gray);
+  font-size: 0.55rem;
+  color: hsl(from var(--light-gray) h s calc(l + 5));
 }
 
 #project-page-add-task-btn{
   width: 100%;
   height: 80px;
+
   border-radius: 1rem;
-  font-size: 40px; 
+  margin: 1rem 0;
+
+  font-size: 40px;
+  color: hsl(from var(--text-color) h s calc(l - 10)); 
   background-color: var(--main-background);
   box-shadow: var(--shadow);
-  margin: 1rem 0;
 }
 
 .task-card,
@@ -581,9 +580,9 @@ div:has(#project-page-description){
 }
 
 .task-displayed-title{
-  font-size: 20px;
+  font-size: 1.15rem;
+  margin-left: 5px;
 }
-
 
 .task-card:hover,
 #project-page-add-task-btn:hover{
@@ -592,7 +591,7 @@ div:has(#project-page-description){
 
 .task-card > .task-check-btn{
   position: relative;
-  transition: none; /* the task itself won't have any transition effects */
+  transition: none; /* the check btn itself won't have any transition effects */
 }
 
 .task-card > .task-check-btn::after{ /* the vertical line between check mark circle and task title */
@@ -613,6 +612,7 @@ div:has(#project-page-description){
   width: 17px;
   height: 17px;
 
+  /* starts invisible */
   position: absolute;
   top: 0;
   right: 0;
@@ -626,7 +626,7 @@ div:has(#project-page-description){
 .task-card:has(> .task-check-btn.checked){
   background-color: hsl(from var(--sidebar-background) h s calc(l - 8));
   text-decoration: line-through;
-  opacity: 0.9;
+  opacity: 0.8;
   color: var(--light-gray);
 }
 
@@ -643,6 +643,7 @@ div:has(#project-page-description){
 }
 
 .task-card > .task-check-btn.checked::before{
+  /* becomes visible when checked */
   opacity: 1;
   top: 11px;
   right: 15.5px;
@@ -673,12 +674,13 @@ div:has(#project-page-description){
 }
 
 .task-expand-btn{
-  padding: 4px;
   position: absolute;
   right: 8px;
   bottom: 0;
-  background-color: transparent;
   z-index: 3;
+
+  background-color: transparent;
+  padding: 4px;
 }
 
 .task-card.expanded > .task-expand-btn{
@@ -719,31 +721,36 @@ div:has(#project-page-description){
 
 
 ul.subtasks-list{
-  grid-column: span 4;
-  border-color: inherit;
   width: max-content;
+  
+  grid-column: span 4;
 
+  
+  
   display: flex;
   flex-direction: column;
   gap: 15px;
-
+  
   padding: 0 40px;
+  border-color: inherit; 
   cursor: default;
-
 }
 
 .subtasks-list li{
-  border-color: inherit;
   position: relative;
-  margin-left: 1rem;
 
+  border-color: inherit;
+  margin-left: 1rem;
 }
+
 .subtasks-list li::before{
+  height: 1px;
+  width: 16px;
+
   content: '';
   position: absolute;
   top: 18px;
-  width: 16px;
-  height: 1px;
+  
   background-color: hsl(from var(--light-gray) h s calc(l + 20));
 }
 
@@ -760,7 +767,6 @@ ul.subtasks-list{
 
   padding: 3px 10px;
   margin-left: 1rem;
-
   border-color: inherit;
 }
 
@@ -793,9 +799,6 @@ ul.subtasks-list{
 .subtask-form > form{
   height: 35px;
   width: 350px;
-  padding: 1px 12px 1px 10px;
-  margin-left: 1rem;
-  border-color: inherit;
 
   grid-template-columns: 1fr max-content;
   gap: 2px;
@@ -803,10 +806,15 @@ ul.subtasks-list{
   align-content: center;
   grid-template-areas:
   "input btns";
+
+  padding: 1px 12px 1px 10px;
+  margin-left: 1rem;
+  border-color: inherit;
 }
 
 .subtask-form .subtask-title{
   grid-area: input;
+
   font-size: 0.8rem;
   background-color: transparent;
   padding: 2px;
@@ -815,8 +823,9 @@ ul.subtasks-list{
 #project-page .subtask-title + .char-counter{
   bottom: 0;
   right: 70px;
+
   background-color: transparent;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
 }
 
 .subtask-form .subtask-btns{
@@ -849,7 +858,6 @@ ul.subtasks-list{
   width: 100%;
   
   padding: 8px;
-
   font-size: 0.8rem;
   text-align: center;
   color: var(--light-gray);

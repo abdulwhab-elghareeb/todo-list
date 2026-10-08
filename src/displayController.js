@@ -16,7 +16,7 @@ const projectsArray = projectsContainer.projectsArray
 
 // Local storage & initial loading
 if (!localStorage.getItem("projectsArray")){
-    addDefaultProject()
+    initialRendering()
     storage.saveProjectsArray(projectsArray)
     storage.saveCurrentProject(0) // the default project
 }else{
@@ -51,6 +51,11 @@ function showLastViewedProject(){
     getProjectSidebarList(projectsArray[currentProjectIdx]).querySelector(".project-list-btn").click()
 }
 
+function initialRendering(){
+    addDefaultProject()
+    addDefaultNotes()
+}
+
 function addDefaultProject(){
     const defaultProject = new Project("Inbox", "")
     projectsContainer.addProjectToArray(defaultProject)
@@ -58,6 +63,13 @@ function addDefaultProject(){
     storage.saveProjectsArray(projectsArray)
 }
 
+function addDefaultNotes(){
+    const note = dom.createProjectPageNote()
+
+    document.querySelector("#project-page .title-container").prepend(note)
+    document.querySelector("#project-page .description-container").prepend(note.cloneNode(true))
+    // note.cloneNode(true) -> to clone the textContent too
+}
 
 // Project helpers
 function getProjectSidebarList(project){
@@ -213,7 +225,7 @@ function renderProjectPage(project){
 }
 
 function clearProjectPage(){
-    [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren())
+    [...document.querySelectorAll("#project-page .wrapper > div")].forEach(container => container.replaceChildren(container.querySelector(".note") || ""))
     if(document.getElementById("project-page-add-task-btn")) document.getElementById("project-page-add-task-btn").remove()
 }
 
@@ -221,11 +233,10 @@ function renderProjectPageInputs(project){
     const projectPageTitleInput = dom.createProjectPageTitleInput(project)
     const projectPageDescriptionInput = dom.createProjectPageDescInput(project)
     const charCounter = dom.createInputCharCounter()
-    const note = dom.createProjectPageNote()
 
-    document.querySelector("#project-page .title-container").append(projectPageTitleInput, charCounter, note)
-    document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, charCounter.cloneNode(), note.cloneNode(true))
-    // note.cloneNode(true) -> to clone the textContent too
+    document.querySelector("#project-page .title-container").append(projectPageTitleInput, charCounter, )
+    document.querySelector("#project-page .description-container").append(projectPageDescriptionInput, charCounter.cloneNode())
+    // .cloneNode(true) -> to clone the textContent too
 
     function inputsDoubleClickHandler(e){
         const projectPageInput = e.currentTarget
@@ -233,7 +244,7 @@ function renderProjectPageInputs(project){
         projectPageInput.removeAttribute("readonly")
         projectPageInput.focus()
         projectPageInput.select()
-        if(note) note.remove()
+        note.textContent = ""
     }
 
     function inputChangeEventHandler(e){
