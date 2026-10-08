@@ -14,7 +14,6 @@ import { format } from "date-fns"
 
 const projectsArray = projectsContainer.projectsArray
 
-// Projects
 // Local storage & initial loading
 if (!localStorage.getItem("projectsArray")){
     addDefaultProject()
@@ -33,7 +32,7 @@ function loadProjects(){
         
         project.tasksArray.forEach(task =>{
             const newTask = new Task(task.title, task.description, task.dueDate, task.priority, task.isCompleted)
-            newProject.addTask(newTask)
+            newProject.createTaskObj(newTask)
 
             task.subtasksArray.forEach(subtask =>{
                 const newSubtask = new Subtask(subtask.title, subtask.isCompleted, subtask.preState)
@@ -43,6 +42,9 @@ function loadProjects(){
     })
     renderProjectsSidebarList()
 }
+
+
+// Projects
 
 function showLastViewedProject(){
     const currentProjectIdx = localStorage.getItem("currentProjectIdx")
@@ -57,7 +59,7 @@ function addDefaultProject(){
 }
 
 
-// Projects helpers
+// Project helpers
 function getProjectSidebarList(project){
     return document.querySelector(`li[data-id="${project.id}"]`)
 }
@@ -87,7 +89,7 @@ function updateCharCount(textInput){
 }
 
 
-// Projects dialog/form
+// Project dialog/form
 function openDialog(){
     document.getElementById("project-dialog").showModal()
     addInputEventToTextInputs()
@@ -256,7 +258,7 @@ function renderProjectPageInputs(project){
 }
 
 function renderAddTaskBtn(){
-    const addTaskBtn = dom.createTaskAddBtn()
+    const createTaskObjBtn = dom.createTaskAddBtn()
     const requiredInput = getAllTaskFormElements().find(input => input.required)
     function openTaskDialog(e){
         document.querySelector("#tasks-dialog form").reset()
@@ -265,28 +267,38 @@ function renderAddTaskBtn(){
         document.querySelector("#tasks-dialog").showModal()
     }
     replaceEventListener(document.getElementById("sidebar-add-task-btn"), "click", openTaskDialog)
-    addTaskBtn.addEventListener("click", openTaskDialog)
+    createTaskObjBtn.addEventListener("click", openTaskDialog)
 
-    document.querySelector("#project-page .description-container").after(addTaskBtn)
+    document.querySelector("#project-page .description-container").after(createTaskObjBtn)
 }
 
 
 
 // Tasks
+// Task helpers
 function getCurrentProject(){
     const currentPageId = document.querySelector("#project-page").dataset.id
     return projectsArray.find((project) => project.id === currentPageId)
 }
 
+function getAllTaskFormElements(){
+    return [...document.querySelector("#tasks-dialog form").elements]
+}
+
+function getTaskContainer(task){
+    return document.querySelector(`.task-card[data-id='${task.id}']`)
+}
+
+
+// Task dialog/form
 function renderTaskForm(e){
-    renderProjectsSidebarListelection()
+    renderProjectSelection()
     if(e.currentTarget.id === "project-page-add-task-btn")selectCurrentProject()
     selectDefaultDate()
     adjustTaskSubmitBtnText(e.currentTarget)
-    
 }
 
-function renderProjectsSidebarListelection(){
+function renderProjectSelection(){
     const projectSelection = document.querySelector("#task-project")
     projectSelection.replaceChildren() // clear 
 
@@ -317,9 +329,16 @@ function adjustTaskSubmitBtnText(showDialogBtn){
     showDialogBtn.id.includes("add-task-btn")? submitBtn.textContent = "Add" : submitBtn.textContent = "Save"
 }
 
+function formSubmitHandler(e){
+    createTaskObj()
+    renderProjectTasks(getCurrentProject())
+    e.currentTarget.reset()
+    resetCharCounters()
+    storage.saveProjectsArray(projectsArray)
+}
+document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
 
-
-function addTask(){
+function createTaskObj(){
     const taskFormElements = getAllTaskFormElements()
     const titleValue = taskFormElements[0].value.trim()
     const descriptionValue = taskFormElements[1].value.trim()
@@ -331,18 +350,11 @@ function addTask(){
     projectsArray[selectedProjectIdx].addTask(task)
 
     storage.saveProjectsArray(projectsArray)
+
     return task
 }
 
-function getAllTaskFormElements(){
-    return [...document.querySelector("#tasks-dialog form").elements]
-}
-
-function getTaskContainer(task){
-    return document.querySelector(`.task-card[data-id='${task.id}']`)
-}
-
-
+// Editing tasks
 function createCardContainer(task){
     const taskCardContainer = dom.createTaskCardContainer(task)
     function taskContainerClickHandler(e){
@@ -379,7 +391,6 @@ function createCardContainer(task){
     return taskCardContainer
 }
 
-
 function setupFormElementsValues(taskFormElements, task){
     taskFormElements.forEach(formElement =>{
         if (formElement.id === "task-project"){
@@ -406,7 +417,7 @@ function moveTaskToSelectedProjects(projSelection, task){
     const selectedProject = projectsArray[projSelection.selectedIndex -1]
     if (selectedProject === getCurrentProject()) return
     getCurrentProject().removeTask(task)
-    selectedProject.addTask(task)
+    selectedProject.createTaskObj(task)
     storage.saveProjectsArray(projectsArray)
 }
 
@@ -420,32 +431,42 @@ function updateDisplayedTask(task){
     displayPriority(task)
 }
 
-function displayPriority(task){
-    const taskContainer = getTaskContainer(task)
-    switch(Number(task.priority)){
-        case 4:
-            taskContainer.style.borderColor = "hsl(0, 100%, 40%)"
-            taskContainer.style.fontWeight = "700"
-            break
 
-        case 3:
-            taskContainer.style.borderColor = "hsl(19, 100%, 50%)"
-            taskContainer.style.fontWeight = "600"
-            break
+// Creating task
+function renderProjectTasks(project){
+    if (!project) return
+    project.tasksArray.forEach((task) => {
+        if (taskAlreadyDisplayed(task)) return
+        
+        const cardMainContent = createTaskMainContent(task)
+        const taskCardContainer = createCardContainer(task)
+        const taskCheckBtn = createCheckBtn(task)
+        const taskTitle = cardMainContent.cardTitle
+        const taskDueDate = cardMainContent.cardDueDate
+        const taskDelBtn = createTaskDelBtn(task)
+        const taskExpandBtn = createExpandBtn(task)
+        const cardsContainer = document.querySelector("#cards-container")
+        const projectPage = document.querySelector("#project-page .wrapper")
 
-        case 2:
-            taskContainer.style.borderColor = "hsl(55, 100%, 45%)"
-            taskContainer.style.fontWeight = "500"
-            break
+        taskCardContainer.append(taskCheckBtn, taskTitle,  taskDueDate, taskDelBtn, taskExpandBtn)
+        cardsContainer.appendChild(taskCardContainer)
+        projectPage.appendChild(cardsContainer)
+        displayPriority(task)
+        updateCheckBtn(task, taskCheckBtn)
 
-        case 1:
-            taskContainer.style.borderColor = "hsl(120, 100%,50%)"
-            taskContainer.style.fontWeight = "500"
-    }
+        if(checkIfTaskIsExpanded(task)) taskExpandBtn.click()
+    })
 }
 
+function taskAlreadyDisplayed(task){
+    return document.querySelector(`*[data-id='${task.id}'`)
+}
 
-
+function createTaskMainContent(task){
+    const cardTitle = dom.createCardTitle(task)
+    const cardDueDate = dom.createCardDueDate(task)
+    return {cardTitle, cardDueDate}
+}
 
 function createCheckBtn(task){
     const checkBtn = dom.createCheckBtn()
@@ -487,7 +508,6 @@ function checkAllSubtasks(task){
 
 }
 
-
 function revertSubtasks(task){
     if (!task.subtasksArray ) return // if it's called from subtask
 
@@ -499,12 +519,6 @@ function revertSubtasks(task){
         }
     })
 }
-function createTaskMainContent(task){
-    const cardTitle = dom.createCardTitle(task)
-    const cardDueDate = dom.createCardDueDate(task)
-    return {cardTitle, cardDueDate}
-}
-
 
 function createTaskDelBtn(task){
     const delBtn = dom.createCardDelBtn()
@@ -519,8 +533,6 @@ function createTaskDelBtn(task){
 
     return delBtn
 }
-
-
 
 function createExpandBtn(task){
     const expandBtn = dom.createExpandBtn()
@@ -560,48 +572,9 @@ function clearTask(card){
     card.querySelector(".description-container").remove()
 }
 
-function renderProjectTasks(project){
-    if (!project) return
-    project.tasksArray.forEach((task) => {
-        if (taskAlreadyDisplayed(task)) return
-        
-        const cardMainContent = createTaskMainContent(task)
-        const taskCardContainer = createCardContainer(task)
-        const taskCheckBtn = createCheckBtn(task)
-        const taskTitle = cardMainContent.cardTitle
-        const taskDueDate = cardMainContent.cardDueDate
-        const taskDelBtn = createTaskDelBtn(task)
-        const taskExpandBtn = createExpandBtn(task)
-        const cardsContainer = document.querySelector("#cards-container")
-        const projectPage = document.querySelector("#project-page .wrapper")
-
-        taskCardContainer.append(taskCheckBtn, taskTitle,  taskDueDate, taskDelBtn, taskExpandBtn)
-        cardsContainer.appendChild(taskCardContainer)
-        projectPage.appendChild(cardsContainer)
-        displayPriority(task)
-        updateCheckBtn(task, taskCheckBtn)
-
-        if(checkIfTaskIsExpanded(task)) taskExpandBtn.click()
-    })
-}
-
-function taskAlreadyDisplayed(task){
-    return document.querySelector(`*[data-id='${task.id}'`)
-}
-
-
 function checkIfTaskIsExpanded(task){
     return JSON.parse(sessionStorage.getItem(task.id))
 }
-
-function formSubmitHandler(e){
-    addTask()
-    renderProjectTasks(getCurrentProject())
-    e.currentTarget.reset()
-    resetCharCounters()
-    storage.saveProjectsArray(projectsArray)
-}
-document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
 
 
 function addInitialSubtasksList(currentTaskCard){
@@ -613,7 +586,32 @@ function addInitialSubtasksList(currentTaskCard){
     return subtasksList
 }
 
+function displayPriority(task){
+    const taskContainer = getTaskContainer(task)
+    switch(Number(task.priority)){
+        case 4:
+            taskContainer.style.borderColor = "hsl(0, 100%, 40%)"
+            taskContainer.style.fontWeight = "700"
+            break
 
+        case 3:
+            taskContainer.style.borderColor = "hsl(19, 100%, 50%)"
+            taskContainer.style.fontWeight = "600"
+            break
+
+        case 2:
+            taskContainer.style.borderColor = "hsl(55, 100%, 45%)"
+            taskContainer.style.fontWeight = "500"
+            break
+
+        case 1:
+            taskContainer.style.borderColor = "hsl(120, 100%,50%)"
+            taskContainer.style.fontWeight = "500"
+    }
+}
+
+
+// Subtasks
 function createAddSubtaskBtnList(task){
     
     const subtasksListItem = dom.createAddBtnList()
