@@ -67,9 +67,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :root.light{
-  --sidebar-background: hsl(45 50 94);
+  --sidebar-background: hsl(48, 48%, 94%);
   --main-background: hsl(43 89 96);
-  --text-color: hsl(0 0 15);
+  --text-color: hsl(0, 0%, 15%);
   --shadow-color: 40deg 29% 60%;
   --light-gray: hsl(0 0 50);
   --submit-btns: hsl(150, 62%, 72%);
@@ -315,7 +315,6 @@ body{
   overflow: hidden;
 }
 
-.hover,
 #sidebar button,
 #project-container .project-list-btn,
 .add-subtask-btn,
