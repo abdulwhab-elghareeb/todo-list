@@ -21,3 +21,8 @@ export function createDOMElement(obj){
     if (obj.type) createdElement.type = obj.type
     return createdElement
 }
+
+export function replaceMultipleClasses(elem, newClass, ...classesToBeReplaced){
+    classesToBeReplaced.forEach( replacedClass => elem.classList.remove(replacedClass))
+    elem.classList.add(newClass)
+}

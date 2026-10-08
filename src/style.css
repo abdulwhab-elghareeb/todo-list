@@ -697,6 +697,27 @@ div:has(#project-page-description){
   position: relative;
 }
 
+.urgent{
+  border-color: hsl(0, 100%, 40%);
+  font-weight: 700;
+}
+
+.important{
+  border-color: hsl(19, 100%, 50%);
+  font-weight: 600;
+
+}
+
+.less-important{
+  border-color: hsl(55, 100%, 45%);
+  font-weight: 500;
+}
+
+.not-important{
+  border-color: hsl(120, 100%,50%);
+  font-weight: 500;
+}
+
 
 ul.subtasks-list{
   grid-column: span 4;

@@ -6,7 +6,7 @@ import { Subtask } from "./Subtask.js"
 import * as dom from "./dom.js"
 import * as storage from "./storage.js"
 
-import { toCamelCase, replaceEventListener } from "./helper.js"
+import { toCamelCase, replaceEventListener, replaceMultipleClasses } from "./helper.js"
 import { intlFormatDistance } from "date-fns";
 import { format } from "date-fns"
 
@@ -32,10 +32,10 @@ function loadProjects(){
         
         project.tasksArray.forEach(task =>{
             const newTask = new Task(task.title, task.description, task.dueDate, task.priority, task.isCompleted)
-            newProject.createTaskObj(newTask)
+            newProject.addTask(newTask)
 
             task.subtasksArray.forEach(subtask =>{
-                const newSubtask = new Subtask(subtask.title, subtask.isCompleted, subtask.preState)
+                const newSubtask = new Subtask(subtask.title, subtask.isCompleted, subtask.originalState)
                 newTask.addSubtask(newSubtask)
             })
         })
@@ -259,19 +259,20 @@ function renderProjectPageInputs(project){
 
 function renderAddTaskBtn(){
     const createTaskObjBtn = dom.createTaskAddBtn()
-    const requiredInput = getAllTaskFormElements().find(input => input.required)
-    function openTaskDialog(e){
-        document.querySelector("#tasks-dialog form").reset()
-        updateFormSubmitBtnAvailability(requiredInput)
-        renderTaskForm(e)
-        document.querySelector("#tasks-dialog").showModal()
-    }
+
     replaceEventListener(document.getElementById("sidebar-add-task-btn"), "click", openTaskDialog)
     createTaskObjBtn.addEventListener("click", openTaskDialog)
 
     document.querySelector("#project-page .description-container").after(createTaskObjBtn)
 }
 
+function openTaskDialog(e){
+    const requiredInput = getAllTaskFormElements().find(input => input.required)
+    document.querySelector("#task-dialog form").reset()
+    updateFormSubmitBtnAvailability(requiredInput)
+    renderTaskForm(e)
+    document.getElementById("task-dialog").showModal()
+}
 
 
 // Tasks
@@ -282,28 +283,42 @@ function getCurrentProject(){
 }
 
 function getAllTaskFormElements(){
-    return [...document.querySelector("#tasks-dialog form").elements]
+    return [...document.querySelector("#task-dialog form").elements]
 }
 
 function getTaskContainer(task){
     return document.querySelector(`.task-card[data-id='${task.id}']`)
 }
 
+function getTargetTask(form){
+    return getCurrentProject().tasksArray.find(task => task.id == form.dataset.id)
+}
 
 // Task dialog/form
 function renderTaskForm(e){
     renderProjectSelection()
-    if(e.currentTarget.id === "project-page-add-task-btn")selectCurrentProject()
+    if(e.currentTarget.id === "project-page-add-task-btn"){
+        selectCurrentProject()
+    }
     selectDefaultDate()
     adjustTaskSubmitBtnText(e.currentTarget)
+
+    if (e.currentTarget.classList.contains("task-card")){
+        document.querySelector("#task-dialog form").dataset.id = e.currentTarget.dataset.id
+        const taskFormElements = getAllTaskFormElements()
+        setupFormElementsValues(taskFormElements, getTargetTask(e.currentTarget))
+        updateFormSubmitBtnAvailability(taskFormElements.find(input => input.required))
+        taskFormElements.filter(input => input.type === "text").forEach(textInput => updateCharCount(textInput))
+    }
 }
 
 function renderProjectSelection(){
-    const projectSelection = document.querySelector("#task-project")
-    projectSelection.replaceChildren() // clear 
+    clearProjectSelection()
 
-    const placeholder = dom.createPlaceholderOption()
-    projectSelection.appendChild(placeholder)
+    const projectSelection = document.getElementById('task-project')
+
+    const placeholderOption = dom.createPlaceholderOption()
+    projectSelection.appendChild(placeholderOption)
 
     projectsArray.forEach((project) =>{
         const projectOption = dom.createProjectOption(project)
@@ -311,13 +326,18 @@ function renderProjectSelection(){
     })
 }
 
+function clearProjectSelection(){
+    const projectSelection = document.getElementById("task-project")
+    projectSelection.replaceChildren() 
+}
+
 function selectCurrentProject(){
-    const projectSelection = document.querySelector("#task-project")
+    const projectSelection = document.getElementById("task-project")
     projectSelection.selectedIndex = projectsArray.indexOf(getCurrentProject()) + 1
 }
 
 function selectDefaultDate(){
-    const dateInput = document.querySelector("#task-due-date")
+    const dateInput = document.getElementById("task-due-date")
     Object.assign(dateInput, {
         min: format(new Date(), 'yyyy-MM-dd'),
         max: '2100-12-20',
@@ -325,18 +345,29 @@ function selectDefaultDate(){
 }
 
 function adjustTaskSubmitBtnText(showDialogBtn){
-    const submitBtn = document.querySelector("#task-dialog-submit-btn")
+    const submitBtn = document.getElementById("task-form-submit-btn")
     showDialogBtn.id.includes("add-task-btn")? submitBtn.textContent = "Add" : submitBtn.textContent = "Save"
 }
 
-function formSubmitHandler(e){
-    createTaskObj()
-    renderProjectTasks(getCurrentProject())
+function taskFormSubmitHandler(e){
+    const formSubmitBtn = document.getElementById("task-form-submit-btn")
+    switch(formSubmitBtn.textContent){
+        case "Add":
+            createTaskObj()
+            break;
+            
+        case "Save":
+            updateDisplayedTask(getTargetTask(e.currentTarget))
+            updateTaskObjectValues(getTargetTask(e.currentTarget))
+    }
+    
     e.currentTarget.reset()
+    e.currentTarget.closest("dialog").close()
     resetCharCounters()
+    renderProjectPage(getCurrentProject())
     storage.saveProjectsArray(projectsArray)
 }
-document.querySelector("#tasks-dialog form").addEventListener("submit", formSubmitHandler)
+document.querySelector("#task-dialog form").addEventListener("submit", taskFormSubmitHandler)
 
 function createTaskObj(){
     const taskFormElements = getAllTaskFormElements()
@@ -354,43 +385,6 @@ function createTaskObj(){
     return task
 }
 
-// Editing tasks
-function createCardContainer(task){
-    const taskCardContainer = dom.createTaskCardContainer(task)
-    function taskContainerClickHandler(e){
-        renderTaskForm(e)
-        
-        const tasksDialog = document.querySelector("#tasks-dialog")
-        tasksDialog.showModal()
-
-        const taskFormElements = getAllTaskFormElements()
-        setupFormElementsValues(taskFormElements, task)
-        updateFormSubmitBtnAvailability(taskFormElements.find(input => input.required))
-        taskFormElements.filter(input => input.type === "text").forEach(textInput => updateCharCount(textInput))
-        
-        const saveBtn = document.querySelector("#task-dialog-submit-btn")
-        function saveBtnHandler(e){
-            e.preventDefault()
-
-            updateTaskObjectValues(taskFormElements, task)
-            updateDisplayedTask(task)
-            renderProjectPage(getCurrentProject())
-
-            document.querySelector("#tasks-dialog form").reset()
-            tasksDialog.close()
-            storage.saveProjectsArray(projectsArray)
-        }
-        saveBtn.addEventListener("click", saveBtnHandler, {once:true}) // setting once to avoid duplicate listeners
-
-        document.querySelector(".task-close-btn").addEventListener("click", () =>{
-            saveBtn.removeEventListener("click", saveBtnHandler)
-        }, {once:true})
-    }
-    taskCardContainer.addEventListener("click", taskContainerClickHandler)
-
-    return taskCardContainer
-}
-
 function setupFormElementsValues(taskFormElements, task){
     taskFormElements.forEach(formElement =>{
         if (formElement.id === "task-project"){
@@ -402,7 +396,8 @@ function setupFormElementsValues(taskFormElements, task){
     })
 }
 
-function updateTaskObjectValues(taskFormElements, task){
+function updateTaskObjectValues(task){
+    const taskFormElements = getAllTaskFormElements()
     taskFormElements.forEach(formElement => {
         if (formElement.id === "task-project"){
             moveTaskToSelectedProjects(formElement, task)
@@ -417,7 +412,7 @@ function moveTaskToSelectedProjects(projSelection, task){
     const selectedProject = projectsArray[projSelection.selectedIndex -1]
     if (selectedProject === getCurrentProject()) return
     getCurrentProject().removeTask(task)
-    selectedProject.createTaskObj(task)
+    selectedProject.addTask(task)
     storage.saveProjectsArray(projectsArray)
 }
 
@@ -454,18 +449,25 @@ function renderProjectTasks(project){
         displayPriority(task)
         updateCheckBtn(task, taskCheckBtn)
 
-        if(checkIfTaskIsExpanded(task)) taskExpandBtn.click()
+        if(taskIsExpanded(task)) taskExpandBtn.click()
     })
 }
 
 function taskAlreadyDisplayed(task){
-    return document.querySelector(`*[data-id='${task.id}'`)
+    return document.querySelector(`.task-card[data-id='${task.id}'`)
 }
 
 function createTaskMainContent(task){
     const cardTitle = dom.createCardTitle(task)
     const cardDueDate = dom.createCardDueDate(task)
     return {cardTitle, cardDueDate}
+}
+
+function createCardContainer(task){
+    const taskCardContainer = dom.createTaskCardContainer(task)
+    taskCardContainer.addEventListener("click", openTaskDialog)
+
+    return taskCardContainer
 }
 
 function createCheckBtn(task){
@@ -498,24 +500,25 @@ function checkAllSubtasks(task){
     if (!task.subtasksArray ) return // if it's called from subtask
 
     task.subtasksArray.forEach(subtask => {
-        subtask.preState = subtask.isCompleted
+        subtask.originalState = subtask.isCompleted 
         subtask.isCompleted = true
 
         if(isExpanded(getTaskContainer(task))){
             updateCheckBtn(subtask, getSubtaskLI(subtask).querySelector(".task-check-btn"))
+            // update displayed subtask to be checked
         }
     })
-
 }
 
 function revertSubtasks(task){
-    if (!task.subtasksArray ) return // if it's called from subtask
+    if (!task.subtasksArray ) return
 
     task.subtasksArray.forEach(subtask => {
-        subtask.isCompleted = subtask.preState
+        subtask.isCompleted = subtask.originalState
 
         if(isExpanded(getTaskContainer(task))){
             updateCheckBtn(subtask, getSubtaskLI(subtask).querySelector(".task-check-btn"))
+            // update displayed subtask to it's original state
         }
     })
 }
@@ -527,7 +530,6 @@ function createTaskDelBtn(task){
         getCurrentProject().removeTask(task)
         e.target.closest(".task-card").remove()
         storage.saveProjectsArray(projectsArray)
-
     }
     delBtn.addEventListener("click", delBtnClickHandler )
 
@@ -538,19 +540,23 @@ function createExpandBtn(task){
     const expandBtn = dom.createExpandBtn()
     function expandBtnClickHandler(e){
         e.stopPropagation()
+
         const taskCardContainer = expandBtn.closest(".task-card")
-        expandCard(taskCardContainer)
+        toggleExpand(taskCardContainer)
 
         if (isExpanded(taskCardContainer)){
-            const ul = addInitialSubtasksList(taskCardContainer)
+            const ul = addSubtasksList(taskCardContainer)
+
             if (!subtasksLimitReached(task)){
                 ul.append(createAddSubtaskBtnList(task))
             }
             renderTaskSubtasks(task)
             renderTaskDescription(task)
+
             storage.saveTaskExpanded(task.id, true) 
         }else{
             clearTask(taskCardContainer)
+
             storage.saveTaskExpanded(task.id, false) 
         }
     }
@@ -558,7 +564,7 @@ function createExpandBtn(task){
     return expandBtn
 }
 
-function expandCard(card){
+function toggleExpand(card){
     card.classList.toggle("expanded")
 }
 
@@ -567,20 +573,17 @@ function isExpanded(card){
 }
 
 function clearTask(card){
-    const ul = card.querySelector(".subtasks-list")
-    ul.replaceChildren()
+    card.querySelector(".subtasks-list").remove()
     card.querySelector(".description-container").remove()
 }
 
-function checkIfTaskIsExpanded(task){
+function taskIsExpanded(task){
     return JSON.parse(sessionStorage.getItem(task.id))
 }
 
-
-function addInitialSubtasksList(currentTaskCard){
-    const subtasksList = currentTaskCard.querySelector("ul") || dom.createSubtasksUL()
+function addSubtasksList(currentTaskCard){
+    const subtasksList = dom.createSubtasksUL()
     subtasksList.addEventListener("click", (e)=> e.stopPropagation())
-
     currentTaskCard.appendChild(subtasksList)
 
     return subtasksList
@@ -588,25 +591,22 @@ function addInitialSubtasksList(currentTaskCard){
 
 function displayPriority(task){
     const taskContainer = getTaskContainer(task)
+    const priorityList = ["urgent", 'important', 'less-important', 'not-important']
     switch(Number(task.priority)){
         case 4:
-            taskContainer.style.borderColor = "hsl(0, 100%, 40%)"
-            taskContainer.style.fontWeight = "700"
+            replaceMultipleClasses(taskContainer, "urgent", priorityList)
             break
 
         case 3:
-            taskContainer.style.borderColor = "hsl(19, 100%, 50%)"
-            taskContainer.style.fontWeight = "600"
+            replaceMultipleClasses(taskContainer, "important", priorityList)
             break
 
         case 2:
-            taskContainer.style.borderColor = "hsl(55, 100%, 45%)"
-            taskContainer.style.fontWeight = "500"
+            replaceMultipleClasses(taskContainer, "less-important", priorityList)
             break
 
         case 1:
-            taskContainer.style.borderColor = "hsl(120, 100%,50%)"
-            taskContainer.style.fontWeight = "500"
+            replaceMultipleClasses(taskContainer, "not-important", priorityList)
     }
 }
 

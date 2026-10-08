@@ -3,17 +3,17 @@ import { Task } from "./Task.js"
 export class Subtask{
   #id = crypto.randomUUID()
   #isCompleted = false
-  preState
+  originalState
   title
-  constructor(title, subTaskState=false, preState){
+  constructor(title, subTaskState=false, originalState){
     ({title:this.title, id:this.#id, isCompleted:this.#isCompleted} = new Task(title, undefined, undefined, undefined, subTaskState))
-    this.preState = preState
+    this.originalState = originalState
 
     this.toJSON = function(){
       return{
         title: this.title,
         isCompleted: this.#isCompleted,
-        preState: this.preState
+        originalState: this.originalState
       }
     }
   }
