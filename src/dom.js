@@ -60,8 +60,8 @@ export function createProjectPageNote(){
     return createDOMElement({elemType:"span", className:"note", textContent:"Double click to edit"})
 }
 
-export function createProjectPageLoader(){
-    return createDOMElement({elemType:"button", className:"project-page-loader"})
+export function createProjectListBtn(){
+    return createDOMElement({elemType:"button", className:"project-list-btn"})
 }
 
 export function createTaskAddBtn(){

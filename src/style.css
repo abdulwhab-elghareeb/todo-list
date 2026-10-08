@@ -288,21 +288,21 @@ body{
   pointer-events: none;
 }
 
-.project-page-loader::before{
+.project-list-btn::before{
   content: "#";
   font-size: 1.2rem;
   margin-right: 8px;
   color: var(--light-gray);
 }
 
-#sidebar .project-page-loader{
+#sidebar .project-list-btn{
   width: 100%;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
 .project-title{
@@ -317,7 +317,7 @@ body{
 
 .hover,
 #sidebar button,
-#project-container .project-page-loader,
+#project-container .project-list-btn,
 .add-subtask-btn,
 .subtask-submit,
 .subtask-cancel{
@@ -348,7 +348,7 @@ body{
 }
 
 .hover:hover,
-#project-container .project-page-loader:hover{
+#project-container .project-list-btn:hover{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
 }
 

@@ -1,14 +1,14 @@
 import { projectsContainer } from "./projectsContainer.js"
 import { Project } from "./Project.js"
 import { Task } from "./Task.js"
-
-import { toCamelCase, replaceEventListener } from "./helper.js"
-import { intlFormatDistance, sub } from "date-fns";
-import { format } from "date-fns"
 import { Subtask } from "./Subtask.js"
 
 import * as dom from "./dom.js"
 import * as storage from "./storage.js"
+
+import { toCamelCase, replaceEventListener } from "./helper.js"
+import { intlFormatDistance } from "date-fns";
+import { format } from "date-fns"
 
 
 
@@ -24,8 +24,7 @@ if (!localStorage.getItem("projectsArray")){
     loadProjects()
     sessionStorage.clear()
 }
-showLastClickedProject()
-
+showLastViewedProject()
 
 function loadProjects(){
     storage.getProjectsArray().forEach(project => {
@@ -41,32 +40,27 @@ function loadProjects(){
                 newTask.addSubtask(newSubtask)
             })
         })
-        
-        renderProjects()
-        
     })
+    renderProjectsSidebarList()
 }
 
-function showLastClickedProject(){
+function showLastViewedProject(){
     const currentProjectIdx = localStorage.getItem("currentProjectIdx")
-    getProjectSidebarList(projectsArray[currentProjectIdx]).querySelector(".project-page-loader").click()
+    getProjectSidebarList(projectsArray[currentProjectIdx]).querySelector(".project-list-btn").click()
 }
-
 
 function addDefaultProject(){
     const defaultProject = new Project("Inbox", "")
     projectsContainer.addProjectToArray(defaultProject)
-    renderProjects()    
+    renderProjectsSidebarList()    
     storage.saveProjectsArray(projectsArray)
 }
-
 
 
 // Projects helpers
 function getProjectSidebarList(project){
     return document.querySelector(`li[data-id="${project.id}"]`)
 }
-
 
 
 // Project Inputs
@@ -76,19 +70,14 @@ function addInputEventToTextInputs(){
 
 function inputsEventHandler(e){
     const currentInput = e.currentTarget
-    if (inputIsRequired(currentInput)) updateFormSubmitBtnAvailability(currentInput)
+    if (currentInput.hasAttribute("required")){
+         updateFormSubmitBtnAvailability(currentInput)
+    }
     updateCharCount(currentInput)
 }
 
-function inputIsRequired(input){
-    return input.hasAttribute("required")
-}
-
-
 function updateFormSubmitBtnAvailability(requiredInput){
-    const activeFormDialog = requiredInput.closest("dialog")
-    const formSubmitBtn = activeFormDialog.querySelector("button[type='submit']");
-
+    const formSubmitBtn = requiredInput.closest("dialog").querySelector("button[type='submit']");
     (requiredInput.checkValidity())? formSubmitBtn.removeAttribute("disabled") : formSubmitBtn.setAttribute("disabled","")
 }
 
@@ -98,17 +87,16 @@ function updateCharCount(textInput){
 }
 
 
-
 // Projects dialog/form
 function openDialog(){
     document.getElementById("project-dialog").showModal()
     addInputEventToTextInputs()
 }
-document.querySelector("#sidebar-add-project-btn").addEventListener("click", openDialog)
+document.getElementById("sidebar-add-project-btn").addEventListener("click", openDialog)
 
 function formSubmissionHandler(e){
     createProjectObj()
-    renderProjects()
+    renderProjectsSidebarList()
     disableFormSubmissionBtn()
     resetCharCounters()
     e.currentTarget.reset()
@@ -128,26 +116,6 @@ function createProjectObj(){
     return project
 }
 
-function renderProjects(){
-    projectsArray.forEach(project =>{
-        if (projectAlreadyExists(project)) return
-
-        const projectListItem = dom.createProjectSidebarListItem(project)
-        const projectListTitle = dom.createProjectSidebarListTitle(project)
-        const removeProjectBtn = createProjectRemoveBtn(project)
-        const projectPageLoader = createProjectPageLoader(project)
-        
-        projectPageLoader.append(projectListTitle, removeProjectBtn)
-        projectListItem.append(projectPageLoader)
-        document.getElementById("projects-list").appendChild(projectListItem)
-
-    })
-}
-
-function projectAlreadyExists(project){
-    return document.querySelector(`li[data-id='${project.id}'`)
-}
-
 function disableFormSubmissionBtn(){
     [...document.querySelectorAll("button[id*='submit']")].forEach((btn) => btn.setAttribute("disabled", ""))
 }
@@ -157,21 +125,38 @@ function resetCharCounters(){
 }
 
 function clickNewProject(){
-    getProjectSidebarList(projectsArray.at(-1)).querySelector(".project-page-loader").click()
+    getProjectSidebarList(projectsArray.at(-1)).querySelector(".project-list-btn").click()
 }
 
 
-
 // Sidebar projects list
-function createProjectPageLoader(project){
-    const projectPageLoader = dom.createProjectPageLoader()
-    projectPageLoader.addEventListener("click", (e) => {
-        renderProjectPage(project)
-        focusCurrentProjectLi(e)
-        storage.saveCurrentProject(projectsArray.indexOf(getCurrentProject()))
+function renderProjectsSidebarList(){
+    projectsArray.forEach(project =>{
+        if (projectListAlreadyExists(project)) return
 
+        const projectListItem = dom.createProjectSidebarListItem(project)
+        const projectListTitle = dom.createProjectSidebarListTitle(project)
+        const removeProjectBtn = createProjectRemoveBtn(project)
+        const projectListBtn = createProjectListBtn(project)
+        
+        projectListBtn.append(projectListTitle, removeProjectBtn)
+        projectListItem.append(projectListBtn)
+        document.getElementById("projects-list").appendChild(projectListItem)
+    })
+}
+
+function projectListAlreadyExists(project){
+    return document.querySelector(`li[data-id='${project.id}'`)
+}
+
+function createProjectListBtn(project){
+    const projectListBtn = dom.createProjectListBtn()
+    projectListBtn.addEventListener("click", (e) => {
+        renderProjectPage(project)
+        focusSelectedProjectList(e)
+        storage.saveCurrentProject(projectsArray.indexOf(getCurrentProject()))
     })    
-    return projectPageLoader
+    return projectListBtn
 }
 
 function createProjectRemoveBtn(project){
@@ -189,9 +174,9 @@ function createProjectRemoveBtn(project){
         // if the length of array after project removal = 0 clear the main page otherwise click the prevOrNextProject
         if(projectsArray.length === 0){
             clearProjectPage() 
-        }else{   
-            const prevOrNextProjectPageLoader = document.querySelector(`li[data-id="${prevOrNextProject.id}"] .project-page-loader`) 
-            prevOrNextProjectPageLoader.click()
+        }else{  
+            const prevOrNextProjectListBtn = getProjectSidebarList(prevOrNextProject).querySelector(".project-list-btn") 
+            prevOrNextProjectListBtn.click()
         }
 
         storage.saveProjectsArray(projectsArray)
@@ -202,20 +187,18 @@ function createProjectRemoveBtn(project){
 }
 
 function updateProjectListTitle(project){
-    document.querySelector(`li[data-id="${project.id}"] .project-title`).textContent = project.title
+    getProjectSidebarList(project).querySelector(".project-title").textContent = project.title
 }
 
-function focusCurrentProjectLi(e){
-    const allLiElem = [...document.querySelectorAll("#sidebar li")]
-    allLiElem.forEach(projectLi => projectLi.querySelector(".project-page-loader").classList.remove("selected-project"))
+function focusSelectedProjectList(e){
+    const allProjectLists = [...document.querySelectorAll("#sidebar li")]
+    allProjectLists.forEach(projectLi => projectLi.querySelector(".project-list-btn").classList.remove("selected-project"))
     e.currentTarget.classList.add("selected-project")
 }
-
 
 function updateProjectPageId(project){
     document.getElementById("project-page").dataset.id = project.id
 }
-
 
 
 // Project page
@@ -261,7 +244,7 @@ function renderProjectPageInputs(project){
         project[lastWordOfInputName] = projectPageInput.value.trim() 
         updateProjectListTitle(project)
 
-        projectPageInput.nextElementSibling.textContent = ""
+        projectPageInput.nextElementSibling.textContent = "" // char counter
         storage.saveProjectsArray(projectsArray)
     }
 
@@ -285,9 +268,7 @@ function renderAddTaskBtn(){
     addTaskBtn.addEventListener("click", openTaskDialog)
 
     document.querySelector("#project-page .description-container").after(addTaskBtn)
-
 }
-
 
 
 
@@ -297,16 +278,15 @@ function getCurrentProject(){
     return projectsArray.find((project) => project.id === currentPageId)
 }
 
-
 function renderTaskForm(e){
-    renderProjectSelection()
+    renderProjectsSidebarListelection()
     if(e.currentTarget.id === "project-page-add-task-btn")selectCurrentProject()
     selectDefaultDate()
     adjustTaskSubmitBtnText(e.currentTarget)
     
 }
 
-function renderProjectSelection(){
+function renderProjectsSidebarListelection(){
     const projectSelection = document.querySelector("#task-project")
     projectSelection.replaceChildren() // clear 
 
@@ -816,6 +796,4 @@ function createSubtaskForm(task){
 function renderTaskDescription(task){
     const container = dom.createDescriptionContainer(task)
     getTaskContainer(task).appendChild(container)
-    console.log(container)
-
 }
