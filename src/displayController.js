@@ -76,7 +76,7 @@ function getProjectSidebarList(project){
 
 // Project Inputs
 function addInputEventToTextInputs(){
-    [...document.querySelectorAll("input[type='text']")].forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
+    [...document.querySelectorAll("input")].filter(input => input.type === "text").forEach((input) => replaceEventListener(input, "input", inputsEventHandler))
 }
 
 function inputsEventHandler(e){
