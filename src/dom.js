@@ -1,3 +1,5 @@
+// This module is for creating all the dom stuff
+
 import { createDOMElement, capitalize } from "./helper.js"
 import delIcon  from "./assets/close.svg"
 import circleIcon from "./assets/circle-outline.svg"

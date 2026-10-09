@@ -1,3 +1,5 @@
+// This module is the core, it displays the logic of the app
+
 import { projectsContainer } from "./projectsContainer.js"
 import { Project } from "./Project.js"
 import { Task } from "./Task.js"

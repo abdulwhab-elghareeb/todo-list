@@ -1,3 +1,5 @@
+// This module manages all the js pure styling stuff that is not related to the app's core logic
+
 import darkMode from "./assets/dark-mode.svg"
 import lightMode from "./assets/light-mode.svg"
 import * as storage from "./storage.js"
