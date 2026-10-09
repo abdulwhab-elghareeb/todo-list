@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos</title>
     <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
     <style>
         body.preload *{
@@ -59,12 +60,12 @@
     <dialog id="project-dialog">
         <form action="" method="dialog">
             <div class="form-element title-contaienr">
-                <input type="text" name="project-title" id="project-title" placeholder="Title" minlength="2" maxlength="50" pattern="^\S{1,}.*" required>
+                <input type="text" name="project-title" id="project-title" placeholder="Title" minlength="2" maxlength="60" pattern="^\S{1,}.*" required>
                 <span class="char-counter"></span>
             </div>
 
             <div class="form-element description-container">
-                <input type="text" name="project-description" id="project-description" placeholder="Description" autocorrect="on" maxlength="80"></input>
+                <input type="text" name="project-description" id="project-description" placeholder="Description" autocorrect="on" maxlength="120"></input>
                 <span class="char-counter"></span>
             </div>
             
@@ -79,7 +80,7 @@
         <form action="" method="dialog">
             <div class="form-element">
                 <label for="task-title">Task Title</label>
-                <input type="text" name="task-title" id="task-title" placeholder="Title" minlength="2" maxlength="50" pattern="^\S{1,}.*" required>
+                <input type="text" name="task-title" id="task-title" placeholder="Title" minlength="2" maxlength="60" pattern="^\S{1,}.*" required>
                 <span class="char-counter"></span>
             </div>
 

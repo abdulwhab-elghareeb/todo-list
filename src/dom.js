@@ -1,8 +1,8 @@
-import { createDOMElement } from "./helper.js"
+import { createDOMElement, capitalize } from "./helper.js"
 import delIcon  from "./assets/close.svg"
 import circleIcon from "./assets/circle-outline.svg"
 import expandIcon from "./assets/chevron-down.svg"
-import { intlFormatDistance } from "date-fns";
+import { intlFormatDistance, format } from "date-fns";
 
 export function createProjectSidebarListItem(project){
     return createDOMElement({elemType:"li", dataId:project.id})
@@ -29,7 +29,7 @@ export function createProjectPageTitleInput(project){
         id: "project-page-title",
         placeholder: "Title",
         minLength: "2",
-        maxLength: "50",
+        maxLength: "60",
         pattern: "^\S{1,}.*",
         readOnly: true,
     })
@@ -68,7 +68,6 @@ export function createTaskAddBtn(){
     return createDOMElement({elemType:"button", id:"project-page-add-task-btn", textContent:"+"})
 }
 
-
 export function createPlaceholderOption(){
     const placeholder = document.createElement('option')
     Object.assign(placeholder, {
@@ -85,6 +84,14 @@ export function createPlaceholderOption(){
 export function createProjectOption(project){
     return createDOMElement({elemType:"option", textContent:project.title, dataId:project.id})
 }
+
+export function setMinMaxDate(){
+    const dateInput = document.getElementById("task-due-date")
+    Object.assign(dateInput, {
+        min: format(new Date(), 'yyyy-MM-dd'),
+        max: '2100-12-20',
+    })
+} 
 
 export function createTaskCardContainer(task){
     return createDOMElement({elemType:"div", className:"task-card", dataId:task.id})
@@ -103,7 +110,8 @@ export function createCardTitle(task){
 }
 
 export function createCardDueDate(task){
-    const dueDate = (task.dueDate)? intlFormatDistance(task.dueDate, new Date()) : "Anytime"
+    // get the distance between the task dueDate and the current date ana make the first letter of the output upper case
+    const dueDate = (task.dueDate)? capitalize(intlFormatDistance(task.dueDate, format(new Date(), 'yyyy-MM-dd'))) : "Anytime"
     return createDOMElement({elemType:"div", className:"task-due-date", textContent:dueDate})
 }
 
@@ -135,7 +143,6 @@ export function createAddBtnList(){
 
     return subtasksListItem
 }
-
 
 export function createSubtaskLI(){
     return createDOMElement({elemType:"li", className:"subtask-list-item"})

@@ -1,11 +1,11 @@
 import { Task } from "./Task.js"
 
 export class Subtask{
-  #id = crypto.randomUUID()
-  #isCompleted = false
-  originalState
+  #id
+  #isCompleted
+  originalState 
   title
-  constructor(title, subTaskState=false, originalState){
+  constructor(title, subTaskState, originalState=false){
     ({title:this.title, id:this.#id, isCompleted:this.#isCompleted} = new Task(title, undefined, undefined, undefined, subTaskState))
     this.originalState = originalState
 
@@ -13,7 +13,7 @@ export class Subtask{
       return{
         title: this.title,
         isCompleted: this.#isCompleted,
-        originalState: this.originalState
+        originalState: this.originalState,
       }
     }
   }

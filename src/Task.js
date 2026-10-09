@@ -2,9 +2,9 @@ import { Project } from "./Project.js"
 
 export class Task{
     #subtasksArray = []
-    #id = crypto.randomUUID()
-    #isCompleted = false
     #maxArrayLength = 5
+    #id
+    #isCompleted
     title
     description
     dueDate
@@ -23,9 +23,7 @@ export class Task{
                 priority: this.priority,
                 subtasksArray: this.#subtasksArray,
                 isCompleted: this.#isCompleted
-
             }
-
         }
     }
 

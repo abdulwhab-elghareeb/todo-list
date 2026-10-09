@@ -1,6 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic);
 
-
 /*
   Josh's Custom CSS Reset
   https://www.joshwcomeau.com/css/custom-css-reset/
@@ -69,11 +68,12 @@ h1, h2, h3, h4, h5, h6 {
 :root.light{
   --sidebar-background: hsl(48, 48%, 94%);
   --main-background: hsl(43 89 96);
-  --text-color: hsl(0, 0%, 20%);
+  --text-color: hsl(0, 0%, 18%);
   --shadow-color: 40deg 29% 60%;
-  --light-gray: hsl(0 0 50);
+  --light-gray: hsl(0 0 48);
   --submit-btns: hsl(150, 62%, 72%);
-  --scrollbar : hsl(from var(--sidebar-background) h s calc(l - 20))
+  --scrollbar : hsl(from var(--sidebar-background) h s calc(l - 20));
+  --sidebar-task-btn : hsl(0 50 70);
 }
 
 :root.dark{
@@ -83,7 +83,8 @@ h1, h2, h3, h4, h5, h6 {
   --shadow-color: 0deg 0% 5%;
   --light-gray: hsl(0 0 65);
   --submit-btns: hsl(150, 62%, 37%);
-  --scrollbar : hsl(from var(--sidebar-background) h s calc(l + 20))
+  --scrollbar : hsl(from var(--sidebar-background) h s calc(l + 20));
+  --sidebar-task-btn : hsl(0 50 20);
 }
 
 button,
@@ -183,6 +184,8 @@ body{
 
   font-weight: 500;
   background-color: var(--sidebar-background);
+  
+  transition: background-color 0.4s;
 }
 
 /* Sidebar add task */
@@ -206,6 +209,15 @@ body{
 
   background-color: var(--submit-btns);
   color: hsl(120, 100%, 22%);
+}
+
+#sidebar-add-task-btn:disabled{
+  opacity: 0.8;
+  cursor: not-allowed;
+
+  &:hover{
+    background-color: hsl(from var(--sidebar-task-btn) h s calc(l + 10));
+  }
 }
 
 /* Projects UL */
@@ -261,7 +273,8 @@ body{
   background-color: hsl(from var(--sidebar-background) h s calc(l - 10));  
 }
 
-.project-title{
+.project-title,
+.task-displayed-title{
   word-break: break-all; /* If the user inputs a long word */
 
   /* Limiting text lines */
@@ -854,7 +867,7 @@ ul.subtasks-list{
   position: absolute;
   bottom: 0;
 
-  height: 40px;
+  height: 50px;
   width: 100%;
   
   padding: 8px;

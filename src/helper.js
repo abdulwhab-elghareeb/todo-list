@@ -3,9 +3,13 @@ export function toCamelCase(kebabCaseStr, wordStartIdx){
     return kebabCaseStr.split("-").at(wordStartIdx) + kebabCaseStr.split("-").slice(wordStartIdx + 1).map((word) => word.at(0).toUpperCase() + word.slice(1).toLowerCase()).join("")
 }
 
+export function capitalize(str){
+    return `${str.at(0).toUpperCase()}${str.slice(1).toLowerCase()}`
+}
+
 export function replaceEventListener(elem, eventType, callBackFunc){
-    elem.removeEventListener(String(eventType), callBackFunc)
-    elem.addEventListener(String(eventType), callBackFunc)
+    elem.removeEventListener(eventType, callBackFunc)
+    elem.addEventListener(eventType, callBackFunc)
 }
 
 export function createDOMElement(obj){
@@ -19,6 +23,7 @@ export function createDOMElement(obj){
     if (obj.height || obj.width) createdElement.height = createdElement.width = obj.height
     if (obj.value) createdElement.value = obj.value
     if (obj.type) createdElement.type = obj.type
+
     return createdElement
 }
 
