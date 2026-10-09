@@ -492,8 +492,6 @@ function updateCheckBtn(task, checkBtn){
 
 function checkAllSubtasks(task){
     task.subtasksArray.forEach(subtask => {
-        console.log(subtask)
-        console.log(subtask.originalState)
         subtask.originalState = subtask.isCompleted 
         subtask.isCompleted = true
 
@@ -506,8 +504,6 @@ function checkAllSubtasks(task){
 
 function revertSubtasks(task){
     task.subtasksArray.forEach(subtask => {
-        console.log(subtask)
-        console.log(subtask.originalState)
         subtask.isCompleted = subtask.originalState
 
         if(isExpanded(getTaskContainer(task))){
